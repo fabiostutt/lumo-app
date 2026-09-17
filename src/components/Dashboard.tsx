@@ -309,8 +309,8 @@ export default function Dashboard({
   onMeetingOptions,
 }: DashboardProps) {
   return (
-    <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] bg-[var(--surface-base,white)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
-      <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)]">
+    <div className="flex w-full flex-col bg-[var(--surface-base,white)]">
+      <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
         <HeadProfile userName={userName} sessionsToday={sessionsToday} />
 
         <div className="flex w-full items-start justify-between">
@@ -328,7 +328,7 @@ export default function Dashboard({
         <div className="h-px w-full bg-[var(--border-subtlest,#eee)]" />
       </div>
 
-      <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
+      <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] px-[var(--spacing-md,16px)] py-[var(--numbers-padding-xxxs,2px)]">
         <WeekCalendar
           month={month}
           weekDays={weekDays}
