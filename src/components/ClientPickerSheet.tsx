@@ -1,0 +1,131 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { Search, User, X } from "lucide-react";
+
+type ClientOption = { id: string; name: string; whatsapp: string | null };
+
+type ClientPickerSheetProps = {
+  open: boolean;
+  clients: ClientOption[];
+  initialSelectedId?: string;
+  onClose: () => void;
+  onConfirm: (clientId: string) => void;
+};
+
+export default function ClientPickerSheet({
+  open,
+  clients,
+  initialSelectedId,
+  onClose,
+  onConfirm,
+}: ClientPickerSheetProps) {
+  const [query, setQuery] = useState("");
+  const [selectedId, setSelectedId] = useState(initialSelectedId ?? "");
+
+  useEffect(() => {
+    if (open) setSelectedId(initialSelectedId ?? "");
+  }, [open, initialSelectedId]);
+
+  const filtered = useMemo(
+    () => clients.filter((c) => c.name.toLowerCase().includes(query.trim().toLowerCase())),
+    [clients, query]
+  );
+
+  return (
+    <div
+      className={`fixed inset-0 z-50 flex items-end justify-center transition-opacity duration-200 ${
+        open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
+      }`}
+    >
+      <div
+        className="absolute inset-0 bg-[#212121]/80 backdrop-blur-[4px]"
+        onClick={onClose}
+        aria-hidden="true"
+      />
+
+      <div
+        className={`relative mx-4 mb-10 flex max-h-[80vh] w-full max-w-[398px] flex-col overflow-hidden rounded-[var(--border-radius-xxl,24px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
+          open ? "translate-y-0" : "translate-y-[120%]"
+        }`}
+      >
+        <div className="flex flex-1 flex-col gap-[var(--sheet-gap,16px)] overflow-y-auto p-[var(--sheet-padding,12px)]">
+          <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
+            <p className="flex-1 text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
+              Selecionar participante
+            </p>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex size-[24px] items-center justify-center text-[color:var(--content-base,#212121)]"
+              aria-label="Fechar"
+            >
+              <X size={24} strokeWidth={1.75} />
+            </button>
+          </div>
+
+          <div className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]">
+            <Search size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+            <input
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="Buscar cliente"
+              className="flex-1 bg-transparent text-[16px] leading-[28px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] outline-none placeholder:text-[color:var(--input-default-content-placeholder,#757575)]"
+            />
+          </div>
+
+          <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
+            <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-strongest,#757575)]">
+              {filtered.length} {filtered.length === 1 ? "cliente cadastrado" : "clientes cadastrados"}
+            </p>
+
+            {filtered.map((client) => {
+              const isSelected = client.id === selectedId;
+              return (
+                <button
+                  key={client.id}
+                  type="button"
+                  onClick={() => setSelectedId(client.id)}
+                  className={`flex h-[72px] w-full items-center gap-[var(--spacing-md,16px)] rounded-[20px] border-solid p-[var(--spacing-md,16px)] text-left ${
+                    isSelected
+                      ? "border-[1.5px] border-[var(--content-base,#212121)] bg-[var(--surface-subtle,#fafafa)]"
+                      : "border-[length:var(--border-width-xxxs,0.5px)] border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)]"
+                  }`}
+                >
+                  <User size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+                  <div className="flex flex-1 flex-col items-start overflow-hidden">
+                    <p className="w-full truncate text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
+                      {client.name}
+                    </p>
+                    <p className="w-full truncate text-[14px] leading-[24px] text-[color:var(--content-strongest,#757575)]">
+                      {client.whatsapp || "Sem WhatsApp cadastrado"}
+                    </p>
+                  </div>
+                </button>
+              );
+            })}
+
+            {filtered.length === 0 && (
+              <p className="w-full py-8 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
+                Nenhum cliente encontrado.
+              </p>
+            )}
+          </div>
+
+          <button
+            type="button"
+            disabled={!selectedId}
+            onClick={() => selectedId && onConfirm(selectedId)}
+            className={`flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] px-[var(--numbers-padding-md,16px)] text-[18px] font-semibold leading-[24px] ${
+              selectedId
+                ? "bg-[var(--button-primary-surface-enabled,#212121)] text-[color:var(--button-primary-content-enabled,#fafafa)]"
+                : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
+            }`}
+          >
+            Confirmar participante
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}

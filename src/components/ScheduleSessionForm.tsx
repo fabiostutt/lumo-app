@@ -1,9 +1,9 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Link from "next/link";
 import { User, ChevronRight, Calendar, Clock as ClockIcon, MessageCircle } from "lucide-react";
 import { createSessionAction } from "@/lib/actions/create-session";
+import ClientPickerSheet from "@/components/ClientPickerSheet";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
@@ -15,6 +15,7 @@ export default function ScheduleSessionForm({
   initialClientId?: string;
 }) {
   const [clientId, setClientId] = useState(initialClientId ?? "");
+  const [pickerOpen, setPickerOpen] = useState(false);
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [platform, setPlatform] = useState<"whatsapp" | "google">("whatsapp");
@@ -46,13 +47,14 @@ export default function ScheduleSessionForm({
         <p className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
           Adicionar participante
         </p>
-        <Link
-          href="/clients?returnTo=/sessions/new"
+        <button
+          type="button"
+          onClick={() => setPickerOpen(true)}
           className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]"
         >
           <User size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
           <span
-            className={`flex-1 text-[16px] leading-[28px] tracking-[-0.2px] ${
+            className={`flex-1 text-left text-[16px] leading-[28px] tracking-[-0.2px] ${
               selectedClient
                 ? "text-[color:var(--content-base,#212121)]"
                 : "text-[color:var(--input-default-content-placeholder,#757575)]"
@@ -61,7 +63,7 @@ export default function ScheduleSessionForm({
             {selectedClient ? selectedClient.name : "Selecionar"}
           </span>
           <ChevronRight size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-        </Link>
+        </button>
       </div>
 
       <div className="flex w-full gap-[var(--stacks-gap-horizontal,16px)]">
@@ -197,6 +199,17 @@ export default function ScheduleSessionForm({
       >
         Salvar sessão
       </button>
+
+      <ClientPickerSheet
+        open={pickerOpen}
+        clients={clients}
+        initialSelectedId={clientId}
+        onClose={() => setPickerOpen(false)}
+        onConfirm={(id) => {
+          setClientId(id);
+          setPickerOpen(false);
+        }}
+      />
     </form>
   );
 }
