@@ -32,7 +32,7 @@ export async function getDashboardData() {
     time: (s.time as string).slice(0, 5), // "14:00:00" -> "14:00"
     clientName: (s.clients as unknown as { name: string })?.name ?? "Cliente",
     notificationsOn: s.notifications_enabled ?? false,
-    confirmed: s.status === "confirmed",
+    confirmed: s.status === "confirmada",
   }));
 
   const [nextMeeting, ...rest] = meetings;
