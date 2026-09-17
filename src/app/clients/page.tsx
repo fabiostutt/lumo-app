@@ -1,32 +1,32 @@
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
-import ScheduleSessionForm from "@/components/ScheduleSessionForm";
 import { getClientsForOwner } from "@/lib/clients";
+import ClientsListScreen from "@/components/ClientsListScreen";
 
-export default async function NewSessionPage({
+export default async function ClientsPage({
   searchParams,
 }: {
-  searchParams: Promise<{ clientId?: string }>;
+  searchParams: Promise<{ returnTo?: string }>;
 }) {
-  const { clientId } = await searchParams;
+  const { returnTo } = await searchParams;
   const clients = await getClientsForOwner();
 
   return (
     <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding,16px)] pt-[var(--spacing-xl,24px)]">
       <div className="flex items-center gap-[var(--spacing-xs,8px)]">
         <Link
-          href="/dashboard"
+          href={returnTo || "/dashboard"}
           className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]"
           aria-label="Voltar"
         >
           <ArrowLeft size={24} strokeWidth={1.75} />
         </Link>
         <h1 className="text-[20px] font-semibold leading-[28px] tracking-[-0.2px] text-[color:var(--content-base,#212121)]">
-          Agendar sessão
+          Clientes
         </h1>
       </div>
 
-      <ScheduleSessionForm clients={clients} initialClientId={clientId} />
+      <ClientsListScreen clients={clients} returnTo={returnTo} />
     </div>
   );
 }

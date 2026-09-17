@@ -1,13 +1,20 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import Link from "next/link";
 import { User, ChevronRight, Calendar, Clock as ClockIcon, MessageCircle } from "lucide-react";
 import { createSessionAction } from "@/lib/actions/create-session";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
-export default function ScheduleSessionForm({ clients }: { clients: ClientOption[] }) {
-  const [clientId, setClientId] = useState("");
+export default function ScheduleSessionForm({
+  clients,
+  initialClientId,
+}: {
+  clients: ClientOption[];
+  initialClientId?: string;
+}) {
+  const [clientId, setClientId] = useState(initialClientId ?? "");
   const [date, setDate] = useState("");
   const [time, setTime] = useState("");
   const [platform, setPlatform] = useState<"whatsapp" | "google">("whatsapp");
@@ -36,33 +43,25 @@ export default function ScheduleSessionForm({ clients }: { clients: ClientOption
       <input type="hidden" name="notificationsEnabled" value={String(notificationsOn)} />
 
       <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
-        <label htmlFor="clientSelect" className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
+        <p className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
           Adicionar participante
-        </label>
-        <div className="relative flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]">
+        </p>
+        <Link
+          href="/clients?returnTo=/sessions/new"
+          className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]"
+        >
           <User size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-          <select
-            id="clientSelect"
-            value={clientId}
-            onChange={(e) => setClientId(e.target.value)}
-            className="flex-1 appearance-none bg-transparent text-[16px] leading-[28px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] outline-none"
+          <span
+            className={`flex-1 text-[16px] leading-[28px] tracking-[-0.2px] ${
+              selectedClient
+                ? "text-[color:var(--content-base,#212121)]"
+                : "text-[color:var(--input-default-content-placeholder,#757575)]"
+            }`}
           >
-            <option value="" disabled>
-              Selecionar
-            </option>
-            {clients.map((c) => (
-              <option key={c.id} value={c.id}>
-                {c.name}
-              </option>
-            ))}
-          </select>
-          <ChevronRight size={24} strokeWidth={1.75} className="pointer-events-none shrink-0 text-[color:var(--content-strongest,#757575)]" />
-        </div>
-        {clients.length === 0 && (
-          <p className="text-[14px] text-[color:var(--content-strongest,#757575)]">
-            Você ainda não tem clientes cadastrados.
-          </p>
-        )}
+            {selectedClient ? selectedClient.name : "Selecionar"}
+          </span>
+          <ChevronRight size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+        </Link>
       </div>
 
       <div className="flex w-full gap-[var(--stacks-gap-horizontal,16px)]">
