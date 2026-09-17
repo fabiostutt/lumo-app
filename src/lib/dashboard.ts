@@ -1,10 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 
-const WEEKDAY_LABELS = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
 const MONTH_LABELS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
+const WEEKDAY_LABELS = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
 
 export async function getDashboardData() {
   const supabase = await createClient();
@@ -15,34 +15,28 @@ export async function getDashboardData() {
 
   if (!user) throw new Error("Usuário não autenticado");
 
-  const today = new Date();
-  const startOfDay = new Date(today.setHours(0, 0, 0, 0)).toISOString();
-  const endOfDay = new Date(today.setHours(23, 59, 59, 999)).toISOString();
+  const now = new Date();
+  const todayStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
 
   const { data: sessions, error } = await supabase
     .from("sessions")
-    .select("id, starts_at, notifications_on, confirmed, clients(name)")
+    .select("id, time, notifications_enabled, status, clients(name)")
     .eq("owner_id", user.id)
-    .gte("starts_at", startOfDay)
-    .lte("starts_at", endOfDay)
-    .order("starts_at", { ascending: true });
+    .eq("date", todayStr)
+    .order("time", { ascending: true });
 
   if (error) throw error;
 
   const meetings = (sessions ?? []).map((s) => ({
     id: s.id,
-    time: new Date(s.starts_at).toLocaleTimeString("pt-BR", {
-      hour: "2-digit",
-      minute: "2-digit",
-    }),
+    time: (s.time as string).slice(0, 5), // "14:00:00" -> "14:00"
     clientName: (s.clients as unknown as { name: string })?.name ?? "Cliente",
-    notificationsOn: s.notifications_on,
-    confirmed: s.confirmed,
+    notificationsOn: s.notifications_enabled ?? false,
+    confirmed: s.status === "confirmed",
   }));
 
   const [nextMeeting, ...rest] = meetings;
 
-  const now = new Date();
   const dayOfWeek = now.getDay();
   const monday = new Date(now);
   monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
