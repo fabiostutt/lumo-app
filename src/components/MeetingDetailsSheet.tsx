@@ -70,7 +70,7 @@ export default function MeetingDetailsSheet({
       }`}
     >
       <div
-        className="absolute inset-0 bg-[#212121]/60 backdrop-blur-[4px]"
+        className="absolute inset-0 bg-[#212121]/80 backdrop-blur-[4px]"
         onClick={onClose}
         aria-hidden="true"
       />
@@ -135,13 +135,19 @@ export default function MeetingDetailsSheet({
                   role="switch"
                   aria-checked={meeting.notificationsOn}
                   onClick={() => onToggleNotifications?.(meeting.id, !meeting.notificationsOn)}
-                  className={`flex h-[28px] w-[48px] shrink-0 items-center rounded-full border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-base,#757575)] p-[2px] transition-colors ${
+                  className={`flex shrink-0 flex-col items-center rounded-[var(--border-radius-10,10px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-base,#757575)] px-[var(--spacing-xxxs,2px)] transition-all ${
                     meeting.notificationsOn
-                      ? "justify-end bg-[var(--surface-strongest,#212121)]"
-                      : "justify-start bg-[#e5e5e5]"
+                      ? "bg-[var(--surface-strongest,#212121)] pt-[var(--spacing-xxxs,2px)] pb-[var(--spacing-md,16px)]"
+                      : "bg-[var(--surface-base,white)] pt-[var(--spacing-md,16px)] pb-[var(--spacing-xxxs,2px)]"
                   }`}
                 >
-                  <span className="size-[22px] rounded-full bg-white" />
+                  <span
+                    className={`size-[24px] rounded-[var(--border-radius-8,8px)] ${
+                      meeting.notificationsOn
+                        ? "bg-[var(--content-subtle,white)]"
+                        : "bg-[var(--content-base,#212121)]"
+                    }`}
+                  />
                 </button>
               </div>
             </div>
