@@ -69,11 +69,15 @@ export default function MeetingDetailsSheet({
         open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
       }`}
     >
-      <div className="absolute inset-0 bg-black/50" onClick={onClose} aria-hidden="true" />
+      <div
+        className="absolute inset-0 bg-[#212121]/60 backdrop-blur-[4px]"
+        onClick={onClose}
+        aria-hidden="true"
+      />
 
       <div
-        className={`relative w-full max-w-[430px] rounded-t-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
-          open ? "translate-y-0" : "translate-y-full"
+        className={`relative mx-4 mb-10 w-full max-w-[398px] rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
+          open ? "translate-y-0" : "translate-y-[120%]"
         }`}
       >
         {meeting && (
