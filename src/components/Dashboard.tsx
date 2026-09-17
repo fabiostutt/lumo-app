@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import {
   ChevronLeft,
   ChevronRight,
@@ -314,6 +315,7 @@ export default function Dashboard({
   onToggleNotifications,
   onMarkCompleted,
 }: DashboardProps) {
+  const router = useRouter();
   const [sheetMeeting, setSheetMeeting] = useState<Meeting | null>(null);
 
   function handleToggleNotifications(id: string, value: boolean) {
@@ -329,7 +331,7 @@ export default function Dashboard({
 
           <div className="flex w-full items-start justify-between">
             <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule} />
-            <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient} />
+            <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient ?? (() => router.push("/clients/new"))} />
             <QuickActionButton icon={<User size={24} strokeWidth={1.75} />} label="Clientes" onClick={onClients} />
             <QuickActionButton
               icon={<Bell size={24} strokeWidth={1.75} />}
