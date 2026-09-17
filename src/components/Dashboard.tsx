@@ -330,7 +330,7 @@ export default function Dashboard({
           <HeadProfile userName={userName} sessionsToday={sessionsToday} onSettings={onNotifications ? undefined : undefined} />
 
           <div className="flex w-full items-start justify-between">
-            <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule} />
+            <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />
             <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient ?? (() => router.push("/clients/new"))} />
             <QuickActionButton icon={<User size={24} strokeWidth={1.75} />} label="Clientes" onClick={onClients} />
             <QuickActionButton
