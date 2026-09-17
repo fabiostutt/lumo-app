@@ -1,0 +1,14 @@
+{
+  "_comment": "Paste your exported Semantic collection JSON here (spacing, border radius, border width, Numbers group: Size/Padding/Gap).",
+  "spacing": {},
+  "borderRadius": {},
+  "borderWidth": {},
+  "numbers": {
+    "size": {},
+    "padding": {},
+    "gap": {}
+  },
+  "typography": {
+    "_comment": "H1-H5, Body Large/Medium/Small, Paragraph Large/Small, Button Large/Small, Small"
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "_comment": "Paste your exported Global collection JSON from Figma here (Font family/weight/size/line-height/letter-spacing, raw color primitives, etc).",
+  "color": {},
+  "font": {
+    "family": {},
+    "weight": {},
+    "size": {},
+    "lineHeight": {},
+    "letterSpacing": {}
+  }
+}

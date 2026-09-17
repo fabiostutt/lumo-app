@@ -1,0 +1,7 @@
+{
+  "_comment": "Paste your exported Components collection JSON here (e.g. Spacing/Section Gap, Spacing/Canvas Gap, and any component-specific tokens).",
+  "spacing": {
+    "sectionGap": null,
+    "canvasGap": null
+  }
+}
