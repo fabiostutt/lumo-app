@@ -21,7 +21,14 @@ export default function ButtonsPage() {
                   <Button key={size} label={size} variant={variant} size={size} tone={tone} />
                 ))}
                 {sizes.map((size) => (
-                  <Button key={size + "-disabled"} label={size} variant={variant} size={size} tone={tone} disabled />
+                  <Button
+                    key={size + "-disabled"}
+                    label={size}
+                    variant={variant}
+                    size={size}
+                    tone={tone}
+                    disabled
+                  />
                 ))}
               </div>
             </div>

@@ -1,155 +1,61 @@
 @import "tailwindcss";
 
-/* ============================================================
-   LUMO DESIGN TOKENS — gerado a partir do Figma (Global + Semantic)
-   ============================================================ */
-
+/*
+  TOKEN LAYER — replace the placeholder values below with the real values
+  from your Figma export (Global + Semantic + Components collections,
+  Lumo theme mode only). Keep the same variable names so nothing else
+  in the app needs to change once real values are pasted in.
+*/
 :root {
-  /* --- Cores: Escala Black (1-10) --- */
-  --color-black-1:  #FAFAFA;
-  --color-black-2:  #F5F5F5;
-  --color-black-3:  #EEEEEE;
-  --color-black-4:  #E0E0E0;
-  --color-black-5:  #BDBDBD;
-  --color-black-6:  #9E9E9E;
-  --color-black-7:  #757575;
-  --color-black-8:  #616161;
-  --color-black-9:  #424242;
-  --color-black-10: #212121;
+  /* --- Global: Root/grayscale color scale (1-10 convention) --- */
+  --color-root-1: #ffffff;
+  --color-root-2: #f5f5f5;
+  --color-root-3: #e5e5e5;
+  --color-root-4: #d4d4d4;
+  --color-root-5: #a3a3a3;
+  --color-root-6: #737373;
+  --color-root-7: #525252;
+  --color-root-8: #404040;
+  --color-root-9: #262626;
+  --color-root-10: #171717;
 
-  /* --- Cores: Blue (1-10) --- */
-  --color-blue-1:  #ECF3FE;
-  --color-blue-2:  #D1E2FB;
-  --color-blue-3:  #ACCBF9;
-  --color-blue-4:  #85B2F6;
-  --color-blue-5:  #619BF3;
-  --color-blue-6:  #3E85F0;
-  --color-blue-7:  #3571CC;
-  --color-blue-8:  #2C5EAA;
-  --color-blue-9:  #234C89;
-  --color-blue-10: #1C3C6C;
+  /* --- Semantic: Action colors (Lumo = grayscale, Primary/Secondary identical) --- */
+  --color-action-primary: var(--color-root-9);
+  --color-action-secondary: var(--color-root-9);
 
-  /* --- Fontes --- */
-  --font-primary:   "TT Hoves Pro Trial", sans-serif;
---font-secondary: var(--font-inter), sans-serif;
-  /* --- Font Weights --- */
-  --font-weight-regular:  400;
-  --font-weight-medium:   500;
-  --font-weight-semibold: 600;
-  --font-weight-bold:     700;
+  /* --- Semantic: Numbers (Size / Padding / Gap) --- */
+  --space-xs: 4px;
+  --space-sm: 8px;
+  --space-md: 16px;
+  --space-lg: 24px;
+  --space-xl: 32px;
 
-  /* --- Font Sizes --- */
-  --font-size-xxxs: 12px;
-  --font-size-xxs:  14px;
-  --font-size-xs:   16px;
-  --font-size-sm:   18px;
-  --font-size-md:   20px;
-  --font-size-lg:   24px;
-  --font-size-xl:   28px;
+  /* --- Global: Font families --- */
+  --font-primary: "TT Hoves Pro Trial", sans-serif;
+  --font-secondary: "Inter", sans-serif;
 
-  /* --- Line Heights --- */
-  --line-height-xxxs: 16px;
-  --line-height-xxs:  20px;
-  --line-height-xs:   24px;
-  --line-height-sm:   28px;
-  --line-height-md:   32px;
-  --line-height-lg:   36px;
-  --line-height-xl:   40px;
-
-  /* --- Border Radius (Semantic) --- */
-  --radius-xxxs: 2px;
-  --radius-xxs:  4px;
-  --radius-xs:   8px;
-  --radius-sm:   10px;
-  --radius-md:   12px;
-  --radius-lg:   16px;
-  --radius-xl:   20px;
-  --radius-xxl:  24px;
-  --radius-xxxl: 32px;
-
-  /* --- Border Width (Semantic) --- */
-  --border-xxxs: 0.5px;
-  --border-xxs:  1px;
-  --border-xs:   2px;
-  --border-sm:   4px;
-
-  /* --- Opacidade --- */
-  --opacity-xs: 0.2;
-  --opacity-sm: 0.4;
-  --opacity-md: 0.6;
-  --opacity-lg: 0.8;
-
-  /* --- Alias: Background e Foreground (tema Lumo = claro) --- */
-  --background: var(--color-black-1);
-  --foreground: var(--color-black-10);
+  --background: var(--color-root-1);
+  --foreground: var(--color-root-10);
 }
 
-/* ============================================================
-   TAILWIND v4 — @theme inline
-   ============================================================ */
 @theme inline {
-  /* Cores */
-  --color-background:  var(--background);
-  --color-foreground:  var(--foreground);
-  --color-black-1:     var(--color-black-1);
-  --color-black-2:     var(--color-black-2);
-  --color-black-3:     var(--color-black-3);
-  --color-black-4:     var(--color-black-4);
-  --color-black-5:     var(--color-black-5);
-  --color-black-6:     var(--color-black-6);
-  --color-black-7:     var(--color-black-7);
-  --color-black-8:     var(--color-black-8);
-  --color-black-9:     var(--color-black-9);
-  --color-black-10:    var(--color-black-10);
-  --color-blue-1:      var(--color-blue-1);
-  --color-blue-6:      var(--color-blue-6);
-  --color-blue-10:     var(--color-blue-10);
-
-  /* Fontes */
-  --font-sans:    var(--font-secondary);
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-root-1: var(--color-root-1);
+  --color-root-10: var(--color-root-10);
+  --color-action-primary: var(--color-action-primary);
+  --color-action-secondary: var(--color-action-secondary);
+  --font-sans: var(--font-secondary);
   --font-heading: var(--font-primary);
-
-  /* Border Radius */
-  --radius-xs:   var(--radius-xs);
-  --radius-sm:   var(--radius-sm);
-  --radius-md:   var(--radius-md);
-  --radius-lg:   var(--radius-lg);
-  --radius-xl:   var(--radius-xl);
-  --radius-xxl:  var(--radius-xxl);
-  --radius-xxxl: var(--radius-xxxl);
+  --spacing-xs: var(--space-xs);
+  --spacing-sm: var(--space-sm);
+  --spacing-md: var(--space-md);
+  --spacing-lg: var(--space-lg);
+  --spacing-xl: var(--space-xl);
 }
 
-/* ============================================================
-   TIPOGRAFIA — estilos base (Semantic › Typography)
-   ============================================================ */
-
-/* Heading — TT Hoves Pro Trial */
-.text-h1 { font-family: var(--font-primary); font-size: 40px; line-height: 48px; font-weight: var(--font-weight-semibold); letter-spacing: -0.4px; }
-.text-h2 { font-family: var(--font-primary); font-size: 32px; line-height: 40px; font-weight: var(--font-weight-semibold); letter-spacing: -0.3px; }
-.text-h3 { font-family: var(--font-primary); font-size: 28px; line-height: 36px; font-weight: var(--font-weight-semibold); letter-spacing: -0.2px; }
-.text-h4 { font-family: var(--font-primary); font-size: 24px; line-height: 32px; font-weight: var(--font-weight-semibold); letter-spacing: -0.1px; }
-.text-h5 { font-family: var(--font-primary); font-size: 20px; line-height: 28px; font-weight: var(--font-weight-semibold); }
-
-/* Body — Inter */
-.text-body-lg { font-family: var(--font-secondary); font-size: 18px; line-height: 28px; font-weight: var(--font-weight-regular); }
-.text-body-md { font-family: var(--font-secondary); font-size: 16px; line-height: 24px; font-weight: var(--font-weight-regular); }
-.text-body-sm { font-family: var(--font-secondary); font-size: 14px; line-height: 20px; font-weight: var(--font-weight-regular); }
-
-/* Button */
-.text-btn-lg { font-family: var(--font-secondary); font-size: 18px; line-height: 28px; font-weight: var(--font-weight-semibold); }
-.text-btn-sm { font-family: var(--font-secondary); font-size: 16px; line-height: 24px; font-weight: var(--font-weight-semibold); }
-
-/* Small / Caption */
-.text-small    { font-family: var(--font-secondary); font-size: 16px; line-height: 24px; font-weight: var(--font-weight-semibold); }
-.text-x-small  { font-family: var(--font-secondary); font-size: 12px; line-height: 16px; font-weight: var(--font-weight-semibold); letter-spacing: 0.4px; }
-
-/* ============================================================
-   BASE
-   ============================================================ */
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-secondary);
-  font-size: var(--font-size-xs);
-  line-height: var(--line-height-xs);
 }
