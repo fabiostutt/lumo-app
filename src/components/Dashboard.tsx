@@ -1,15 +1,17 @@
 "use client";
 
-const imgChevronLeft = "/icons/chevron-left.svg";
-const imgChevronRight = "/icons/chevron-right.svg";
-const imgEngine = "/icons/engine.svg";
-const imgSchedule = "/icons/schedule.svg";
-const imgUserPlus = "/icons/user-plus.svg";
-const imgUser = "/icons/user.svg";
-const imgBell = "/icons/bell.svg";
-const imgOptions = "/icons/options.svg";
-const imgVideo = "/icons/video.svg";
-const imgCheck = "/icons/check.svg";
+import {
+  ChevronLeft,
+  ChevronRight,
+  Settings,
+  CalendarPlus,
+  UserPlus,
+  User,
+  Bell,
+  MoreVertical,
+  Video,
+  Check,
+} from "lucide-react";
 
 type WeekDay = {
   label: string;
@@ -58,7 +60,7 @@ function QuickActionButton({
   hasBadge = false,
   onClick,
 }: {
-  icon: string;
+  icon: React.ReactNode;
   label: string;
   primary?: boolean;
   hasBadge?: boolean;
@@ -73,11 +75,11 @@ function QuickActionButton({
       <div
         className={`relative flex size-[48px] items-center justify-center rounded-[var(--border-radius/lg,16px)] border-solid ${
           primary
-            ? "bg-[var(--surface/strongest,#212121)] border-[length:var(--border-width/primary,0.5px)] border-[var(--border/base,#757575)]"
-            : "bg-[var(--surface/subtle,#fafafa)] border-[length:var(--border-width/xxs,1px)] border-[var(--border/subtlest,#eee)]"
+            ? "bg-[var(--surface/strongest,#212121)] border-[length:var(--border-width/primary,0.5px)] border-[var(--border/base,#757575)] text-white"
+            : "bg-[var(--surface/subtle,#fafafa)] border-[length:var(--border-width/xxs,1px)] border-[var(--border/subtlest,#eee)] text-[color:var(--content/base,#212121)]"
         }`}
       >
-        <img src={icon} alt="" className="size-[24px]" />
+        {icon}
         {hasBadge && (
           <span className="absolute -top-[7px] left-[61px] size-[12px] rounded-full bg-red-500" />
         )}
@@ -115,10 +117,10 @@ function HeadProfile({
       <button
         type="button"
         onClick={onSettings}
-        className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius/lg,16px)] bg-[var(--surface/base,white)]"
+        className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius/lg,16px)] bg-[var(--surface/base,white)] text-[color:var(--content/base,#212121)]"
         aria-label="Configurações"
       >
-        <img src={imgEngine} alt="" className="size-[24px]" />
+        <Settings size={24} strokeWidth={1.75} />
       </button>
     </div>
   );
@@ -144,18 +146,18 @@ function WeekCalendar({
         <button
           type="button"
           onClick={onPrevWeek}
-          className="flex size-[48px] items-center justify-center rounded-[var(--border-radius/lg,16px)] bg-[var(--surface/base,white)]"
+          className="flex size-[48px] items-center justify-center rounded-[var(--border-radius/lg,16px)] bg-[var(--surface/base,white)] text-[color:var(--content/base,#212121)]"
           aria-label="Semana anterior"
         >
-          <img src={imgChevronLeft} alt="" className="size-[24px]" />
+          <ChevronLeft size={24} strokeWidth={1.75} />
         </button>
         <button
           type="button"
           onClick={onNextWeek}
-          className="flex size-[48px] items-center justify-center rounded-[var(--border-radius/lg,16px)] bg-[var(--surface/base,white)]"
+          className="flex size-[48px] items-center justify-center rounded-[var(--border-radius/lg,16px)] bg-[var(--surface/base,white)] text-[color:var(--content/base,#212121)]"
           aria-label="Próxima semana"
         >
-          <img src={imgChevronRight} alt="" className="size-[24px]" />
+          <ChevronRight size={24} strokeWidth={1.75} />
         </button>
       </div>
 
@@ -227,19 +229,19 @@ function NextMeetingCard({
         <button
           type="button"
           onClick={onOptions}
-          className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius/lg,16px)] border-[length:var(--border-width/primary,0.5px)] border-[var(--border/base,#757575)] border-solid bg-[var(--surface/strongest,#212121)]"
+          className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius/lg,16px)] border-[length:var(--border-width/primary,0.5px)] border-[var(--border/base,#757575)] border-solid bg-[var(--surface/strongest,#212121)] text-white"
           aria-label="Opções"
         >
-          <img src={imgOptions} alt="" className="size-[24px]" />
+          <MoreVertical size={24} strokeWidth={1.75} />
         </button>
       </div>
       <button
         type="button"
         onClick={onJoinCall}
-        className="flex h-[40px] w-full items-center justify-center gap-[var(--button/gap,8px)] rounded-[var(--button/border-radius-small,8px)] bg-[var(--button/secondary/surface/enabled,#fafafa)] px-[var(--button/padding-small,12px)]"
+        className="flex h-[40px] w-full items-center justify-center gap-[var(--button/gap,8px)] rounded-[var(--button/border-radius-small,8px)] bg-[var(--button/secondary/surface/enabled,#fafafa)] px-[var(--button/padding-small,12px)] text-[color:var(--button/secondary/content/enabled,#212121)]"
       >
-        <img src={imgVideo} alt="" className="size-[24px]" />
-        <span className="text-[18px] font-[var(--typography/label/medium/font-weight,600)] leading-[24px] text-[color:var(--button/secondary/content/enabled,#212121)]">
+        <Video size={24} strokeWidth={1.75} />
+        <span className="text-[18px] font-[var(--typography/label/medium/font-weight,600)] leading-[24px]">
           Entrar na chamada
         </span>
       </button>
@@ -272,17 +274,17 @@ function MeetingListItem({
         </div>
         <div className="flex shrink-0 items-center gap-[var(--spacing/xs,8px)]">
           {meeting.confirmed && (
-            <div className="flex items-center justify-center gap-[var(--spacing/xxs,4px)] rounded-[var(--border-radius/lg,16px)] bg-[var(--feedback/success/subtlest,#efffe5)] p-[var(--spacing/xxs,4px)]">
-              <img src={imgCheck} alt="Confirmado" className="size-[16px]" />
+            <div className="flex items-center justify-center gap-[var(--spacing/xxs,4px)] rounded-[var(--border-radius/lg,16px)] bg-[var(--feedback/success/subtlest,#efffe5)] p-[var(--spacing/xxs,4px)] text-green-700">
+              <Check size={16} strokeWidth={2} />
             </div>
           )}
           <button
             type="button"
             onClick={onOptions}
-            className="flex size-[48px] items-center justify-center rounded-[var(--border-radius/lg,16px)] border-[length:var(--border-width/xxs,1px)] border-[var(--border/subtlest,#eee)] border-solid bg-[var(--surface/subtle,#fafafa)]"
+            className="flex size-[48px] items-center justify-center rounded-[var(--border-radius/lg,16px)] border-[length:var(--border-width/xxs,1px)] border-[var(--border/subtlest,#eee)] border-solid bg-[var(--surface/subtle,#fafafa)] text-[color:var(--content/base,#212121)]"
             aria-label="Opções"
           >
-            <img src={imgOptions} alt="" className="size-[24px]" />
+            <MoreVertical size={24} strokeWidth={1.75} />
           </button>
         </div>
       </div>
@@ -312,11 +314,11 @@ export default function Dashboard({
         <HeadProfile userName={userName} sessionsToday={sessionsToday} />
 
         <div className="flex w-full items-start justify-between">
-          <QuickActionButton icon={imgSchedule} label="Agendar" primary onClick={onSchedule} />
-          <QuickActionButton icon={imgUserPlus} label="Novo cliente" onClick={onNewClient} />
-          <QuickActionButton icon={imgUser} label="Clientes" onClick={onClients} />
+          <QuickActionButton icon={<CalendarPlus size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule} />
+          <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient} />
+          <QuickActionButton icon={<User size={24} strokeWidth={1.75} />} label="Clientes" onClick={onClients} />
           <QuickActionButton
-            icon={imgBell}
+            icon={<Bell size={24} strokeWidth={1.75} />}
             label="Notificações"
             hasBadge
             onClick={onNotifications}
