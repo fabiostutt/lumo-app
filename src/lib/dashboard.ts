@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import type { SessionStatus } from "@/components/MeetingDetailsSheet";
 
 const MONTH_LABELS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -16,11 +17,11 @@ export async function getDashboardData() {
   if (!user) throw new Error("Usuário não autenticado");
 
   const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10); // YYYY-MM-DD
+  const todayStr = now.toISOString().slice(0, 10);
 
   const { data: sessions, error } = await supabase
     .from("sessions")
-    .select("id, time, notifications_enabled, status, clients(name)")
+    .select("id, date, time, notifications_enabled, status, meeting_link, clients(name)")
     .eq("owner_id", user.id)
     .eq("date", todayStr)
     .order("time", { ascending: true });
@@ -29,10 +30,12 @@ export async function getDashboardData() {
 
   const meetings = (sessions ?? []).map((s) => ({
     id: s.id,
-    time: (s.time as string).slice(0, 5), // "14:00:00" -> "14:00"
+    time: (s.time as string).slice(0, 5),
+    date: s.date as string,
     clientName: (s.clients as unknown as { name: string })?.name ?? "Cliente",
+    status: (s.status as SessionStatus) ?? "pendente",
     notificationsOn: s.notifications_enabled ?? false,
-    confirmed: s.status === "confirmada",
+    meetingUrl: s.meeting_link ?? null,
   }));
 
   const [nextMeeting, ...rest] = meetings;

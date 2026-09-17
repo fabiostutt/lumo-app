@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import {
   ChevronLeft,
   ChevronRight,
@@ -12,6 +13,7 @@ import {
   Video,
   Check,
 } from "lucide-react";
+import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
 
 type WeekDay = {
   label: string;
@@ -20,12 +22,14 @@ type WeekDay = {
   hasEvent?: boolean;
 };
 
-type Meeting = {
+export type Meeting = {
   id: string;
   time: string;
+  date: string; // ISO "yyyy-mm-dd"
   clientName: string;
-  notificationsOn?: boolean;
-  confirmed?: boolean;
+  status: SessionStatus;
+  notificationsOn: boolean;
+  meetingUrl?: string | null;
 };
 
 type DashboardProps = {
@@ -42,7 +46,8 @@ type DashboardProps = {
   onClients?: () => void;
   onNotifications?: () => void;
   onJoinCall?: (meetingId: string) => void;
-  onMeetingOptions?: (meetingId: string) => void;
+  onToggleNotifications?: (meetingId: string, value: boolean) => void;
+  onMarkCompleted?: (meetingId: string) => void;
 };
 
 function SectionTitle({ text }: { text: string }) {
@@ -117,7 +122,7 @@ function HeadProfile({
       <button
         type="button"
         onClick={onSettings}
-        className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)] text-[color:var(--content-base,#212121)]"
+        className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)]"
         aria-label="Configurações"
       >
         <Settings size={24} strokeWidth={1.75} />
@@ -146,7 +151,7 @@ function WeekCalendar({
         <button
           type="button"
           onClick={onPrevWeek}
-          className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)] text-[color:var(--content-base,#212121)]"
+          className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)]"
           aria-label="Semana anterior"
         >
           <ChevronLeft size={24} strokeWidth={1.75} />
@@ -154,7 +159,7 @@ function WeekCalendar({
         <button
           type="button"
           onClick={onNextWeek}
-          className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)] text-[color:var(--content-base,#212121)]"
+          className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)]"
           aria-label="Próxima semana"
         >
           <ChevronRight size={24} strokeWidth={1.75} />
@@ -229,10 +234,10 @@ function NextMeetingCard({
         <button
           type="button"
           onClick={onOptions}
-          className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--border-base,#757575)] border-solid bg-[var(--surface-strongest,#212121)] text-white"
+          className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--border-base,#757575)] border-solid bg-[var(--surface-strongest,#212121)]"
           aria-label="Opções"
         >
-          <MoreVertical size={24} strokeWidth={1.75} />
+          <MoreVertical size={24} strokeWidth={1.75} className="text-white" />
         </button>
       </div>
       <button
@@ -273,7 +278,7 @@ function MeetingListItem({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-[var(--spacing-xs,8px)]">
-          {meeting.confirmed && (
+          {meeting.status === "confirmada" && (
             <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)] text-green-700">
               <Check size={16} strokeWidth={2} />
             </div>
@@ -281,7 +286,7 @@ function MeetingListItem({
           <button
             type="button"
             onClick={onOptions}
-            className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-[var(--border-subtlest,#eee)] border-solid bg-[var(--surface-subtle,#fafafa)] text-[color:var(--content-base,#212121)]"
+            className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-[var(--border-subtlest,#eee)] border-solid bg-[var(--surface-subtle,#fafafa)]"
             aria-label="Opções"
           >
             <MoreVertical size={24} strokeWidth={1.75} />
@@ -306,60 +311,78 @@ export default function Dashboard({
   onClients,
   onNotifications,
   onJoinCall,
-  onMeetingOptions,
+  onToggleNotifications,
+  onMarkCompleted,
 }: DashboardProps) {
+  const [sheetMeeting, setSheetMeeting] = useState<Meeting | null>(null);
+
+  function handleToggleNotifications(id: string, value: boolean) {
+    onToggleNotifications?.(id, value);
+    setSheetMeeting((prev) => (prev && prev.id === id ? { ...prev, notificationsOn: value } : prev));
+  }
+
   return (
-    <div className="flex w-full flex-col bg-[var(--surface-base,white)]">
-      <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
-        <HeadProfile userName={userName} sessionsToday={sessionsToday} />
+    <>
+      <div className="flex w-full flex-col bg-[var(--surface-base,white)]">
+        <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
+          <HeadProfile userName={userName} sessionsToday={sessionsToday} onSettings={onNotifications ? undefined : undefined} />
 
-        <div className="flex w-full items-start justify-between">
-          <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule} />
-          <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient} />
-          <QuickActionButton icon={<User size={24} strokeWidth={1.75} />} label="Clientes" onClick={onClients} />
-          <QuickActionButton
-            icon={<Bell size={24} strokeWidth={1.75} />}
-            label="Notificações"
-            hasBadge
-            onClick={onNotifications}
-          />
-        </div>
-
-        <div className="h-px w-full bg-[var(--border-subtlest,#eee)]" />
-      </div>
-
-      <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] px-[var(--spacing-md,16px)] py-[var(--numbers-padding-xxxs,2px)]">
-        <WeekCalendar
-          month={month}
-          weekDays={weekDays}
-          onPrevWeek={onPrevWeek}
-          onNextWeek={onNextWeek}
-        />
-
-        {nextMeeting && (
-          <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-            <SectionTitle text="Próxima sessão" />
-            <NextMeetingCard
-              meeting={nextMeeting}
-              onJoinCall={() => onJoinCall?.(nextMeeting.id)}
-              onOptions={() => onMeetingOptions?.(nextMeeting.id)}
+          <div className="flex w-full items-start justify-between">
+            <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule} />
+            <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient} />
+            <QuickActionButton icon={<User size={24} strokeWidth={1.75} />} label="Clientes" onClick={onClients} />
+            <QuickActionButton
+              icon={<Bell size={24} strokeWidth={1.75} />}
+              label="Notificações"
+              hasBadge
+              onClick={onNotifications}
             />
           </div>
-        )}
 
-        <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-          <SectionTitle text="Sessões do dia" />
-          <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-            {meetings.map((meeting) => (
-              <MeetingListItem
-                key={meeting.id}
-                meeting={meeting}
-                onOptions={() => onMeetingOptions?.(meeting.id)}
+          <div className="h-px w-full bg-[var(--border-subtlest,#eee)]" />
+        </div>
+
+        <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] px-[var(--spacing-md,16px)] py-[var(--numbers-padding-xxxs,2px)]">
+          <WeekCalendar
+            month={month}
+            weekDays={weekDays}
+            onPrevWeek={onPrevWeek}
+            onNextWeek={onNextWeek}
+          />
+
+          {nextMeeting && (
+            <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
+              <SectionTitle text="Próxima sessão" />
+              <NextMeetingCard
+                meeting={nextMeeting}
+                onJoinCall={() => onJoinCall?.(nextMeeting.id)}
+                onOptions={() => setSheetMeeting(nextMeeting)}
               />
-            ))}
+            </div>
+          )}
+
+          <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
+            <SectionTitle text="Sessões do dia" />
+            <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
+              {meetings.map((meeting) => (
+                <MeetingListItem
+                  key={meeting.id}
+                  meeting={meeting}
+                  onOptions={() => setSheetMeeting(meeting)}
+                />
+              ))}
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <MeetingDetailsSheet
+        meeting={sheetMeeting}
+        onClose={() => setSheetMeeting(null)}
+        onToggleNotifications={handleToggleNotifications}
+        onMarkCompleted={onMarkCompleted}
+        onJoinCall={onJoinCall}
+      />
+    </>
   );
 }
