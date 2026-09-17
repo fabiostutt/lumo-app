@@ -4,7 +4,7 @@ import {
   ChevronLeft,
   ChevronRight,
   Settings,
-  CalendarPlus,
+  Clock,
   UserPlus,
   User,
   Bell,
@@ -73,7 +73,7 @@ function QuickActionButton({
       className="flex flex-col items-center justify-center gap-[var(--spacing-xs,8px)] shrink-0"
     >
       <div
-        className={`relative flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] border-solid ${
+        className={`relative flex h-[48px] w-[80px] items-center justify-center rounded-[var(--border-radius-lg,16px)] border-solid ${
           primary
             ? "bg-[var(--surface-strongest,#212121)] border-[length:var(--border-width-primary,0.5px)] border-[var(--border-base,#757575)] text-white"
             : "bg-[var(--surface-subtle,#fafafa)] border-[length:var(--border-width-xxs,1px)] border-[var(--border-subtlest,#eee)] text-[color:var(--content-base,#212121)]"
@@ -314,7 +314,7 @@ export default function Dashboard({
         <HeadProfile userName={userName} sessionsToday={sessionsToday} />
 
         <div className="flex w-full items-start justify-between">
-          <QuickActionButton icon={<CalendarPlus size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule} />
+          <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule} />
           <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient} />
           <QuickActionButton icon={<User size={24} strokeWidth={1.75} />} label="Clientes" onClick={onClients} />
           <QuickActionButton
