@@ -1,11 +1,19 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useState, useTransition } from "react";
 import { deleteClientAction } from "@/lib/actions/delete-client";
 
 export default function DeleteClientButton({ clientId }: { clientId: string }) {
   const [open, setOpen] = useState(false);
-  const formRef = useRef<HTMLFormElement>(null);
+  const [isPending, startTransition] = useTransition();
+
+  function handleConfirm() {
+    startTransition(async () => {
+      const formData = new FormData();
+      formData.set("clientId", clientId);
+      await deleteClientAction(formData);
+    });
+  }
 
   return (
     <>
@@ -18,10 +26,6 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
           Excluir cliente
         </span>
       </button>
-
-      <form ref={formRef} action={deleteClientAction} className="hidden">
-        <input type="hidden" name="clientId" value={clientId} />
-      </form>
 
       <div
         className={`fixed inset-0 z-50 flex items-end justify-center transition-opacity duration-200 ${
@@ -48,16 +52,18 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
             <div className="flex w-full flex-col gap-[var(--stacks-gap-vertical,8px)]">
               <button
                 type="button"
-                onClick={() => formRef.current?.requestSubmit()}
+                onClick={handleConfirm}
+                disabled={isPending}
                 className="flex h-[48px] w-full items-center justify-center rounded-[var(--button-border-radius-medium,12px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--button-danger-border,#ee9e9e)] bg-[var(--button-danger-surface-enabled,white)] px-[var(--button-padding,16px)]"
               >
                 <span className="text-[18px] font-semibold leading-[24px] text-[color:var(--button-danger-content-enabled,#d71d1d)]">
-                  Sim, excluir
+                  {isPending ? "Excluindo..." : "Sim, excluir"}
                 </span>
               </button>
               <button
                 type="button"
                 onClick={() => setOpen(false)}
+                disabled={isPending}
                 className="flex h-[48px] w-full items-center justify-center rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding,16px)]"
               >
                 <span className="text-[18px] font-semibold leading-[24px] text-[color:var(--button-tertiary-content-enabled,#212121)]">
