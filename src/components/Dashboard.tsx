@@ -355,6 +355,13 @@ export default function Dashboard({
 
   const weekDays = buildWeekDays(selectedDate, eventDates);
 
+  // A sessão em destaque no card "Próxima sessão" não deve se repetir na
+  // lista "Sessões do dia" logo abaixo.
+  const isNextMeetingShown = Boolean(nextMeeting) && selectedDate === todayIso;
+  const dayMeetings = isNextMeetingShown
+    ? meetings.filter((meeting) => meeting.id !== nextMeeting!.id)
+    : meetings;
+
   async function loadDay(dateStr: string) {
     setLoading(true);
     try {
@@ -446,14 +453,14 @@ export default function Dashboard({
           <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
             <SectionTitle text="Sessões do dia" />
             <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-              {meetings.map((meeting) => (
+              {dayMeetings.map((meeting) => (
                 <MeetingListItem
                   key={meeting.id}
                   meeting={meeting}
                   onOptions={() => setSheetMeeting(meeting)}
                 />
               ))}
-              {meetings.length === 0 && !nextMeeting && (
+              {dayMeetings.length === 0 && !isNextMeetingShown && (
                 <p className="w-full py-6 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
                   Nenhuma sessão neste dia.
                 </p>

@@ -7,13 +7,24 @@ import BottomSheet from "@/components/BottomSheet";
 
 export default function DeleteClientButton({ clientId }: { clientId: string }) {
   const [open, setOpen] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
 
   function handleConfirm() {
+    setError(null);
     startTransition(async () => {
-      const formData = new FormData();
-      formData.set("clientId", clientId);
-      await deleteClientAction(formData);
+      try {
+        const formData = new FormData();
+        formData.set("clientId", clientId);
+        await deleteClientAction(formData);
+      } catch (err) {
+        // redirect() dentro da server action lança um erro especial que
+        // precisa continuar subindo para o Next.js navegar — não é uma falha.
+        if (err && typeof err === "object" && "digest" in err && String(err.digest).startsWith("NEXT_REDIRECT")) {
+          throw err;
+        }
+        setError(err instanceof Error ? err.message : "Não foi possível excluir o cliente");
+      }
     });
   }
 
@@ -48,6 +59,12 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
             <X size={24} strokeWidth={1.75} />
           </button>
         </div>
+
+        {error && (
+          <p className="w-full text-[14px] text-[color:var(--feedback-danger-strong,#991515)]">
+            {error}
+          </p>
+        )}
 
         <div className="flex w-full items-start justify-end gap-[var(--stacks-gap-vertical,8px)]">
           <button

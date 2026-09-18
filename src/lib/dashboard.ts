@@ -7,8 +7,31 @@ const MONTH_LABELS = [
 ];
 const WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
 
+// A prática roda em horário de Brasília — calcular "hoje"/"agora" a partir do
+// relógio local do servidor quebra em produção, onde o processo costuma
+// rodar em UTC (uma sessão às 22h BRT parecia "no passado" às 22h UTC, que
+// ainda são 19h em Brasília).
+const APP_TIME_ZONE = "America/Sao_Paulo";
+
 function toISO(d: Date) {
   return d.toISOString().slice(0, 10);
+}
+
+function getNowInAppTimeZone() {
+  const now = new Date();
+  const dateStr = new Intl.DateTimeFormat("en-CA", {
+    timeZone: APP_TIME_ZONE,
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(now);
+  const timeStr = new Intl.DateTimeFormat("en-GB", {
+    timeZone: APP_TIME_ZONE,
+    hour: "2-digit",
+    minute: "2-digit",
+    hourCycle: "h23",
+  }).format(now);
+  return { dateStr, timeStr };
 }
 
 type SessionRow = {
@@ -42,13 +65,12 @@ export async function getDashboardData() {
 
   if (!user) throw new Error("Usuário não autenticado");
 
-  const now = new Date();
-  const todayStr = toISO(now);
-  const currentTime = now.toTimeString().slice(0, 5);
+  const { dateStr: todayStr, timeStr: currentTime } = getNowInAppTimeZone();
+  const today = new Date(`${todayStr}T00:00:00`);
 
-  const dayOfWeek = now.getDay();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
+  const dayOfWeek = today.getDay();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((dayOfWeek + 6) % 7));
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
@@ -106,7 +128,7 @@ export async function getDashboardData() {
   return {
     userName: user.user_metadata?.full_name?.split(" ")[0] ?? "Usuário",
     sessionsToday: meetings.length,
-    month: MONTH_LABELS[now.getMonth()],
+    month: MONTH_LABELS[today.getMonth()],
     weekDays,
     nextMeeting,
     meetings,

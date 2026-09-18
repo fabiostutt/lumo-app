@@ -16,13 +16,15 @@ export async function deleteSessionAction(formData: FormData) {
   const sessionId = String(formData.get("sessionId") || "");
   if (!sessionId) throw new Error("Sessão inválida");
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("sessions")
     .delete()
     .eq("id", sessionId)
-    .eq("owner_id", user.id);
+    .eq("owner_id", user.id)
+    .select("id");
 
   if (error) throw error;
+  if (!data || data.length === 0) throw new Error("Sessão não encontrada");
 
   revalidatePath("/dashboard");
   redirect("/dashboard");

@@ -42,7 +42,7 @@ export async function updateClientAction(
     }
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("clients")
     .update({
       name,
@@ -52,10 +52,14 @@ export async function updateClientAction(
       session_type: sessionType,
     })
     .eq("id", clientId)
-    .eq("owner_id", user.id);
+    .eq("owner_id", user.id)
+    .select("id");
 
   if (error) {
     return { error: error.message };
+  }
+  if (!data || data.length === 0) {
+    return { error: "Cliente não encontrado" };
   }
 
   revalidatePath("/clients");
