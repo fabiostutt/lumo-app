@@ -146,7 +146,7 @@ function WeekCalendar({
   return (
     <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
       <div className="flex w-full items-center gap-[var(--spacing-xs,8px)] pl-[var(--spacing-xxs,4px)]">
-        <p className="flex-1 text-[16px] font-[var(--typography-label-small-font-weight,600)] leading-[24px] text-[color:var(--content-strongest,#757575)]">
+        <p className="flex-1 font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-strongest,#757575)]">
           {month}
         </p>
         <button
