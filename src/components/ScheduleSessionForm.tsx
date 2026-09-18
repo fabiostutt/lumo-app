@@ -52,13 +52,17 @@ export default function ScheduleSessionForm({
         <button
           type="button"
           onClick={() => setPickerOpen(true)}
-          className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]"
+          className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
+            selectedClient
+              ? "border-[var(--input-filled-border-default,#757575)]"
+              : "border-[var(--input-default-border-default,#bdbdbd)]"
+          }`}
         >
           <User size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
           <span
-            className={`flex-1 text-left text-[16px] leading-[28px] tracking-[-0.2px] ${
+            className={`flex-1 text-left font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
               selectedClient
-                ? "text-[color:var(--content-base,#212121)]"
+                ? "text-[color:var(--input-filled-content-value,#212121)]"
                 : "text-[color:var(--input-default-content-placeholder,#757575)]"
             }`}
           >
