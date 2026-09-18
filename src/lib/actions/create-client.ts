@@ -28,6 +28,19 @@ export async function createClientAction(
     return { error: "Nome é obrigatório" };
   }
 
+  if (cpf) {
+    const { data: existingCpf } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("owner_id", user.id)
+      .eq("cpf", cpf)
+      .maybeSingle();
+
+    if (existingCpf) {
+      return { error: "cpf_duplicate" };
+    }
+  }
+
   const profile = await getOrCreateProfile();
   const plan = getEffectivePlan(profile);
 

@@ -28,6 +28,19 @@ export async function updateClientAction(
     return { error: "Nome é obrigatório" };
   }
 
+  if (cpf) {
+    const { data: existingCpf } = await supabase
+      .from("clients")
+      .select("id")
+      .eq("owner_id", user.id)
+      .eq("cpf", cpf)
+      .maybeSingle();
+
+    if (existingCpf && existingCpf.id !== clientId) {
+      return { error: "cpf_duplicate" };
+    }
+  }
+
   const { error } = await supabase
     .from("clients")
     .update({
