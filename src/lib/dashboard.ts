@@ -22,6 +22,7 @@ export async function getDashboardData() {
 
   const now = new Date();
   const todayStr = toISO(now);
+  const currentTime = now.toTimeString().slice(0, 5); // "HH:MM"
 
   const dayOfWeek = now.getDay();
   const monday = new Date(now);
@@ -60,7 +61,11 @@ export async function getDashboardData() {
     meetingUrl: s.meeting_link ?? null,
   }));
 
-  const [nextMeeting, ...rest] = meetings;
+  // "Próxima sessão" = primeira sessão de HOJE que ainda não aconteceu.
+  // Se todas já passaram, não há próxima sessão (fica null).
+  const nextIndex = meetings.findIndex((m) => m.time >= currentTime);
+  const nextMeeting = nextIndex === -1 ? null : meetings[nextIndex];
+  const rest = nextIndex === -1 ? meetings : meetings.filter((_, i) => i !== nextIndex);
 
   const weekDays = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date(monday);
@@ -79,7 +84,7 @@ export async function getDashboardData() {
     sessionsToday: meetings.length,
     month: MONTH_LABELS[now.getMonth()],
     weekDays,
-    nextMeeting: nextMeeting ?? null,
+    nextMeeting,
     meetings: rest,
     initialEventDates: eventDates,
   };
