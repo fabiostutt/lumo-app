@@ -11,6 +11,28 @@ function toISO(d: Date) {
   return d.toISOString().slice(0, 10);
 }
 
+type SessionRow = {
+  id: string;
+  date: string;
+  time: string;
+  notifications_enabled: boolean | null;
+  status: string | null;
+  meeting_link: string | null;
+  clients: { name: string } | null;
+};
+
+function mapRow(s: SessionRow) {
+  return {
+    id: s.id,
+    time: s.time.slice(0, 5),
+    date: s.date,
+    clientName: s.clients?.name ?? "Cliente",
+    status: (s.status as SessionStatus) ?? "pendente",
+    notificationsOn: s.notifications_enabled ?? false,
+    meetingUrl: s.meeting_link ?? null,
+  };
+}
+
 export async function getDashboardData() {
   const supabase = await createClient();
 
@@ -42,6 +64,7 @@ export async function getDashboardData() {
   const eventDates = Array.from(new Set((weekSessions ?? []).map((s) => s.date as string)));
   const eventDatesSet = new Set(eventDates);
 
+  // Todas as sessões de hoje (lista "Sessões do dia")
   const { data: sessions, error } = await supabase
     .from("sessions")
     .select("id, date, time, notifications_enabled, status, meeting_link, clients(name)")
@@ -51,21 +74,23 @@ export async function getDashboardData() {
 
   if (error) throw error;
 
-  const meetings = (sessions ?? []).map((s) => ({
-    id: s.id,
-    time: (s.time as string).slice(0, 5),
-    date: s.date as string,
-    clientName: (s.clients as unknown as { name: string })?.name ?? "Cliente",
-    status: (s.status as SessionStatus) ?? "pendente",
-    notificationsOn: s.notifications_enabled ?? false,
-    meetingUrl: s.meeting_link ?? null,
-  }));
+  const meetings = (sessions ?? []).map((s) => mapRow(s as unknown as SessionRow));
 
-  // "Próxima sessão" = primeira sessão de HOJE que ainda não aconteceu.
-  // Se todas já passaram, não há próxima sessão (fica null).
-  const nextIndex = meetings.findIndex((m) => m.time >= currentTime);
-  const nextMeeting = nextIndex === -1 ? null : meetings[nextIndex];
-  const rest = nextIndex === -1 ? meetings : meetings.filter((_, i) => i !== nextIndex);
+  // A PRÓXIMA sessão de verdade: a primeira, de qualquer dia futuro (ou hoje
+  // ainda não realizada), independente de qual dia está selecionado no calendário.
+  const { data: nextRows, error: nextError } = await supabase
+    .from("sessions")
+    .select("id, date, time, notifications_enabled, status, meeting_link, clients(name)")
+    .eq("owner_id", user.id)
+    .or(`date.gt.${todayStr},and(date.eq.${todayStr},time.gte.${currentTime})`)
+    .order("date", { ascending: true })
+    .order("time", { ascending: true })
+    .limit(1);
+
+  if (nextError) throw nextError;
+
+  const nextMeeting =
+    nextRows && nextRows.length > 0 ? mapRow(nextRows[0] as unknown as SessionRow) : null;
 
   const weekDays = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date(monday);
@@ -85,7 +110,7 @@ export async function getDashboardData() {
     month: MONTH_LABELS[now.getMonth()],
     weekDays,
     nextMeeting,
-    meetings: rest,
+    meetings,
     initialEventDates: eventDates,
   };
 }

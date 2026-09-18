@@ -376,9 +376,9 @@ export default function Dashboard({
       const data = await res.json();
       setEventDates(new Set(data.eventDates as string[]));
       setSessionsToday(data.sessionsToday);
-      setNextMeeting(data.nextMeeting);
       setMeetings(data.meetings);
       setMonth(MONTH_LABELS[new Date(`${dateStr}T00:00:00`).getMonth()]);
+      // "Próxima sessão" fica fixa (não depende do dia selecionado no calendário)
     } finally {
       setLoading(false);
     }

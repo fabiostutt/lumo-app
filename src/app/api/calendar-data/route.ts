@@ -63,35 +63,9 @@ export async function GET(request: NextRequest) {
     meetingUrl: s.meeting_link ?? null,
   }));
 
-  const now = new Date();
-  const isToday = dateParam === toISO(now);
-  const currentTime = now.toTimeString().slice(0, 5);
-
-  let nextMeeting = null as (typeof meetings)[number] | null;
-  let rest = meetings;
-
-  if (meetings.length > 0) {
-    if (isToday) {
-      // Hoje: só conta como "próxima" a primeira sessão que ainda não aconteceu.
-      const nextIndex = meetings.findIndex((m) => m.time >= currentTime);
-      if (nextIndex === -1) {
-        nextMeeting = null;
-        rest = meetings;
-      } else {
-        nextMeeting = meetings[nextIndex];
-        rest = meetings.filter((_, i) => i !== nextIndex);
-      }
-    } else {
-      // Outro dia (passado ou futuro): a primeira da lista mesmo.
-      nextMeeting = meetings[0];
-      rest = meetings.slice(1);
-    }
-  }
-
   return NextResponse.json({
     eventDates,
     sessionsToday: meetings.length,
-    nextMeeting,
-    meetings: rest,
+    meetings,
   });
 }
