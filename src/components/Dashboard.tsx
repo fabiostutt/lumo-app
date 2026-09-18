@@ -445,7 +445,7 @@ export default function Dashboard({
             onSelectDay={handleSelectDay}
           />
 
-          {nextMeeting && (
+          {nextMeeting && selectedDate === todayIso && (
             <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
               <SectionTitle text="Próxima sessão" />
               <NextMeetingCard
