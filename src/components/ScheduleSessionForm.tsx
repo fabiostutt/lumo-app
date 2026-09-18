@@ -3,36 +3,53 @@
 import { useMemo, useState } from "react";
 import { User, ChevronRight, Calendar, Clock as ClockIcon, MessageCircle } from "lucide-react";
 import { createSessionAction } from "@/lib/actions/create-session";
+import { updateSessionAction } from "@/lib/actions/update-session";
 import ClientPickerSheet from "@/components/ClientPickerSheet";
 import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
+type ScheduleSessionFormProps = {
+  clients: ClientOption[];
+  initialClientId?: string;
+  sessionId?: string;
+  initialDate?: string;
+  initialTime?: string;
+  initialNotificationsOn?: boolean;
+  initialMeetingLink?: string | null;
+};
+
 export default function ScheduleSessionForm({
   clients,
   initialClientId,
-}: {
-  clients: ClientOption[];
-  initialClientId?: string;
-}) {
+  sessionId,
+  initialDate,
+  initialTime,
+  initialNotificationsOn,
+  initialMeetingLink,
+}: ScheduleSessionFormProps) {
+  const isEditing = !!sessionId;
+
   const [clientId, setClientId] = useState(initialClientId ?? "");
   const [pickerOpen, setPickerOpen] = useState(false);
-  const [date, setDate] = useState("");
-  const [time, setTime] = useState("");
+  const [date, setDate] = useState(initialDate ?? "");
+  const [time, setTime] = useState(initialTime ?? "");
   const [platform, setPlatform] = useState<"whatsapp" | "google">("whatsapp");
-  const [notificationsOn, setNotificationsOn] = useState(true);
+  const [notificationsOn, setNotificationsOn] = useState(initialNotificationsOn ?? true);
   const [copied, setCopied] = useState(false);
 
   const selectedClient = clients.find((c) => c.id === clientId) ?? null;
 
-  const meetingLink = useMemo(() => {
+  const computedLink = useMemo(() => {
     if (platform === "whatsapp" && selectedClient?.whatsapp) {
       const digits = selectedClient.whatsapp.replace(/\D/g, "");
       return digits ? `https://wa.me/${digits}` : "";
     }
     return "";
   }, [platform, selectedClient]);
+
+  const meetingLink = isEditing && initialMeetingLink ? initialMeetingLink : computedLink;
 
   const isValid = !!clientId && !!date && !!time;
 
@@ -43,18 +60,22 @@ export default function ScheduleSessionForm({
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
-      // clipboard indisponível (ex: contexto não seguro) — ignora silenciosamente
+      // clipboard indisponível — ignora
     }
   }
 
   return (
-    <form action={createSessionAction} className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
+    <form
+      action={isEditing ? updateSessionAction : createSessionAction}
+      className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]"
+    >
+      {isEditing && <input type="hidden" name="sessionId" value={sessionId} />}
       <input type="hidden" name="clientId" value={clientId} />
       <input type="hidden" name="meetingLink" value={meetingLink} />
       <input type="hidden" name="notificationsEnabled" value={String(notificationsOn)} />
 
       <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
-        <p className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
+        <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
           Adicionar participante
         </p>
         <button
@@ -188,7 +209,7 @@ export default function ScheduleSessionForm({
             : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
         }`}
       >
-        Salvar sessão
+        {isEditing ? "Salvar alterações" : "Salvar sessão"}
       </button>
 
       <ClientPickerSheet
