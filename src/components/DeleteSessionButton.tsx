@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import { X } from "lucide-react";
 import { deleteSessionAction } from "@/lib/actions/delete-session";
 import BottomSheet from "@/components/BottomSheet";
 
@@ -29,31 +30,44 @@ export default function DeleteSessionButton({ sessionId }: { sessionId: string }
       </button>
 
       <BottomSheet open={open} onClose={() => setOpen(false)}>
-        <p className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
-          Excluir sessão?
-        </p>
-        <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-strongest,#757575)]">
-          Essa ação não pode ser desfeita. O cliente não será notificado sobre o cancelamento.
-        </p>
-        <div className="flex w-full flex-col gap-[var(--stacks-gap-vertical,8px)]">
+        <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
+          <div className="flex flex-1 flex-col items-start">
+            <p className="font-[family-name:var(--typography-heading-h4-font-family)] font-[var(--typography-heading-h4-font-weight,600)] text-[length:var(--typography-heading-h4-font-size,16px)] leading-[var(--typography-heading-h4-line-height,24px)] tracking-[var(--typography-heading-h4-letter-spacing,-0.1px)] text-[color:var(--content-base,#212121)]">
+              Excluir sessão?
+            </p>
+            <p className="font-[family-name:var(--typography-heading-h4-font-family)] font-[var(--typography-heading-h4-font-weight,600)] text-[length:var(--typography-heading-h4-font-size,16px)] leading-[var(--typography-heading-h4-line-height,24px)] tracking-[var(--typography-heading-h4-letter-spacing,-0.1px)] text-[color:var(--content-strongest,#757575)]">
+              Esta ação não poderá ser desfeita.
+            </p>
+          </div>
           <button
             type="button"
-            onClick={handleConfirm}
-            disabled={isPending}
-            className="flex h-[48px] w-full items-center justify-center rounded-[var(--button-border-radius-medium,12px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--button-danger-border,#ee9e9e)] bg-[var(--button-danger-surface-enabled,white)] px-[var(--button-padding,16px)]"
+            onClick={() => setOpen(false)}
+            className="flex size-[24px] shrink-0 items-center justify-center text-[color:var(--content-base,#212121)]"
+            aria-label="Fechar"
           >
-            <span className="text-[18px] font-semibold leading-[24px] text-[color:var(--button-danger-content-enabled,#d71d1d)]">
-              {isPending ? "Excluindo..." : "Sim, excluir"}
-            </span>
+            <X size={24} strokeWidth={1.75} />
           </button>
+        </div>
+
+        <div className="flex w-full items-start justify-end gap-[var(--stacks-gap-vertical,8px)]">
           <button
             type="button"
             onClick={() => setOpen(false)}
             disabled={isPending}
-            className="flex h-[48px] w-full items-center justify-center rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding,16px)]"
+            className="flex h-[40px] items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)]"
           >
-            <span className="text-[18px] font-semibold leading-[24px] text-[color:var(--button-tertiary-content-enabled,#212121)]">
+            <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-tertiary-content-enabled,#212121)] whitespace-nowrap">
               Cancelar
+            </span>
+          </button>
+          <button
+            type="button"
+            onClick={handleConfirm}
+            disabled={isPending}
+            className="flex h-[40px] items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--feedback-danger-strong,#991515)] px-[var(--button-padding-small,12px)]"
+          >
+            <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--feedback-danger-subtlest,#fbe8e8)] whitespace-nowrap">
+              {isPending ? "Excluindo..." : "Excluir"}
             </span>
           </button>
         </div>
