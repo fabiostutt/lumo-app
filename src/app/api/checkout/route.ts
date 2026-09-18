@@ -24,18 +24,25 @@ export async function POST(request: Request) {
   }
 
   const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+  const priceId = PRICE_IDS[plan as "monthly" | "yearly"];
 
-  const session = await stripe.checkout.sessions.create({
-    mode: "subscription",
-    line_items: [{ price: PRICE_IDS[plan as "monthly" | "yearly"], quantity: 1 }],
-    success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
-    cancel_url: `${siteUrl}/pricing`,
-    customer_email: user.email,
-    client_reference_id: user.id,
-    metadata: {
-      supabase_user_id: user.id,
-    },
-  });
+  try {
+    const session = await stripe.checkout.sessions.create({
+      mode: "subscription",
+      line_items: [{ price: priceId, quantity: 1 }],
+      success_url: `${siteUrl}/success?session_id={CHECKOUT_SESSION_ID}`,
+      cancel_url: `${siteUrl}/pricing`,
+      customer_email: user.email,
+      client_reference_id: user.id,
+      metadata: {
+        supabase_user_id: user.id,
+      },
+    });
 
-  return NextResponse.json({ url: session.url });
+    return NextResponse.json({ url: session.url });
+  } catch (err) {
+    console.error("Stripe checkout error:", err);
+    const message = err instanceof Error ? err.message : "Erro desconhecido";
+    return NextResponse.json({ error: message, priceIdUsed: priceId }, { status: 500 });
+  }
 }

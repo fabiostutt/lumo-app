@@ -5,9 +5,11 @@ import Button from "@/components/ui/Button";
 
 export default function PricingPage() {
   const [loading, setLoading] = useState<"monthly" | "yearly" | null>(null);
+  const [errorMsg, setErrorMsg] = useState<string | null>(null);
 
   async function handleSubscribe(plan: "monthly" | "yearly") {
     setLoading(plan);
+    setErrorMsg(null);
     try {
       const res = await fetch("/api/checkout", {
         method: "POST",
@@ -18,9 +20,11 @@ export default function PricingPage() {
       if (data.url) {
         window.location.href = data.url;
       } else {
+        setErrorMsg(data.error || "Erro desconhecido ao criar checkout");
         setLoading(null);
       }
-    } catch {
+    } catch (err) {
+      setErrorMsg(err instanceof Error ? err.message : "Erro de rede");
       setLoading(null);
     }
   }
@@ -43,6 +47,18 @@ export default function PricingPage() {
         <p style={{ fontSize: 16, color: "#757575", marginBottom: 40 }}>
           Escolha seu plano
         </p>
+
+        {errorMsg && (
+          <p style={{ fontSize: 14, color: "#D71D1D", marginBottom: 24 }}>
+            {errorMsg}
+          </p>
+        )}
+
+        {errorMsg && (
+          <p style={{ fontSize: 14, color: "#D71D1D", marginBottom: 24 }}>
+            {errorMsg}
+          </p>
+        )}
 
         <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
           <div
