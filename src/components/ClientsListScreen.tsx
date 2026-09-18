@@ -3,6 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { Search, User, Pencil } from "lucide-react";
+import { maskPhone } from "@/lib/masks";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
@@ -45,7 +46,7 @@ export default function ClientsListScreen({
                   {client.name}
                 </p>
                 <p className="w-full truncate font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-                  {client.whatsapp || "Sem WhatsApp cadastrado"}
+                  {client.whatsapp ? maskPhone(client.whatsapp) : "Sem WhatsApp cadastrado"}
                 </p>
               </div>
               {!returnTo && (

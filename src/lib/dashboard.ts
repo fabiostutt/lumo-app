@@ -44,7 +44,7 @@ export async function getDashboardData() {
 
   const now = new Date();
   const todayStr = toISO(now);
-  const currentTime = now.toTimeString().slice(0, 5); // "HH:MM"
+  const currentTime = now.toTimeString().slice(0, 5);
 
   const dayOfWeek = now.getDay();
   const monday = new Date(now);
@@ -52,45 +52,44 @@ export async function getDashboardData() {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
-  const { data: weekSessions, error: weekError } = await supabase
-    .from("sessions")
-    .select("date")
-    .eq("owner_id", user.id)
-    .gte("date", toISO(monday))
-    .lte("date", toISO(sunday));
+  const sessionSelect = "id, date, time, notifications_enabled, status, meeting_link, clients(name)";
 
-  if (weekError) throw weekError;
+  const [weekResult, todayResult, nextResult] = await Promise.all([
+    supabase
+      .from("sessions")
+      .select("date")
+      .eq("owner_id", user.id)
+      .gte("date", toISO(monday))
+      .lte("date", toISO(sunday)),
+    supabase
+      .from("sessions")
+      .select(sessionSelect)
+      .eq("owner_id", user.id)
+      .eq("date", todayStr)
+      .order("time", { ascending: true }),
+    supabase
+      .from("sessions")
+      .select(sessionSelect)
+      .eq("owner_id", user.id)
+      .or(`date.gt.${todayStr},and(date.eq.${todayStr},time.gte.${currentTime})`)
+      .order("date", { ascending: true })
+      .order("time", { ascending: true })
+      .limit(1),
+  ]);
 
-  const eventDates = Array.from(new Set((weekSessions ?? []).map((s) => s.date as string)));
+  if (weekResult.error) throw weekResult.error;
+  if (todayResult.error) throw todayResult.error;
+  if (nextResult.error) throw nextResult.error;
+
+  const eventDates = Array.from(new Set((weekResult.data ?? []).map((s) => s.date as string)));
   const eventDatesSet = new Set(eventDates);
 
-  // Todas as sessões de hoje (lista "Sessões do dia")
-  const { data: sessions, error } = await supabase
-    .from("sessions")
-    .select("id, date, time, notifications_enabled, status, meeting_link, clients(name)")
-    .eq("owner_id", user.id)
-    .eq("date", todayStr)
-    .order("time", { ascending: true });
-
-  if (error) throw error;
-
-  const meetings = (sessions ?? []).map((s) => mapRow(s as unknown as SessionRow));
-
-  // A PRÓXIMA sessão de verdade: a primeira, de qualquer dia futuro (ou hoje
-  // ainda não realizada), independente de qual dia está selecionado no calendário.
-  const { data: nextRows, error: nextError } = await supabase
-    .from("sessions")
-    .select("id, date, time, notifications_enabled, status, meeting_link, clients(name)")
-    .eq("owner_id", user.id)
-    .or(`date.gt.${todayStr},and(date.eq.${todayStr},time.gte.${currentTime})`)
-    .order("date", { ascending: true })
-    .order("time", { ascending: true })
-    .limit(1);
-
-  if (nextError) throw nextError;
+  const meetings = (todayResult.data ?? []).map((s) => mapRow(s as unknown as SessionRow));
 
   const nextMeeting =
-    nextRows && nextRows.length > 0 ? mapRow(nextRows[0] as unknown as SessionRow) : null;
+    nextResult.data && nextResult.data.length > 0
+      ? mapRow(nextResult.data[0] as unknown as SessionRow)
+      : null;
 
   const weekDays = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date(monday);
