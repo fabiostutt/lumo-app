@@ -102,24 +102,28 @@ export default function ScheduleSessionForm({
       </div>
 
       <div className="flex w-full gap-[var(--stacks-gap-horizontal,16px)]">
-        <TextField
-          label="Data"
-          name="date"
-          type="date"
-          placeholder=""
-          icon={<Calendar size={24} strokeWidth={1.75} />}
-          value={date}
-          onChange={setDate}
-        />
-        <TextField
-          label="Hora"
-          name="time"
-          type="time"
-          placeholder=""
-          icon={<ClockIcon size={24} strokeWidth={1.75} />}
-          value={time}
-          onChange={setTime}
-        />
+        <div className="min-w-0 flex-1">
+          <TextField
+            label="Data"
+            name="date"
+            type="date"
+            placeholder=""
+            icon={<Calendar size={24} strokeWidth={1.75} />}
+            value={date}
+            onChange={setDate}
+          />
+        </div>
+        <div className="min-w-0 flex-1">
+          <TextField
+            label="Hora"
+            name="time"
+            type="time"
+            placeholder=""
+            icon={<ClockIcon size={24} strokeWidth={1.75} />}
+            value={time}
+            onChange={setTime}
+          />
+        </div>
       </div>
 
       <SegmentedToggle
