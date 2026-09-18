@@ -81,7 +81,6 @@ type DashboardProps = {
   onNotifications?: () => void;
   onJoinCall?: (meetingId: string) => void;
   onToggleNotifications?: (meetingId: string, value: boolean) => void;
-  onMarkCompleted?: (meetingId: string) => void;
 };
 
 function SectionTitle({ text }: { text: string }) {
@@ -354,7 +353,6 @@ export default function Dashboard({
   onNotifications,
   onJoinCall,
   onToggleNotifications,
-  onMarkCompleted,
 }: DashboardProps) {
   const router = useRouter();
   const todayIso = toISO(new Date());
@@ -410,6 +408,11 @@ export default function Dashboard({
   function handleToggleNotifications(id: string, value: boolean) {
     onToggleNotifications?.(id, value);
     setSheetMeeting((prev) => (prev && prev.id === id ? { ...prev, notificationsOn: value } : prev));
+  }
+
+  function handleEdit(id: string) {
+    setSheetMeeting(null);
+    router.push(`/sessions/${id}/edit`);
   }
 
   return (
@@ -477,7 +480,7 @@ export default function Dashboard({
         meeting={sheetMeeting}
         onClose={() => setSheetMeeting(null)}
         onToggleNotifications={handleToggleNotifications}
-        onMarkCompleted={onMarkCompleted}
+        onEdit={handleEdit}
         onJoinCall={onJoinCall}
       />
     </>

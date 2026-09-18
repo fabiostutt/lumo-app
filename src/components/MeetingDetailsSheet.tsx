@@ -18,7 +18,7 @@ type MeetingDetailsSheetProps = {
   meeting: MeetingDetails | null;
   onClose: () => void;
   onToggleNotifications?: (id: string, value: boolean) => void;
-  onMarkCompleted?: (id: string) => void;
+  onEdit?: (id: string) => void;
   onJoinCall?: (id: string) => void;
 };
 
@@ -60,7 +60,7 @@ export default function MeetingDetailsSheet({
   meeting,
   onClose,
   onToggleNotifications,
-  onMarkCompleted,
+  onEdit,
   onJoinCall,
 }: MeetingDetailsSheetProps) {
   const open = !!meeting;
@@ -170,11 +170,11 @@ export default function MeetingDetailsSheet({
             <div className="flex w-full flex-col gap-[var(--stacks-gap-vertical,8px)]">
               <button
                 type="button"
-                onClick={() => onMarkCompleted?.(meeting.id)}
+                onClick={() => onEdit?.(meeting.id)}
                 className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding,16px)]"
               >
                 <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-tertiary-content-enabled,#212121)]">
-                  Marcar como concluída
+                  Editar sessão
                 </span>
               </button>
               <button
