@@ -1,13 +1,14 @@
 "use client";
 
 import { X, MessageCircle, Video, Check } from "lucide-react";
+import BottomSheet from "@/components/BottomSheet";
 
 export type SessionStatus = "pendente" | "confirmada" | "cancelada";
 
 export type MeetingDetails = {
   id: string;
   time: string;
-  date: string; // ISO "yyyy-mm-dd"
+  date: string;
   clientName: string;
   status: SessionStatus;
   notificationsOn: boolean;
@@ -63,138 +64,121 @@ export default function MeetingDetailsSheet({
   onEdit,
   onJoinCall,
 }: MeetingDetailsSheetProps) {
-  const open = !!meeting;
   const isFilled = !!meeting?.meetingUrl;
 
   return (
-    <div
-      className={`fixed inset-0 z-50 flex items-end justify-center transition-opacity duration-200 ${
-        open ? "pointer-events-auto opacity-100" : "pointer-events-none opacity-0"
-      }`}
-    >
-      <div
-        className="absolute inset-0 bg-[#212121]/80 backdrop-blur-[4px]"
-        onClick={onClose}
-        aria-hidden="true"
-      />
-
-      <div
-        className={`relative mx-4 mb-10 w-full max-w-[398px] rounded-[var(--sheet-border-radius,32px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
-          open ? "translate-y-0" : "translate-y-[120%]"
-        }`}
-      >
-        {meeting && (
-          <div className="flex flex-col gap-[var(--sheet-gap,16px)] p-[var(--sheet-padding,24px)] pb-[max(var(--sheet-padding,24px),env(safe-area-inset-bottom))]">
-            <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
-              <div className="flex flex-1 flex-col items-start justify-end gap-[var(--spacing-xxs,4px)]">
-                <div className="flex flex-col items-start">
-                  <p className="font-[family-name:var(--typography-heading-h2-font-family)] font-[var(--typography-heading-h2-font-weight,600)] text-[length:var(--typography-heading-h2-font-size,24px)] leading-[var(--typography-heading-h2-line-height,32px)] tracking-[var(--typography-heading-h2-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
-                    {meeting.time}
-                  </p>
-                  <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-strongest,#757575)]">
-                    {formatDateLabel(meeting.date)}
-                  </p>
-                </div>
-                <StatusChip status={meeting.status} />
-              </div>
-              <button
-                type="button"
-                onClick={onClose}
-                className="flex size-[24px] items-center justify-center text-[color:var(--content-base,#212121)]"
-                aria-label="Fechar"
-              >
-                <X size={24} strokeWidth={1.75} />
-              </button>
-            </div>
-
-            <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
-              <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--input-default-label,#212121)]">
-                Link da sessão
-              </p>
-              <div
-                className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
-                  isFilled
-                    ? "border-[var(--input-filled-border-default,#757575)]"
-                    : "border-[var(--input-default-border-default,#bdbdbd)]"
-                }`}
-              >
-                <MessageCircle
-                  size={24}
-                  strokeWidth={1.75}
-                  className="shrink-0 text-[color:var(--content-strongest,#757575)]"
-                />
-                <p
-                  className={`flex-[1_0_0] truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
-                    isFilled
-                      ? "text-[color:var(--input-filled-content-value,#212121)]"
-                      : "text-[color:var(--input-default-content-placeholder,#757575)]"
-                  }`}
-                >
-                  {meeting.meetingUrl || "O link aparecerá aqui"}
+    <BottomSheet open={!!meeting} onClose={onClose}>
+      {meeting && (
+        <>
+          <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
+            <div className="flex flex-1 flex-col items-start justify-end gap-[var(--spacing-xxs,4px)]">
+              <div className="flex flex-col items-start">
+                <p className="font-[family-name:var(--typography-heading-h2-font-family)] font-[var(--typography-heading-h2-font-weight,600)] text-[length:var(--typography-heading-h2-font-size,24px)] leading-[var(--typography-heading-h2-line-height,32px)] tracking-[var(--typography-heading-h2-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
+                  {meeting.time}
+                </p>
+                <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-strongest,#757575)]">
+                  {formatDateLabel(meeting.date)}
                 </p>
               </div>
+              <StatusChip status={meeting.status} />
             </div>
+            <button
+              type="button"
+              onClick={onClose}
+              className="flex size-[24px] items-center justify-center text-[color:var(--content-base,#212121)]"
+              aria-label="Fechar"
+            >
+              <X size={24} strokeWidth={1.75} />
+            </button>
+          </div>
 
-            <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
-              <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
-                <div className="flex flex-1 flex-col items-start">
-                  <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--action-secondary-strongest,#212121)]">
-                    Notificações e lembretes
-                  </p>
-                  <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-                    Ativar alertas e confirmações
-                  </p>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={meeting.notificationsOn}
-                  onClick={() => onToggleNotifications?.(meeting.id, !meeting.notificationsOn)}
-                  className={`flex shrink-0 flex-col items-center rounded-[var(--border-radius-10,10px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-base,#757575)] px-[var(--spacing-xxxs,2px)] transition-all ${
-                    meeting.notificationsOn
-                      ? "bg-[var(--surface-strongest,#212121)] pt-[var(--spacing-xxxs,2px)] pb-[var(--spacing-md,16px)]"
-                      : "bg-[var(--surface-base,white)] pt-[var(--spacing-md,16px)] pb-[var(--spacing-xxxs,2px)]"
-                  }`}
-                >
-                  <span
-                    className={`size-[24px] rounded-[var(--border-radius-8,8px)] ${
-                      meeting.notificationsOn
-                        ? "bg-[var(--content-subtle,white)]"
-                        : "bg-[var(--content-base,#212121)]"
-                    }`}
-                  />
-                </button>
+          <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
+            <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--input-default-label,#212121)]">
+              Link da sessão
+            </p>
+            <div
+              className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
+                isFilled
+                  ? "border-[var(--input-filled-border-default,#757575)]"
+                  : "border-[var(--input-default-border-default,#bdbdbd)]"
+              }`}
+            >
+              <MessageCircle
+                size={24}
+                strokeWidth={1.75}
+                className="shrink-0 text-[color:var(--content-strongest,#757575)]"
+              />
+              <p
+                className={`flex-[1_0_0] truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+                  isFilled
+                    ? "text-[color:var(--input-filled-content-value,#212121)]"
+                    : "text-[color:var(--input-default-content-placeholder,#757575)]"
+                }`}
+              >
+                {meeting.meetingUrl || "O link aparecerá aqui"}
+              </p>
+            </div>
+          </div>
+
+          <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
+            <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
+              <div className="flex flex-1 flex-col items-start">
+                <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--action-secondary-strongest,#212121)]">
+                  Notificações e lembretes
+                </p>
+                <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+                  Ativar alertas e confirmações
+                </p>
               </div>
-            </div>
-
-            <div className="flex w-full flex-col gap-[var(--stacks-gap-vertical,8px)]">
               <button
                 type="button"
-                onClick={() => onEdit?.(meeting.id)}
-                className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)]"
+                role="switch"
+                aria-checked={meeting.notificationsOn}
+                onClick={() => onToggleNotifications?.(meeting.id, !meeting.notificationsOn)}
+                className={`flex shrink-0 flex-col items-center rounded-[var(--border-radius-10,10px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-base,#757575)] px-[var(--spacing-xxxs,2px)] transition-all ${
+                  meeting.notificationsOn
+                    ? "bg-[var(--surface-strongest,#212121)] pt-[var(--spacing-xxxs,2px)] pb-[var(--spacing-md,16px)]"
+                    : "bg-[var(--surface-base,white)] pt-[var(--spacing-md,16px)] pb-[var(--spacing-xxxs,2px)]"
+                }`}
               >
-                <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-tertiary-content-enabled,#212121)]">
-                  Editar sessão
-                </span>
-              </button>
-              <button
-                type="button"
-                onClick={() => onJoinCall?.(meeting.id)}
-                className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)]"
-              >
-                <Video
-                  size={24}
-                  strokeWidth={1.75}
-                  className="text-[color:var(--button-primary-content-enabled,#fafafa)]"
+                <span
+                  className={`size-[24px] rounded-[var(--border-radius-8,8px)] ${
+                    meeting.notificationsOn
+                      ? "bg-[var(--content-subtle,white)]"
+                      : "bg-[var(--content-base,#212121)]"
+                  }`}
                 />
-                <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
-                  Iniciar sessão
-                </span>
               </button>
             </div>
           </div>
-        )}
-      </div>
-    </div>
+
+          <div className="flex w-full flex-col gap-[var(--stacks-gap-vertical,8px)]">
+            <button
+              type="button"
+              onClick={() => onEdit?.(meeting.id)}
+              className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)]"
+            >
+              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-tertiary-content-enabled,#212121)]">
+                Editar sessão
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => onJoinCall?.(meeting.id)}
+              className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)]"
+            >
+              <Video
+                size={24}
+                strokeWidth={1.75}
+                className="text-[color:var(--button-primary-content-enabled,#fafafa)]"
+              />
+              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
+                Iniciar sessão
+              </span>
+            </button>
+          </div>
+        </>
+      )}
+    </BottomSheet>
   );
 }
