@@ -9,7 +9,6 @@ import {
   Clock,
   UserPlus,
   User,
-  Bell,
   MoreVertical,
   Video,
   Check,
@@ -132,34 +131,22 @@ function QuickActionButton({
 function HeadProfile({
   userName,
   sessionsToday,
-  onSettings,
 }: {
   userName: string;
   sessionsToday: number;
-  onSettings?: () => void;
 }) {
   return (
-    <div className="flex w-full items-center gap-[var(--spacing-sm,12px)]">
-      <div className="flex flex-1 flex-col items-start">
-        <h1 className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] leading-[var(--typography-heading-h1-line-height,36px)] text-[color:var(--content-base,#212121)] text-[length:var(--typography-heading-h1-font-size,28px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
-          Olá, {userName}
-        </h1>
-        <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-strongest,#757575)]">
-          Você tem{" "}
-          <span className="text-[color:var(--content-base,#212121)]">
-            {sessionsToday} sessões
-          </span>{" "}
-          agendadas para hoje
-        </p>
-      </div>
-      <button
-        type="button"
-        onClick={onSettings}
-        className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)]"
-        aria-label="Configurações"
-      >
-        <Settings size={24} strokeWidth={1.75} />
-      </button>
+    <div className="flex w-full flex-col items-start">
+      <h1 className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] leading-[var(--typography-heading-h1-line-height,36px)] text-[color:var(--content-base,#212121)] text-[length:var(--typography-heading-h1-font-size,28px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
+        Olá, {userName}
+      </h1>
+      <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-strongest,#757575)]">
+        Você tem{" "}
+        <span className="text-[color:var(--content-base,#212121)]">
+          {sessionsToday} sessões
+        </span>{" "}
+        agendadas para hoje
+      </p>
     </div>
   );
 }
@@ -419,17 +406,17 @@ export default function Dashboard({
     <>
       <div className="flex w-full flex-col bg-[var(--surface-base,white)]">
         <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
-          <HeadProfile userName={userName} sessionsToday={sessionsToday} onSettings={() => router.push("/pricing")} />
+          <HeadProfile userName={userName} sessionsToday={sessionsToday} />
 
           <div className="flex w-full items-start justify-between">
             <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />
             <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient ?? (() => router.push("/clients/new"))} />
             <QuickActionButton icon={<User size={24} strokeWidth={1.75} />} label="Clientes" onClick={onClients ?? (() => router.push("/clients"))} />
             <QuickActionButton
-              icon={<Bell size={24} strokeWidth={1.75} />}
-              label="Notificações"
+              icon={<Settings size={24} strokeWidth={1.75} />}
+              label="Configurações"
               hasBadge
-              onClick={onNotifications}
+              onClick={() => router.push("/pricing")}
             />
           </div>
 
