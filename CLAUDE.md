@@ -36,11 +36,9 @@ Three separate ways to talk to Supabase, chosen by execution context — use the
 
 `src/app/api/checkout/route.ts` creates a Stripe Checkout session for the authenticated user (`client_reference_id` = Supabase user id) and redirects to `/success` or `/pricing`.
 
-There are currently **two** Stripe webhook route handlers with diverging logic:
-- `src/app/api/stripe/webhook/route.ts` — writes subscription state onto the `profiles` table (matches `plan.ts`'s `Profile` type).
-- `src/app/api/webhooks/stripe/route.ts` — writes to a separate `subscriptions` table and looks up the user via `session.metadata.supabase_user_id` instead of `client_reference_id`.
+`src/app/api/stripe/webhook/route.ts` handles `checkout.session.completed` / `customer.subscription.updated` / `customer.subscription.deleted` and writes subscription state onto the `profiles` table (matches `plan.ts`'s `Profile` type and is what `getEffectivePlan()` actually reads).
 
-Only one of these matches whatever webhook URL is actually configured in the Stripe dashboard — check which is live before assuming either is dead code, and be careful not to silently fix "bugs" in the other one that's actually unused. **TODO:** this needs to be investigated and the unused route deleted (see Project Rules below).
+There used to be a second, older webhook route at `src/app/api/webhooks/stripe/route.ts` that wrote to a separate `subscriptions` table (keyed off `session.metadata.supabase_user_id` instead of `client_reference_id`). That table was never read anywhere in the app — `plan.ts` only ever queries `profiles` — so it was dead code left over from an earlier iteration (predating the `profiles`-based plan system) and has been removed. If a Stripe webhook URL was ever pointed at `/api/webhooks/stripe` in the Stripe dashboard, it needs to be repointed to `/api/stripe/webhook`.
 
 ### WhatsApp session confirmations
 
@@ -61,4 +59,4 @@ Only one of these matches whatever webhook URL is actually configured in the Str
 - **Bottom sheets sempre usam o componente compartilhado `src/components/BottomSheet.tsx`.** Não crie um novo overlay/drawer do zero — componha sobre `BottomSheet` (como `ClientPickerSheet.tsx` e `MeetingDetailsSheet.tsx` já fazem).
 - **Nunca `<form>` dentro de `<form>`.** HTML não permite formulários aninhados. Quando uma ação precisa ser disparada de dentro de outro `<form>` (ex: um botão de exclusão dentro do form de edição), chame a server action diretamente via `useTransition`/`startTransition` em vez de envolvê-la em um segundo `<form action={...}>`.
 - **Sempre chamar `revalidatePath` depois de qualquer create/update/delete que afete o dashboard.** Toda Server Action em `src/lib/actions/` que altera `clients` ou `sessions` deve revalidar `/dashboard` (e qualquer outra rota que dependa dos dados alterados) antes de retornar/redirecionar — siga o padrão já usado em `create-session.ts` e `create-client.ts`.
-- **Rota de webhook do Stripe duplicada precisa de investigação.** `src/app/api/stripe/webhook/route.ts` e `src/app/api/webhooks/stripe/route.ts` implementam lógicas divergentes (uma escreve em `profiles`, a outra em `subscriptions`). Antes de mexer em qualquer lógica de billing, descubra qual rota está configurada no dashboard da Stripe como ativa e remova a outra — não assuma que uma delas é código morto sem confirmar.
+- **~~Rota de webhook do Stripe duplicada~~ — resolvido.** Existiam duas rotas (`/api/stripe/webhook` escrevendo em `profiles`, `/api/webhooks/stripe` escrevendo em `subscriptions`). A tabela `subscriptions` nunca era lida em nenhum lugar do app (`plan.ts` só consulta `profiles`), então `/api/webhooks/stripe` era código morto de uma iteração anterior e foi removida. A rota oficial é `src/app/api/stripe/webhook/route.ts`. Se o dashboard da Stripe ainda aponta para `/api/webhooks/stripe`, o endpoint do webhook precisa ser atualizado lá para `/api/stripe/webhook`.
