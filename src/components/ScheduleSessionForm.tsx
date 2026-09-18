@@ -172,11 +172,11 @@ export default function ScheduleSessionForm({
 
       <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
         <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
-          <div className="flex flex-1 flex-col items-start gap-[var(--spacing-xxxs,2px)]">
-            <p className="w-full text-[16px] font-semibold leading-[24px] text-[color:var(--action-secondary-strongest,#212121)]">
+          <div className="flex flex-1 flex-col items-start">
+            <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--action-secondary-strongest,#212121)]">
               Notificações e lembretes
             </p>
-            <p className="w-full text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-strongest,#757575)]">
+            <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
               Ativar alertas e confirmações de sessão
             </p>
           </div>
