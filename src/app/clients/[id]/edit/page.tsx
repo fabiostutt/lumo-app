@@ -22,7 +22,6 @@ export default async function EditClientPage({
         initialWhatsapp={client.whatsapp ?? ""}
         initialEmail={client.email ?? ""}
         initialCpf={client.cpf ?? ""}
-        initialSessionType={(client.session_type as "online" | "presencial") ?? "online"}
       />
     </div>
   );
