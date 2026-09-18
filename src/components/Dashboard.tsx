@@ -140,7 +140,7 @@ function HeadProfile({
       <h1 className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] leading-[var(--typography-heading-h1-line-height,36px)] text-[color:var(--content-base,#212121)] text-[length:var(--typography-heading-h1-font-size,28px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
         Olá, {userName}
       </h1>
-      <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-strongest,#757575)]">
+      <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
         Você tem{" "}
         <span className="text-[color:var(--content-base,#212121)]">
           {sessionsToday} sessões
@@ -253,10 +253,10 @@ function NextMeetingCard({
     <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-base,#757575)] border-solid bg-[var(--next-meeting-surface-base,#212121)] p-[var(--next-meeting-padding-large,24px)]">
       <div className="flex w-full items-center gap-[var(--next-meeting-gap,16px)]">
         <div className="flex flex-1 flex-col items-start justify-center text-[color:var(--next-meeting-content-base,#fafafa)]">
-          <p className="text-[28px] font-[var(--typography-heading-h1-font-weight,600)] leading-[36px] tracking-[-0.4px]">
+          <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
             {meeting.time}
           </p>
-          <p className="text-[18px] font-[var(--typography-body-large-font-weight,500)] leading-[24px] tracking-[-0.2px]">
+          <p className="font-[family-name:var(--typography-body-large-font-family)] font-[var(--typography-body-large-font-weight,500)] text-[length:var(--typography-body-large-font-size,18px)] leading-[var(--typography-body-large-line-height,24px)] tracking-[var(--typography-body-large-letter-spacing,-0.2px)]">
             {meeting.clientName}
           </p>
         </div>
@@ -275,7 +275,7 @@ function NextMeetingCard({
         className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding-small,12px)] text-[color:var(--button-secondary-content-enabled,#212121)]"
       >
         <Video size={24} strokeWidth={1.75} />
-        <span className="text-[18px] font-[var(--typography-label-medium-font-weight,600)] leading-[24px]">
+        <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
           Entrar na chamada
         </span>
       </button>
@@ -291,17 +291,17 @@ function MeetingListItem({
   onOptions?: () => void;
 }) {
   return (
-    <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-inverse,#eee)] border-solid bg-[var(--next-meeting-surface-inverse,#fafafa)] p-[var(--next-meeting-padding-small,16px)]">
+    <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-inverse,#eee)] border-solid bg-[var(--next-meeting-surface-inverse,white)] p-[var(--next-meeting-padding-small,16px)]">
       <div className="flex w-full items-center gap-[var(--next-meeting-gap,16px)]">
         <div className="flex flex-1 items-center gap-[var(--next-meeting-padding-small,16px)]">
-          <p className="text-[28px] font-[var(--typography-heading-h1-font-weight,600)] leading-[36px] tracking-[-0.4px] text-[color:var(--next-meeting-content-inverse,#212121)]">
+          <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)] text-[color:var(--next-meeting-content-inverse,#212121)]">
             {meeting.time}
           </p>
           <div className="flex flex-1 flex-col items-start justify-center">
-            <p className="w-full truncate text-[18px] font-[var(--typography-body-large-font-weight,500)] leading-[24px] tracking-[-0.2px] text-[color:var(--next-meeting-content-inverse,#212121)]">
+            <p className="w-full truncate font-[family-name:var(--typography-body-large-font-family)] font-[var(--typography-body-large-font-weight,500)] text-[length:var(--typography-body-large-font-size,18px)] leading-[var(--typography-body-large-line-height,24px)] tracking-[var(--typography-body-large-letter-spacing,-0.2px)] text-[color:var(--next-meeting-content-inverse,#212121)]">
               {meeting.clientName}
             </p>
-            <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--meeting-list-item-content-inverse,#212121)]">
+            <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--meeting-list-item-content-inverse,#212121)]">
               {meeting.notificationsOn ? "Notificações ligadas" : "Notificações desligadas"}
             </p>
           </div>
