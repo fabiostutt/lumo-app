@@ -22,6 +22,7 @@ export default function ScheduleSessionForm({
   const [time, setTime] = useState("");
   const [platform, setPlatform] = useState<"whatsapp" | "google">("whatsapp");
   const [notificationsOn, setNotificationsOn] = useState(true);
+  const [copied, setCopied] = useState(false);
 
   const selectedClient = clients.find((c) => c.id === clientId) ?? null;
 
@@ -35,8 +36,15 @@ export default function ScheduleSessionForm({
 
   const isValid = !!clientId && !!date && !!time;
 
-  function handleCopy() {
-    if (meetingLink) navigator.clipboard.writeText(meetingLink);
+  async function handleCopy() {
+    if (!meetingLink) return;
+    try {
+      await navigator.clipboard.writeText(meetingLink);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch {
+      // clipboard indisponível (ex: contexto não seguro) — ignora silenciosamente
+    }
   }
 
   return (
@@ -105,12 +113,24 @@ export default function ScheduleSessionForm({
 
       <div className="flex w-full items-end gap-[var(--spacing-xs,8px)]">
         <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
-          <p className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
+          <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
             Link da sessão
           </p>
-          <div className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]">
+          <div
+            className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
+              meetingLink
+                ? "border-[var(--input-filled-border-default,#757575)]"
+                : "border-[var(--input-default-border-default,#bdbdbd)]"
+            }`}
+          >
             <MessageCircle size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-            <p className="flex-1 truncate text-[16px] leading-[28px] tracking-[-0.2px] text-[color:var(--input-default-content-placeholder,#757575)]">
+            <p
+              className={`flex-1 truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+                meetingLink
+                  ? "text-[color:var(--input-filled-content-value,#212121)]"
+                  : "text-[color:var(--input-default-content-placeholder,#757575)]"
+              }`}
+            >
               {meetingLink || "O link aparecerá aqui"}
             </p>
           </div>
@@ -125,7 +145,7 @@ export default function ScheduleSessionForm({
               : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
           }`}
         >
-          Copiar
+          {copied ? "Copiado!" : "Copiar"}
         </button>
       </div>
 
