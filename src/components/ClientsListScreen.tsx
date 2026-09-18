@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, User, MoreVertical } from "lucide-react";
+import { Search, User, Pencil } from "lucide-react";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
@@ -49,14 +49,13 @@ export default function ClientsListScreen({
                 </p>
               </div>
               {!returnTo && (
-                <button
-                  type="button"
-                  onClick={(e) => e.preventDefault()}
+                <Link
+                  href={`/clients/${client.id}/edit`}
                   className="flex size-[40px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]"
-                  aria-label="Opções"
+                  aria-label="Editar cliente"
                 >
-                  <MoreVertical size={24} strokeWidth={1.75} />
-                </button>
+                  <Pencil size={20} strokeWidth={1.75} />
+                </Link>
               )}
             </div>
           );
