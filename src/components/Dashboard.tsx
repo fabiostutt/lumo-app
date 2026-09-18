@@ -419,7 +419,7 @@ export default function Dashboard({
     <>
       <div className="flex w-full flex-col bg-[var(--surface-base,white)]">
         <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
-          <HeadProfile userName={userName} sessionsToday={sessionsToday} />
+          <HeadProfile userName={userName} sessionsToday={sessionsToday} onSettings={() => router.push("/pricing")} />
 
           <div className="flex w-full items-start justify-between">
             <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />
