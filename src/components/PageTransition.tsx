@@ -4,25 +4,42 @@ import { AnimatePresence, motion } from "framer-motion";
 import { usePathname } from "next/navigation";
 import { useRef } from "react";
 
+const variants = {
+  enter: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? 24 : -24,
+  }),
+  center: {
+    opacity: 1,
+    x: 0,
+  },
+  exit: (direction: number) => ({
+    opacity: 0,
+    x: direction > 0 ? -24 : 24,
+  }),
+};
+
 export default function PageTransition({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const prevPathname = useRef(pathname);
+  const directionRef = useRef(1);
 
-  // Heurística simples: ir para /dashboard é sempre "voltar" nesse app
-  // (todas as outras telas partem dele e retornam a ele).
-  const isBack = pathname === "/dashboard" && prevPathname.current !== "/dashboard";
-  prevPathname.current = pathname;
-
-  const enterX = isBack ? -24 : 24;
-  const exitX = isBack ? 24 : -24;
+  if (prevPathname.current !== pathname) {
+    // 1 = avançando (desliza da direita); -1 = voltando pro dashboard (desliza da esquerda)
+    const goingBack = pathname === "/dashboard" && prevPathname.current !== "/dashboard";
+    directionRef.current = goingBack ? -1 : 1;
+    prevPathname.current = pathname;
+  }
 
   return (
-    <AnimatePresence mode="wait" initial={false}>
+    <AnimatePresence mode="wait" initial={false} custom={directionRef.current}>
       <motion.div
         key={pathname}
-        initial={{ opacity: 0, x: enterX }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: exitX }}
+        custom={directionRef.current}
+        variants={variants}
+        initial="enter"
+        animate="center"
+        exit="exit"
         transition={{ duration: 0.22, ease: "easeOut" }}
         className="flex w-full flex-1 flex-col"
       >
