@@ -1,25 +1,50 @@
 "use client";
 
-import { useActionState } from "react";
-import { useState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { User, MessageCircle, Mail, CreditCard } from "lucide-react";
 import { createClientAction } from "@/lib/actions/create-client";
+import { updateClientAction } from "@/lib/actions/update-client";
 import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
+import DeleteClientButton from "@/components/DeleteClientButton";
 
-export default function ClientForm() {
-  const [state, formAction, pending] = useActionState(createClientAction, null);
-  const [name, setName] = useState("");
-  const [whatsapp, setWhatsapp] = useState("");
-  const [email, setEmail] = useState("");
-  const [cpf, setCpf] = useState("");
-  const [sessionType, setSessionType] = useState<"online" | "presencial">("online");
+type ClientFormProps = {
+  clientId?: string;
+  initialName?: string;
+  initialWhatsapp?: string;
+  initialEmail?: string;
+  initialCpf?: string;
+  initialSessionType?: "online" | "presencial";
+};
+
+export default function ClientForm({
+  clientId,
+  initialName,
+  initialWhatsapp,
+  initialEmail,
+  initialCpf,
+  initialSessionType,
+}: ClientFormProps) {
+  const isEditing = !!clientId;
+  const [state, formAction, pending] = useActionState(
+    isEditing ? updateClientAction : createClientAction,
+    null
+  );
+  const [name, setName] = useState(initialName ?? "");
+  const [whatsapp, setWhatsapp] = useState(initialWhatsapp ?? "");
+  const [email, setEmail] = useState(initialEmail ?? "");
+  const [cpf, setCpf] = useState(initialCpf ?? "");
+  const [sessionType, setSessionType] = useState<"online" | "presencial">(
+    initialSessionType ?? "online"
+  );
 
   const isValid = name.trim().length > 0;
 
   return (
     <form action={formAction} className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
+      {isEditing && <input type="hidden" name="clientId" value={clientId} />}
+
       <TextField
         label="Nome do cliente"
         name="name"
@@ -93,8 +118,10 @@ export default function ClientForm() {
             : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
         }`}
       >
-        {pending ? "Salvando..." : "Salvar cliente"}
+        {pending ? "Salvando..." : isEditing ? "Salvar alterações" : "Salvar cliente"}
       </button>
+
+      {isEditing && <DeleteClientButton clientId={clientId} />}
     </form>
   );
 }
