@@ -30,9 +30,9 @@ export default function ClientForm({
     null
   );
   const [name, setName] = useState(initialName ?? "");
-  const [whatsapp, setWhatsapp] = useState(initialWhatsapp ?? "");
+  const [whatsapp, setWhatsapp] = useState(maskPhone(initialWhatsapp ?? ""));
   const [email, setEmail] = useState(initialEmail ?? "");
-  const [cpf, setCpf] = useState(initialCpf ?? "");
+  const [cpf, setCpf] = useState(maskCPF(initialCpf ?? ""));
 
   const isValid = name.trim().length > 0;
 
