@@ -7,6 +7,7 @@ import { updateSessionAction } from "@/lib/actions/update-session";
 import ClientPickerSheet from "@/components/ClientPickerSheet";
 import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
+import DeleteSessionButton from "@/components/DeleteSessionButton";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
@@ -204,17 +205,21 @@ export default function ScheduleSessionForm({
         </div>
       </div>
 
-      <button
-        type="submit"
-        disabled={!isValid}
-        className={`flex h-[56px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-large,16px)] px-[var(--button-padding,16px)] text-[20px] font-medium leading-[24px] tracking-[-0.4px] ${
-          isValid
-            ? "bg-[var(--button-primary-surface-enabled,#212121)] text-[color:var(--button-primary-content-enabled,#fafafa)]"
-            : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
-        }`}
-      >
-        {isEditing ? "Salvar alterações" : "Salvar sessão"}
-      </button>
+      <div className="flex w-full flex-col gap-[var(--stacks-gap-vertical,8px)]">
+        <button
+          type="submit"
+          disabled={!isValid}
+          className={`flex h-[56px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-large,16px)] px-[var(--button-padding,16px)] text-[20px] font-medium leading-[24px] tracking-[-0.4px] ${
+            isValid
+              ? "bg-[var(--button-primary-surface-enabled,#212121)] text-[color:var(--button-primary-content-enabled,#fafafa)]"
+              : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
+          }`}
+        >
+          {isEditing ? "Salvar alterações" : "Salvar sessão"}
+        </button>
+
+        {isEditing && <DeleteSessionButton sessionId={sessionId!} />}
+      </div>
 
       <ClientPickerSheet
         open={pickerOpen}
