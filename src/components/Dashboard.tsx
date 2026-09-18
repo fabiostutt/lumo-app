@@ -74,6 +74,7 @@ type DashboardProps = {
   weekDays: { label: string; date: number; selected?: boolean; hasEvent?: boolean }[];
   nextMeeting: Meeting | null;
   meetings: Meeting[];
+  initialEventDates?: string[];
   onSchedule?: () => void;
   onNewClient?: () => void;
   onClients?: () => void;
@@ -346,6 +347,7 @@ export default function Dashboard({
   weekDays: initialWeekDaysRaw,
   nextMeeting: initialNextMeeting,
   meetings: initialMeetings,
+  initialEventDates,
   onSchedule,
   onNewClient,
   onClients,
@@ -358,9 +360,7 @@ export default function Dashboard({
   const todayIso = toISO(new Date());
 
   const [selectedDate, setSelectedDate] = useState(todayIso);
-  const [eventDates, setEventDates] = useState<Set<string>>(
-    new Set(initialWeekDaysRaw.some((d) => d.hasEvent) ? [todayIso] : [])
-  );
+  const [eventDates, setEventDates] = useState<Set<string>>(new Set(initialEventDates ?? []));
   const [month, setMonth] = useState(initialMonth);
   const [sessionsToday, setSessionsToday] = useState(initialSessionsToday);
   const [nextMeeting, setNextMeeting] = useState<Meeting | null>(initialNextMeeting);
