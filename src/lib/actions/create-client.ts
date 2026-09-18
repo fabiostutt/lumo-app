@@ -3,6 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getOrCreateProfile, getEffectivePlan, FREE_CLIENT_LIMIT } from "@/lib/plan";
+import { revalidatePath } from "next/cache";
 
 export type CreateClientState = { error?: string } | null;
 
@@ -68,5 +69,6 @@ export async function createClientAction(
     return { error: error.message };
   }
 
+  revalidatePath("/dashboard");
   redirect("/dashboard");
 }

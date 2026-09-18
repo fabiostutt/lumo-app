@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export async function deleteClientAction(formData: FormData) {
   const supabase = await createClient();
@@ -23,5 +24,6 @@ export async function deleteClientAction(formData: FormData) {
 
   if (error) throw error;
 
+  revalidatePath("/clients");
   redirect("/clients");
 }

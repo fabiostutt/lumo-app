@@ -2,6 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { revalidatePath } from "next/cache";
 
 export type UpdateClientState = { error?: string } | null;
 
@@ -57,5 +58,6 @@ export async function updateClientAction(
     return { error: error.message };
   }
 
+  revalidatePath("/clients");
   redirect("/clients");
 }
