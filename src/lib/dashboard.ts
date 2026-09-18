@@ -5,7 +5,11 @@ const MONTH_LABELS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
   "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro",
 ];
-const WEEKDAY_LABELS = ["DOM", "SEG", "TER", "QUA", "QUI", "SEX", "SÁB"];
+const WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
+
+function toISO(d: Date) {
+  return d.toISOString().slice(0, 10);
+}
 
 export async function getDashboardData() {
   const supabase = await createClient();
@@ -17,7 +21,25 @@ export async function getDashboardData() {
   if (!user) throw new Error("Usuário não autenticado");
 
   const now = new Date();
-  const todayStr = now.toISOString().slice(0, 10);
+  const todayStr = toISO(now);
+
+  const dayOfWeek = now.getDay();
+  const monday = new Date(now);
+  monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
+  const sunday = new Date(monday);
+  sunday.setDate(monday.getDate() + 6);
+
+  const { data: weekSessions, error: weekError } = await supabase
+    .from("sessions")
+    .select("date")
+    .eq("owner_id", user.id)
+    .gte("date", toISO(monday))
+    .lte("date", toISO(sunday));
+
+  if (weekError) throw weekError;
+
+  const eventDates = Array.from(new Set((weekSessions ?? []).map((s) => s.date as string)));
+  const eventDatesSet = new Set(eventDates);
 
   const { data: sessions, error } = await supabase
     .from("sessions")
@@ -40,17 +62,15 @@ export async function getDashboardData() {
 
   const [nextMeeting, ...rest] = meetings;
 
-  const dayOfWeek = now.getDay();
-  const monday = new Date(now);
-  monday.setDate(now.getDate() - ((dayOfWeek + 6) % 7));
-
   const weekDays = Array.from({ length: 7 }).map((_, i) => {
     const d = new Date(monday);
     d.setDate(monday.getDate() + i);
+    const iso = toISO(d);
     return {
-      label: WEEKDAY_LABELS[d.getDay()],
+      label: WEEKDAY_LABELS[i],
       date: d.getDate(),
-      selected: d.toDateString() === now.toDateString(),
+      selected: iso === todayStr,
+      hasEvent: eventDatesSet.has(iso),
     };
   });
 
@@ -61,5 +81,6 @@ export async function getDashboardData() {
     weekDays,
     nextMeeting: nextMeeting ?? null,
     meetings: rest,
+    initialEventDates: eventDates,
   };
 }
