@@ -2,8 +2,14 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
+import { getOrCreateProfile, getEffectivePlan, FREE_CLIENT_LIMIT } from "@/lib/plan";
 
-export async function createClientAction(formData: FormData) {
+export type CreateClientState = { error?: string } | null;
+
+export async function createClientAction(
+  _prevState: CreateClientState,
+  formData: FormData
+): Promise<CreateClientState> {
   const supabase = await createClient();
 
   const {
@@ -19,7 +25,21 @@ export async function createClientAction(formData: FormData) {
   const sessionType = String(formData.get("sessionType") || "online");
 
   if (!name) {
-    throw new Error("Nome é obrigatório");
+    return { error: "Nome é obrigatório" };
+  }
+
+  const profile = await getOrCreateProfile();
+  const plan = getEffectivePlan(profile);
+
+  if (plan === "free") {
+    const { count } = await supabase
+      .from("clients")
+      .select("id", { count: "exact", head: true })
+      .eq("owner_id", user.id);
+
+    if ((count ?? 0) >= FREE_CLIENT_LIMIT) {
+      return { error: "limit_reached" };
+    }
   }
 
   const { error } = await supabase.from("clients").insert({
@@ -31,7 +51,9 @@ export async function createClientAction(formData: FormData) {
     session_type: sessionType,
   });
 
-  if (error) throw error;
+  if (error) {
+    return { error: error.message };
+  }
 
   redirect("/dashboard");
 }

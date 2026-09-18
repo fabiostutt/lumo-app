@@ -1,12 +1,15 @@
 "use client";
 
+import { useActionState } from "react";
 import { useState } from "react";
+import Link from "next/link";
 import { User, MessageCircle, Mail, CreditCard } from "lucide-react";
 import { createClientAction } from "@/lib/actions/create-client";
 import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
 
 export default function ClientForm() {
+  const [state, formAction, pending] = useActionState(createClientAction, null);
   const [name, setName] = useState("");
   const [whatsapp, setWhatsapp] = useState("");
   const [email, setEmail] = useState("");
@@ -16,7 +19,7 @@ export default function ClientForm() {
   const isValid = name.trim().length > 0;
 
   return (
-    <form action={createClientAction} className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
+    <form action={formAction} className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
       <TextField
         label="Nome do cliente"
         name="name"
@@ -64,16 +67,33 @@ export default function ClientForm() {
         <input type="hidden" name="sessionType" value={sessionType} />
       </div>
 
+      {state?.error === "limit_reached" && (
+        <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
+          <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-base,#212121)]">
+            Você atingiu o limite de 5 clientes do plano Free.
+          </p>
+          <Link
+            href="/pricing"
+            className="text-[14px] font-semibold leading-[24px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] underline"
+          >
+            Ver planos
+          </Link>
+        </div>
+      )}
+      {state?.error && state.error !== "limit_reached" && (
+        <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[#d71d1d]">{state.error}</p>
+      )}
+
       <button
         type="submit"
-        disabled={!isValid}
+        disabled={!isValid || pending}
         className={`flex h-[56px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-large,16px)] px-[var(--button-padding,16px)] text-[20px] font-medium leading-[24px] tracking-[-0.4px] ${
-          isValid
+          isValid && !pending
             ? "bg-[var(--button-primary-surface-enabled,#212121)] text-[color:var(--button-primary-content-enabled,#fafafa)]"
             : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
         }`}
       >
-        Salvar cliente
+        {pending ? "Salvando..." : "Salvar cliente"}
       </button>
     </form>
   );
