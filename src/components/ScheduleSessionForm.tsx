@@ -5,6 +5,7 @@ import { User, ChevronRight, Calendar, Clock as ClockIcon, MessageCircle } from 
 import { createSessionAction } from "@/lib/actions/create-session";
 import ClientPickerSheet from "@/components/ClientPickerSheet";
 import SegmentedToggle from "@/components/SegmentedToggle";
+import TextField from "@/components/TextField";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
@@ -68,38 +69,24 @@ export default function ScheduleSessionForm({
       </div>
 
       <div className="flex w-full gap-[var(--stacks-gap-horizontal,16px)]">
-        <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
-          <label htmlFor="date" className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
-            Data
-          </label>
-          <div className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]">
-            <Calendar size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-            <input
-              id="date"
-              name="date"
-              type="date"
-              value={date}
-              onChange={(e) => setDate(e.target.value)}
-              className="w-full flex-1 bg-transparent text-[16px] leading-[28px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] outline-none"
-            />
-          </div>
-        </div>
-        <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
-          <label htmlFor="time" className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
-            Hora
-          </label>
-          <div className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]">
-            <ClockIcon size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-            <input
-              id="time"
-              name="time"
-              type="time"
-              value={time}
-              onChange={(e) => setTime(e.target.value)}
-              className="w-full flex-1 bg-transparent text-[16px] leading-[28px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] outline-none"
-            />
-          </div>
-        </div>
+        <TextField
+          label="Data"
+          name="date"
+          type="date"
+          placeholder=""
+          icon={<Calendar size={24} strokeWidth={1.75} />}
+          value={date}
+          onChange={setDate}
+        />
+        <TextField
+          label="Hora"
+          name="time"
+          type="time"
+          placeholder=""
+          icon={<ClockIcon size={24} strokeWidth={1.75} />}
+          value={time}
+          onChange={setTime}
+        />
       </div>
 
       <SegmentedToggle

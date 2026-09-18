@@ -4,50 +4,13 @@ import { useState } from "react";
 import { User, MessageCircle, Mail, CreditCard } from "lucide-react";
 import { createClientAction } from "@/lib/actions/create-client";
 import SegmentedToggle from "@/components/SegmentedToggle";
-
-function TextField({
-  label,
-  name,
-  placeholder,
-  icon,
-  type = "text",
-  value,
-  onChange,
-}: {
-  label: string;
-  name: string;
-  placeholder: string;
-  icon: React.ReactNode;
-  type?: string;
-  value?: string;
-  onChange?: (value: string) => void;
-}) {
-  return (
-    <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
-      <label
-        htmlFor={name}
-        className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]"
-      >
-        {label}
-      </label>
-      <div className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]">
-        <span className="shrink-0 text-[color:var(--content-strongest,#757575)]">{icon}</span>
-        <input
-          id={name}
-          name={name}
-          type={type}
-          placeholder={placeholder}
-          value={value}
-          onChange={onChange ? (e) => onChange(e.target.value) : undefined}
-          className="flex-1 bg-transparent text-[16px] leading-[28px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] outline-none placeholder:text-[color:var(--input-default-content-placeholder,#757575)]"
-        />
-      </div>
-    </div>
-  );
-}
+import TextField from "@/components/TextField";
 
 export default function ClientForm() {
   const [name, setName] = useState("");
+  const [whatsapp, setWhatsapp] = useState("");
+  const [email, setEmail] = useState("");
+  const [cpf, setCpf] = useState("");
   const [sessionType, setSessionType] = useState<"online" | "presencial">("online");
 
   const isValid = name.trim().length > 0;
@@ -67,6 +30,8 @@ export default function ClientForm() {
         name="whatsapp"
         placeholder="DDD 99999-0000"
         icon={<MessageCircle size={24} strokeWidth={1.75} />}
+        value={whatsapp}
+        onChange={setWhatsapp}
       />
       <TextField
         label="E-mail"
@@ -74,12 +39,16 @@ export default function ClientForm() {
         placeholder="mail@mail.com"
         icon={<Mail size={24} strokeWidth={1.75} />}
         type="email"
+        value={email}
+        onChange={setEmail}
       />
       <TextField
         label="CPF"
         name="cpf"
         placeholder="000.000.000-00"
         icon={<CreditCard size={24} strokeWidth={1.75} />}
+        value={cpf}
+        onChange={setCpf}
       />
 
       <div className="flex w-full flex-col">
