@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { User, MessageCircle, Mail, CreditCard } from "lucide-react";
 import { createClientAction } from "@/lib/actions/create-client";
+import SegmentedToggle from "@/components/SegmentedToggle";
 
 function TextField({
   label,
@@ -81,35 +82,16 @@ export default function ClientForm() {
         icon={<CreditCard size={24} strokeWidth={1.75} />}
       />
 
-      <div className="flex w-full flex-col gap-[var(--spacing-xs,8px)]">
-        <p className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
-          Tipo de sessão
-        </p>
-        <div className="flex w-full items-center gap-[var(--spacing-horizontal-sm,8px)] rounded-[var(--border-radius-20,20px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtle,#bdbdbd)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-xs,4px)]">
-          <button
-            type="button"
-            onClick={() => setSessionType("online")}
-            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] p-[var(--spacing-md,16px)] text-[18px] font-semibold leading-[24px] ${
-              sessionType === "online"
-                ? "bg-white text-[color:var(--content-base,#212121)] shadow-[0px_1px_1px_rgba(0,0,0,0.16)]"
-                : "text-[color:var(--content-strongest,#757575)]"
-            }`}
-          >
-            Online
-          </button>
-          <div className="h-[24px] w-px shrink-0 bg-[var(--content-strong,#bdbdbd)]" />
-          <button
-            type="button"
-            onClick={() => setSessionType("presencial")}
-            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] p-[var(--spacing-md,16px)] text-[18px] font-semibold leading-[24px] ${
-              sessionType === "presencial"
-                ? "bg-white text-[color:var(--content-base,#212121)] shadow-[0px_1px_1px_rgba(0,0,0,0.16)]"
-                : "text-[color:var(--content-strongest,#757575)]"
-            }`}
-          >
-            Presencial
-          </button>
-        </div>
+      <div className="flex w-full flex-col">
+        <SegmentedToggle
+          label="Tipo de sessão"
+          value={sessionType}
+          onChange={setSessionType}
+          options={[
+            { value: "online", label: "Online" },
+            { value: "presencial", label: "Presencial" },
+          ]}
+        />
         <input type="hidden" name="sessionType" value={sessionType} />
       </div>
 

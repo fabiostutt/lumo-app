@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { User, ChevronRight, Calendar, Clock as ClockIcon, MessageCircle } from "lucide-react";
 import { createSessionAction } from "@/lib/actions/create-session";
 import ClientPickerSheet from "@/components/ClientPickerSheet";
+import SegmentedToggle from "@/components/SegmentedToggle";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
@@ -101,36 +102,15 @@ export default function ScheduleSessionForm({
         </div>
       </div>
 
-      <div className="flex w-full flex-col gap-[var(--spacing-xs,8px)]">
-        <p className="text-[16px] font-semibold leading-[24px] text-[color:var(--content-base,#212121)]">
-          Plataforma
-        </p>
-        <div className="flex w-full items-center gap-[var(--spacing-horizontal-sm,8px)] rounded-[var(--border-radius-20,20px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtle,#bdbdbd)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-xs,4px)]">
-          <button
-            type="button"
-            onClick={() => setPlatform("whatsapp")}
-            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] p-[var(--spacing-md,16px)] text-[18px] font-semibold leading-[24px] ${
-              platform === "whatsapp"
-                ? "bg-white text-[color:var(--content-base,#212121)] shadow-[0px_1px_1px_rgba(0,0,0,0.16)]"
-                : "text-[color:var(--content-strongest,#757575)]"
-            }`}
-          >
-            WhatsApp
-          </button>
-          <div className="h-[24px] w-px shrink-0 bg-[var(--content-strong,#bdbdbd)]" />
-          <button
-            type="button"
-            onClick={() => setPlatform("google")}
-            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] p-[var(--spacing-md,16px)] text-[18px] font-semibold leading-[24px] ${
-              platform === "google"
-                ? "bg-white text-[color:var(--content-base,#212121)] shadow-[0px_1px_1px_rgba(0,0,0,0.16)]"
-                : "text-[color:var(--content-strongest,#757575)]"
-            }`}
-          >
-            Google
-          </button>
-        </div>
-      </div>
+      <SegmentedToggle
+        label="Plataforma"
+        value={platform}
+        onChange={setPlatform}
+        options={[
+          { value: "whatsapp", label: "WhatsApp" },
+          { value: "google", label: "Google" },
+        ]}
+      />
 
       <div className="flex w-full items-end gap-[var(--spacing-xs,8px)]">
         <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
