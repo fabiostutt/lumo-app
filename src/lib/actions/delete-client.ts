@@ -16,13 +16,15 @@ export async function deleteClientAction(formData: FormData) {
   const clientId = String(formData.get("clientId") || "");
   if (!clientId) throw new Error("Cliente inválido");
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("clients")
     .delete()
     .eq("id", clientId)
-    .eq("owner_id", user.id);
+    .eq("owner_id", user.id)
+    .select("id");
 
   if (error) throw error;
+  if (!data || data.length === 0) throw new Error("Cliente não encontrado");
 
   revalidatePath("/clients");
   redirect("/clients");

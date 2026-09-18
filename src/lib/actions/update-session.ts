@@ -24,7 +24,7 @@ export async function updateSessionAction(formData: FormData) {
     throw new Error("Preencha participante, data e hora");
   }
 
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from("sessions")
     .update({
       client_id: clientId,
@@ -34,9 +34,11 @@ export async function updateSessionAction(formData: FormData) {
       meeting_link: meetingLink || null,
     })
     .eq("id", sessionId)
-    .eq("owner_id", user.id);
+    .eq("owner_id", user.id)
+    .select("id");
 
   if (error) throw error;
+  if (!data || data.length === 0) throw new Error("Sessão não encontrada");
 
   revalidatePath("/dashboard");
   redirect("/dashboard");
