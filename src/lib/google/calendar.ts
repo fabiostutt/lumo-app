@@ -114,6 +114,43 @@ export async function createCalendarEvent({
   return JSON.parse(body) as CalendarEvent;
 }
 
+type UpdateEventParams = {
+  summary?: string;
+  description?: string;
+  startDateTime: string;
+  endDateTime: string;
+  timeZone: string;
+  attendeeEmail?: string | null;
+};
+
+export async function updateCalendarEvent(
+  accessToken: string,
+  eventId: string,
+  updates: UpdateEventParams
+): Promise<CalendarEvent> {
+  const res = await fetch(`${CALENDAR_EVENTS_URL}/${eventId}?sendUpdates=all`, {
+    method: "PATCH",
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({
+      summary: updates.summary,
+      description: updates.description,
+      start: { dateTime: updates.startDateTime, timeZone: updates.timeZone },
+      end: { dateTime: updates.endDateTime, timeZone: updates.timeZone },
+      attendees: updates.attendeeEmail ? [{ email: updates.attendeeEmail }] : undefined,
+    }),
+  });
+
+  const body = await res.text();
+  if (!res.ok) {
+    throw new Error(`Google Calendar API error ao atualizar evento: ${body}`);
+  }
+
+  return JSON.parse(body) as CalendarEvent;
+}
+
 export async function deleteCalendarEvent(accessToken: string, eventId: string) {
   const res = await fetch(`${CALENDAR_EVENTS_URL}/${eventId}?sendUpdates=all`, {
     method: "DELETE",
