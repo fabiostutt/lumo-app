@@ -46,26 +46,9 @@ export default function PricingPage() {
       .finally(() => setLoadingPrices(false));
   }, []);
 
-  async function handleSubscribe() {
+  function handleSubscribe() {
     setSubmitting(true);
-    setErrorMsg(null);
-    try {
-      const res = await fetch("/api/checkout", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan }),
-      });
-      const data = await res.json();
-      if (data.url) {
-        window.location.href = data.url;
-      } else {
-        setErrorMsg(data.error || "Erro desconhecido ao criar checkout");
-        setSubmitting(false);
-      }
-    } catch (err) {
-      setErrorMsg(err instanceof Error ? err.message : "Erro de rede");
-      setSubmitting(false);
-    }
+    router.push(`/checkout?plan=${plan}`);
   }
 
   const displayedAmount = prices ? (plan === "monthly" ? prices.monthly : prices.yearly) : null;
