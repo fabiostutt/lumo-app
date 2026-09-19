@@ -1,11 +1,7 @@
 import { stripe } from "@/lib/stripe/server";
+import { PRICE_IDS } from "@/lib/stripe/prices";
 import { createClient } from "@/lib/supabase/server";
 import { NextResponse } from "next/server";
-
-const PRICE_IDS = {
-  monthly: process.env.STRIPE_PRICE_MONTHLY!,
-  yearly: process.env.STRIPE_PRICE_YEARLY!,
-};
 
 export async function POST(request: Request) {
   const { plan } = await request.json();
