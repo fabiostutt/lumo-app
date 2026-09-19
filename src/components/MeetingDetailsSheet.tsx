@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect } from "react";
 import { X, MessageCircle, Video, Check } from "lucide-react";
 import BottomSheet from "@/components/BottomSheet";
 
@@ -21,6 +22,7 @@ type MeetingDetailsSheetProps = {
   onToggleNotifications?: (id: string, value: boolean) => void;
   onEdit?: (id: string) => void;
   onJoinCall?: (id: string) => void;
+  onStatusChange?: (id: string, status: SessionStatus) => void;
 };
 
 const WEEKDAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
@@ -63,8 +65,29 @@ export default function MeetingDetailsSheet({
   onToggleNotifications,
   onEdit,
   onJoinCall,
+  onStatusChange,
 }: MeetingDetailsSheetProps) {
   const isFilled = !!meeting?.meetingUrl;
+  const meetingId = meeting?.id;
+  const meetingStatus = meeting?.status;
+
+  useEffect(() => {
+    if (!meetingId || meetingStatus !== "pendente") return;
+
+    fetch(`/api/sessions/${meetingId}/sync-status`, { method: "POST" })
+      .then((res) => res.json())
+      .then((data: { status?: SessionStatus | null }) => {
+        if (data.status && data.status !== meetingStatus) {
+          onStatusChange?.(meetingId, data.status);
+        }
+      })
+      .catch(() => {
+        // Falha silenciosa — o status só fica desatualizado até a próxima abertura.
+      });
+    // Só queremos disparar isso quando o sheet abre com uma sessão pendente
+    // diferente, não a cada re-render.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [meetingId]);
 
   return (
     <BottomSheet open={!!meeting} onClose={onClose}>
