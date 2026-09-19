@@ -9,7 +9,7 @@ import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
 
-type ClientOption = { id: string; name: string; whatsapp: string | null };
+type ClientOption = { id: string; name: string; whatsapp: string | null; email?: string | null };
 
 type ScheduleSessionFormProps = {
   clients: ClientOption[];
@@ -74,6 +74,7 @@ export default function ScheduleSessionForm({
       <input type="hidden" name="clientId" value={clientId} />
       <input type="hidden" name="meetingLink" value={meetingLink} />
       <input type="hidden" name="notificationsEnabled" value={String(notificationsOn)} />
+      <input type="hidden" name="platform" value={platform} />
 
       <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
         <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
