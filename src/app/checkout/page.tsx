@@ -11,7 +11,7 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { CreditCard, Lock } from "lucide-react";
+import { IdIcon, LockIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
 import { maskCPF } from "@/lib/masks";
 import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -115,7 +115,7 @@ function CardFields() {
           <div className="min-w-0 flex-1">
             <CardCvcElement options={{ style: CARD_ELEMENT_STYLE, placeholder: "CVC" }} />
           </div>
-          <CreditCard size={20} strokeWidth={1.5} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+          <IdIcon size={20} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
         </div>
       </div>
     </div>
@@ -253,7 +253,7 @@ function CheckoutFormBody({
           </span>
         </button>
         <div className="flex w-full items-center justify-center gap-[var(--spacing-xxs,4px)]">
-          <Lock size={16} strokeWidth={2} className="text-[color:var(--content-strongest,#757575)]" />
+          <LockIcon size={16} className="text-[color:var(--content-strongest,#757575)]" />
           <span className="whitespace-nowrap font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--content-strongest,#757575)]">
             Pagamento processado com segurança pela Stripe
           </span>

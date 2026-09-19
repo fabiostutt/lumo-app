@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useTransition } from "react";
-import { X } from "lucide-react";
+import { AppXIcon } from "@/components/icons";
 import { deleteClientAction } from "@/lib/actions/delete-client";
 import BottomSheet from "@/components/BottomSheet";
 
@@ -56,7 +56,7 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
             className="flex size-[24px] shrink-0 items-center justify-center text-[color:var(--content-base,#212121)]"
             aria-label="Fechar"
           >
-            <X size={24} strokeWidth={1.75} />
+            <AppXIcon size={24} />
           </button>
         </div>
 

@@ -2,17 +2,16 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { ChevronLeft, ChevronRight } from "lucide-react";
 import {
-  ChevronLeft,
-  ChevronRight,
-  Settings,
-  Clock,
-  UserPlus,
-  User,
-  MoreVertical,
-  Video,
-  Check,
-} from "lucide-react";
+  EngineIcon,
+  WatchIcon,
+  AddUserIcon,
+  PeopleIcon,
+  OptionsIcon,
+  VideoIcon,
+  SingleCheckIcon,
+} from "@/components/icons";
 import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
 
 const WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
@@ -267,7 +266,7 @@ function NextMeetingCard({
           className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--border-base,#757575)] border-solid bg-[var(--surface-strongest,#212121)]"
           aria-label="Opções"
         >
-          <MoreVertical size={24} strokeWidth={1.75} className="text-white" />
+          <OptionsIcon size={24} className="text-white" />
         </button>
       </div>
       <button
@@ -275,7 +274,7 @@ function NextMeetingCard({
         onClick={onJoinCall}
         className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding-small,12px)] text-[color:var(--button-secondary-content-enabled,#212121)]"
       >
-        <Video size={24} strokeWidth={1.75} />
+        <VideoIcon size={24} />
         <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
           Entrar na chamada
         </span>
@@ -310,7 +309,7 @@ function MeetingListItem({
         <div className="flex shrink-0 items-center gap-[var(--spacing-xs,8px)]">
           {meeting.status === "confirmada" && (
             <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)] text-green-700">
-              <Check size={16} strokeWidth={2} />
+              <SingleCheckIcon size={16} />
             </div>
           )}
           <button
@@ -319,7 +318,7 @@ function MeetingListItem({
             className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-[var(--border-subtlest,#eee)] border-solid bg-[var(--surface-subtle,#fafafa)]"
             aria-label="Opções"
           >
-            <MoreVertical size={24} strokeWidth={1.75} />
+            <OptionsIcon size={24} />
           </button>
         </div>
       </div>
@@ -423,11 +422,11 @@ export default function Dashboard({
           <HeadProfile userName={userName} sessionsToday={sessionsToday} />
 
           <div className="flex w-full items-start justify-between">
-            <QuickActionButton icon={<Clock size={24} strokeWidth={1.75} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />
-            <QuickActionButton icon={<UserPlus size={24} strokeWidth={1.75} />} label="Novo cliente" onClick={onNewClient ?? (() => router.push("/clients/new"))} />
-            <QuickActionButton icon={<User size={24} strokeWidth={1.75} />} label="Clientes" onClick={onClients ?? (() => router.push("/clients"))} />
+            <QuickActionButton icon={<WatchIcon size={24} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />
+            <QuickActionButton icon={<AddUserIcon size={24} />} label="Novo cliente" onClick={onNewClient ?? (() => router.push("/clients/new"))} />
+            <QuickActionButton icon={<PeopleIcon size={24} />} label="Clientes" onClick={onClients ?? (() => router.push("/clients"))} />
             <QuickActionButton
-              icon={<Settings size={24} strokeWidth={1.75} />}
+              icon={<EngineIcon size={24} />}
               label="Configurações"
               hasBadge
               onClick={() => router.push("/pricing")}
