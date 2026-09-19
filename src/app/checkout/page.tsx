@@ -100,19 +100,19 @@ function LabeledInput({
 function CardFields() {
   return (
     <div className="flex w-full flex-col items-start overflow-clip rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)]">
-      <div className="flex h-[48px] w-full items-center gap-[var(--spacing-xs,8px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
-        <div className="flex-1">
+      <div className="flex h-[48px] w-full min-w-0 items-center gap-[var(--spacing-xs,8px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
+        <div className="min-w-0 flex-1">
           <CardNumberElement options={{ style: CARD_ELEMENT_STYLE, showIcon: true, placeholder: "1234 1234 1234 1234" }} />
         </div>
       </div>
       <div className="h-px w-full bg-[var(--border-subtle,#bdbdbd)]" />
-      <div className="flex w-full items-center">
-        <div className="flex-1 px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
+      <div className="flex h-[48px] w-full min-w-0 items-center">
+        <div className="min-w-0 flex-1 px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
           <CardExpiryElement options={{ style: CARD_ELEMENT_STYLE, placeholder: "MM / AA" }} />
         </div>
         <div className="h-[24px] w-px shrink-0 bg-[var(--content-strong,#bdbdbd)]" />
-        <div className="flex flex-1 items-center gap-[var(--spacing-xs,8px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
-          <div className="flex-1">
+        <div className="flex min-w-0 flex-1 items-center gap-[var(--spacing-xs,8px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
+          <div className="min-w-0 flex-1">
             <CardCvcElement options={{ style: CARD_ELEMENT_STYLE, placeholder: "CVC" }} />
           </div>
           <CreditCard size={20} strokeWidth={1.5} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
