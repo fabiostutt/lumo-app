@@ -54,6 +54,13 @@ export default function ScheduleSessionForm({
 
   const meetingLink = isEditing && initialMeetingLink ? initialMeetingLink : computedLink;
 
+  // No Google ainda sem link salvo, o Meet só é gerado ao salvar (criando o
+  // evento de verdade na Calendar API) — mostrar um campo vazio "O link
+  // aparecerá aqui" seria enganoso, e criar o evento antes da hora geraria
+  // convites órfãos toda vez que alguém mudasse algo no formulário antes de
+  // salvar. Trocamos por um aviso.
+  const showMeetingLinkField = platform === "whatsapp" || !!meetingLink;
+
   const isValid = !!clientId && !!date && !!time;
 
   async function handleCopy() {
@@ -140,43 +147,49 @@ export default function ScheduleSessionForm({
         ]}
       />
 
-      <div className="flex w-full items-end gap-[var(--spacing-xs,8px)]">
-        <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
-          <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-            Link da sessão
-          </p>
-          <div
-            className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
-              meetingLink
-                ? "border-[var(--input-filled-border-default,#757575)]"
-                : "border-[var(--input-default-border-default,#bdbdbd)]"
-            }`}
-          >
-            <MessageCircle size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-            <p
-              className={`flex-1 truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+      {showMeetingLinkField ? (
+        <div className="flex w-full items-end gap-[var(--spacing-xs,8px)]">
+          <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
+            <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+              Link da sessão
+            </p>
+            <div
+              className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
                 meetingLink
-                  ? "text-[color:var(--input-filled-content-value,#212121)]"
-                  : "text-[color:var(--input-default-content-placeholder,#757575)]"
+                  ? "border-[var(--input-filled-border-default,#757575)]"
+                  : "border-[var(--input-default-border-default,#bdbdbd)]"
               }`}
             >
-              {meetingLink || "O link aparecerá aqui"}
-            </p>
+              <MessageCircle size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+              <p
+                className={`flex-1 truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+                  meetingLink
+                    ? "text-[color:var(--input-filled-content-value,#212121)]"
+                    : "text-[color:var(--input-default-content-placeholder,#757575)]"
+                }`}
+              >
+                {meetingLink || "O link aparecerá aqui"}
+              </p>
+            </div>
           </div>
+          <button
+            type="button"
+            onClick={handleCopy}
+            disabled={!meetingLink}
+            className={`flex h-[48px] shrink-0 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] px-[var(--numbers-padding-md,16px)] text-[18px] font-semibold leading-[24px] ${
+              meetingLink
+                ? "bg-[var(--button-primary-surface-enabled,#212121)] text-[color:var(--button-primary-content-enabled,#fafafa)]"
+                : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
+            }`}
+          >
+            {copied ? "Copiado!" : "Copiar"}
+          </button>
         </div>
-        <button
-          type="button"
-          onClick={handleCopy}
-          disabled={!meetingLink}
-          className={`flex h-[48px] shrink-0 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] px-[var(--numbers-padding-md,16px)] text-[18px] font-semibold leading-[24px] ${
-            meetingLink
-              ? "bg-[var(--button-primary-surface-enabled,#212121)] text-[color:var(--button-primary-content-enabled,#fafafa)]"
-              : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
-          }`}
-        >
-          {copied ? "Copiado!" : "Copiar"}
-        </button>
-      </div>
+      ) : (
+        <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+          O link do Google Meet é gerado automaticamente ao salvar.
+        </p>
+      )}
 
       <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
         <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
