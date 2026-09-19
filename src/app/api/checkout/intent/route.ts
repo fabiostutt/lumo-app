@@ -54,16 +54,30 @@ export async function POST(request: Request) {
       items: [{ price: PRICE_IDS[plan as "monthly" | "yearly"] }],
       default_payment_method: paymentMethodId,
       payment_behavior: "default_incomplete",
-      expand: ["latest_invoice.payment_intent"],
+      expand: ["latest_invoice.payment_intent", "pending_setup_intent"],
       metadata: { supabase_user_id: user.id },
     });
 
-    const invoice = subscription.latest_invoice as Stripe.Invoice & {
-      payment_intent: Stripe.PaymentIntent;
-    };
-    const clientSecret = invoice.payment_intent?.client_secret;
+    // Quando o Price tem período de teste, a primeira fatura é de R$ 0,00 e a
+    // Stripe não gera PaymentIntent (nada a cobrar agora) — em vez disso ela
+    // cria um SetupIntent, só para guardar o cartão e cobrar depois do trial.
+    const invoice = subscription.latest_invoice as
+      | (Stripe.Invoice & { payment_intent: Stripe.PaymentIntent | null })
+      | null;
+    const pendingSetupIntent =
+      typeof subscription.pending_setup_intent === "object"
+        ? subscription.pending_setup_intent
+        : null;
+
+    const clientSecret = invoice?.payment_intent?.client_secret ?? pendingSetupIntent?.client_secret;
+    const mode: "payment" | "setup" = invoice?.payment_intent ? "payment" : "setup";
 
     if (!clientSecret) {
+      console.error("Assinatura sem client secret:", {
+        subscriptionStatus: subscription.status,
+        invoiceStatus: invoice?.status,
+        invoiceAmountDue: invoice?.amount_due,
+      });
       throw new Error("Stripe não retornou um client secret para o pagamento");
     }
 
@@ -72,7 +86,7 @@ export async function POST(request: Request) {
       .update({ stripe_subscription_id: subscription.id })
       .eq("id", user.id);
 
-    return NextResponse.json({ clientSecret, subscriptionId: subscription.id });
+    return NextResponse.json({ clientSecret, mode, subscriptionId: subscription.id });
   } catch (err) {
     console.error("Erro ao criar intenção de pagamento:", err);
     const message = err instanceof Error ? err.message : "Erro desconhecido";
