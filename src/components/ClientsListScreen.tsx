@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import Link from "next/link";
-import { Search, User, Pencil } from "lucide-react";
+import { Search, Pencil } from "lucide-react";
+import { PeopleIcon } from "@/components/icons";
 import { maskPhone } from "@/lib/masks";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
@@ -40,7 +41,7 @@ export default function ClientsListScreen({
         {filtered.map((client) => {
           const row = (
             <div className="flex h-[72px] w-full items-center gap-[var(--spacing-md,16px)] rounded-[20px] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-md,16px)]">
-              <User size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+              <PeopleIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
               <div className="flex flex-1 flex-col items-start overflow-hidden">
                 <p className="w-full truncate font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
                   {client.name}

@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Search, User, X } from "lucide-react";
+import { Search } from "lucide-react";
+import { AppXIcon, PeopleIcon } from "@/components/icons";
 import BottomSheet from "@/components/BottomSheet";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
@@ -46,7 +47,7 @@ export default function ClientPickerSheet({
             className="flex size-[24px] items-center justify-center text-[color:var(--content-base,#212121)]"
             aria-label="Fechar"
           >
-            <X size={24} strokeWidth={1.75} />
+            <AppXIcon size={24} />
           </button>
         </div>
 
@@ -78,7 +79,7 @@ export default function ClientPickerSheet({
                     : "border-[length:var(--border-width-xxxs,0.5px)] border-[var(--border-subtlest,#eee)]"
                 }`}
               >
-                <User size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+                <PeopleIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
                 <div className="flex flex-1 flex-col items-start overflow-hidden">
                   <p className="w-full truncate font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
                     {client.name}

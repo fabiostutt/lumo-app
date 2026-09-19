@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { X, MessageCircle, Video, Check, Share2 } from "lucide-react";
+import { AppXIcon, WhatsAppIcon, VideoIcon, SingleCheckIcon } from "@/components/icons";
 import BottomSheet from "@/components/BottomSheet";
 
 export type SessionStatus = "pendente" | "confirmada" | "cancelada";
@@ -57,7 +57,7 @@ function StatusChip({ status }: { status: SessionStatus }) {
     <div
       className={`flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] p-[var(--spacing-xxs,4px)] ${s.bg}`}
     >
-      {status === "confirmada" && <Check size={16} strokeWidth={2} className={s.text} />}
+      {status === "confirmada" && <SingleCheckIcon size={16} className={s.text} />}
       <span
         className={`font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] ${s.text}`}
       >
@@ -119,7 +119,7 @@ export default function MeetingDetailsSheet({
               className="flex size-[24px] items-center justify-center text-[color:var(--content-base,#212121)]"
               aria-label="Fechar"
             >
-              <X size={24} strokeWidth={1.75} />
+              <AppXIcon size={24} />
             </button>
           </div>
 
@@ -134,11 +134,7 @@ export default function MeetingDetailsSheet({
                   : "border-[var(--input-default-border-default,#bdbdbd)]"
               }`}
             >
-              <MessageCircle
-                size={24}
-                strokeWidth={1.75}
-                className="shrink-0 text-[color:var(--content-strongest,#757575)]"
-              />
+              <WhatsAppIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
               <p
                 className={`flex-[1_0_0] truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
                   isFilled
@@ -163,7 +159,7 @@ export default function MeetingDetailsSheet({
               rel="noopener noreferrer"
               className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] px-[var(--button-padding,16px)]"
             >
-              <Share2 size={20} strokeWidth={1.75} className="text-[color:var(--content-base,#212121)]" />
+              <WhatsAppIcon size={20} className="text-[color:var(--content-base,#212121)]" />
               <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
                 Compartilhar por WhatsApp
               </span>
@@ -217,11 +213,7 @@ export default function MeetingDetailsSheet({
               onClick={() => onJoinCall?.(meeting.id)}
               className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)]"
             >
-              <Video
-                size={24}
-                strokeWidth={1.75}
-                className="text-[color:var(--button-primary-content-enabled,#fafafa)]"
-              />
+              <VideoIcon size={24} className="text-[color:var(--button-primary-content-enabled,#fafafa)]" />
               <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
                 Iniciar sessão
               </span>

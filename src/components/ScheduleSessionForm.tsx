@@ -1,7 +1,8 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { User, ChevronRight, Calendar, Clock as ClockIcon, MessageCircle } from "lucide-react";
+import { ChevronRight } from "lucide-react";
+import { PeopleIcon, ScheduleIcon, WatchIcon, WhatsAppIcon } from "@/components/icons";
 import { createSessionAction } from "@/lib/actions/create-session";
 import { updateSessionAction } from "@/lib/actions/update-session";
 import ClientPickerSheet from "@/components/ClientPickerSheet";
@@ -98,7 +99,7 @@ export default function ScheduleSessionForm({
               : "border-[var(--input-default-border-default,#bdbdbd)]"
           }`}
         >
-          <User size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+          <PeopleIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
           <span
             className={`flex-1 text-left font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
               selectedClient
@@ -119,7 +120,7 @@ export default function ScheduleSessionForm({
             name="date"
             type="date"
             placeholder=""
-            icon={<Calendar size={24} strokeWidth={1.75} />}
+            icon={<ScheduleIcon size={24} />}
             value={date}
             onChange={setDate}
           />
@@ -130,7 +131,7 @@ export default function ScheduleSessionForm({
             name="time"
             type="time"
             placeholder=""
-            icon={<ClockIcon size={24} strokeWidth={1.75} />}
+            icon={<WatchIcon size={24} />}
             value={time}
             onChange={setTime}
           />
@@ -160,7 +161,7 @@ export default function ScheduleSessionForm({
                   : "border-[var(--input-default-border-default,#bdbdbd)]"
               }`}
             >
-              <MessageCircle size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+              <WhatsAppIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
               <p
                 className={`flex-1 truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
                   meetingLink

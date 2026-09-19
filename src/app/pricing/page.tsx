@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ShieldCheck, X } from "lucide-react";
+import { AppXIcon, SingleCheckIcon, VerifiedIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
 
 type Plan = "monthly" | "yearly";
@@ -80,14 +80,14 @@ export default function PricingPage() {
               aria-label="Fechar"
               className="shrink-0 text-[color:var(--content-base,#212121)]"
             >
-              <X size={24} strokeWidth={1.75} />
+              <AppXIcon size={24} />
             </button>
           </div>
 
           <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
             {savingsPercent !== null && savingsPercent > 0 && (
               <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)]">
-                <Check size={16} strokeWidth={2.5} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
+                <SingleCheckIcon size={16} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
                 <span className="font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--feedback-success-strongest,#1b6303)]">
                   Economize {savingsPercent}% no plano anual
                 </span>
@@ -134,7 +134,7 @@ export default function PricingPage() {
           <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
             {FEATURES.map((feature) => (
               <div key={feature} className="flex w-full items-center gap-[var(--spacing-xs,8px)]">
-                <Check size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--feedback-success-strong,#2b9c04)]" />
+                <SingleCheckIcon size={24} className="shrink-0 text-[color:var(--feedback-success-strong,#2b9c04)]" />
                 <p className="flex-1 font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
                   {feature}
                 </p>
@@ -154,7 +154,7 @@ export default function PricingPage() {
             disabled={submitting || loadingPrices}
             className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--numbers-padding-md,16px)] disabled:opacity-60"
           >
-            <ShieldCheck size={24} strokeWidth={1.75} className="text-[color:var(--button-primary-content-enabled,#fafafa)]" />
+            <VerifiedIcon size={24} className="text-[color:var(--button-primary-content-enabled,#fafafa)]" />
             <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] whitespace-nowrap text-[color:var(--button-primary-content-enabled,#fafafa)]">
               {submitting ? "Redirecionando..." : "Assinar agora"}
             </span>

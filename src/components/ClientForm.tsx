@@ -2,7 +2,7 @@
 
 import { useActionState, useState } from "react";
 import Link from "next/link";
-import { User, MessageCircle, Mail, CreditCard } from "lucide-react";
+import { PeopleIcon, WhatsAppIcon, MailIcon, IdIcon } from "@/components/icons";
 import { createClientAction } from "@/lib/actions/create-client";
 import { updateClientAction } from "@/lib/actions/update-client";
 import TextField from "@/components/TextField";
@@ -44,7 +44,7 @@ export default function ClientForm({
         label="Nome do cliente"
         name="name"
         placeholder="Digite o nome"
-        icon={<User size={24} strokeWidth={1.75} />}
+        icon={<PeopleIcon size={24} />}
         value={name}
         onChange={setName}
       />
@@ -52,7 +52,7 @@ export default function ClientForm({
         label="Número de WhatsApp"
         name="whatsapp"
         placeholder="11 11111-1111"
-        icon={<MessageCircle size={24} strokeWidth={1.75} />}
+        icon={<WhatsAppIcon size={24} />}
         value={whatsapp}
         onChange={(v) => setWhatsapp(maskPhone(v))}
       />
@@ -60,7 +60,7 @@ export default function ClientForm({
         label="E-mail"
         name="email"
         placeholder="mail@mail.com"
-        icon={<Mail size={24} strokeWidth={1.75} />}
+        icon={<MailIcon size={24} />}
         type="email"
         value={email}
         onChange={setEmail}
@@ -69,7 +69,7 @@ export default function ClientForm({
         label="CPF"
         name="cpf"
         placeholder="000.000.000-00"
-        icon={<CreditCard size={24} strokeWidth={1.75} />}
+        icon={<IdIcon size={24} />}
         value={cpf}
         onChange={(v) => setCpf(maskCPF(v))}
         error={state?.error === "cpf_duplicate" ? "Já existe um cliente com esse CPF" : undefined}
