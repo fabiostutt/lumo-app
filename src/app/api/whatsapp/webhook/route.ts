@@ -15,11 +15,25 @@ export async function GET(request: Request) {
   return new Response("Forbidden", { status: 403 });
 }
 
-// Recebe as respostas (clique em Confirmar/Cancelar)
+// Recebe respostas de botão (Confirmar/Cancelar) e atualizações de status de
+// entrega ("sent"/"delivered"/"read"/"failed") da mensagem de confirmação.
 export async function POST(request: Request) {
   try {
     const body = await request.json();
-    const message = body?.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+    console.log("[whatsapp webhook] Payload recebido:", JSON.stringify(body));
+
+    const value = body?.entry?.[0]?.changes?.[0]?.value;
+    const statuses = value?.statuses as
+      | Array<{ id?: string; status?: string; timestamp?: string; recipient_id?: string; errors?: unknown }>
+      | undefined;
+
+    if (statuses?.length) {
+      for (const status of statuses) {
+        console.log("[whatsapp webhook] Status de entrega:", status);
+      }
+    }
+
+    const message = value?.messages?.[0];
 
     if (message?.type === "button") {
       const payload = message.button?.payload as string | undefined;
