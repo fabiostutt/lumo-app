@@ -22,6 +22,15 @@ export async function sendSessionConfirmationMessage({
   const to = formatPhoneForWhatsApp(toRaw);
   const url = `https://graph.facebook.com/v21.0/${process.env.WHATSAPP_PHONE_NUMBER_ID}/messages`;
 
+  console.log("[whatsapp] Enviando confirmação de sessão", {
+    sessionId,
+    toRaw,
+    toFormatted: to,
+    clientName,
+    date,
+    time,
+  });
+
   const res = await fetch(url, {
     method: "POST",
     headers: {
@@ -61,10 +70,23 @@ export async function sendSessionConfirmationMessage({
     }),
   });
 
+  const resBody = await res.text();
+
   if (!res.ok) {
-    const errText = await res.text();
-    throw new Error(`WhatsApp API error: ${errText}`);
+    console.error("[whatsapp] Erro retornado pela Graph API", {
+      sessionId,
+      status: res.status,
+      body: resBody,
+    });
+    throw new Error(`WhatsApp API error: ${resBody}`);
   }
 
-  return res.json();
+  const json = JSON.parse(resBody);
+  console.log("[whatsapp] Mensagem aceita pela Graph API", {
+    sessionId,
+    wamid: json?.messages?.[0]?.id,
+    waId: json?.contacts?.[0]?.wa_id,
+  });
+
+  return json;
 }
