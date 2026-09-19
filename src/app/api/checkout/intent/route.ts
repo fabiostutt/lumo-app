@@ -54,23 +54,24 @@ export async function POST(request: Request) {
       items: [{ price: PRICE_IDS[plan as "monthly" | "yearly"] }],
       default_payment_method: paymentMethodId,
       payment_behavior: "default_incomplete",
-      expand: ["latest_invoice.payment_intent", "pending_setup_intent"],
+      expand: ["latest_invoice.confirmation_secret", "pending_setup_intent"],
       metadata: { supabase_user_id: user.id },
     });
 
-    // Quando o Price tem período de teste, a primeira fatura é de R$ 0,00 e a
-    // Stripe não gera PaymentIntent (nada a cobrar agora) — em vez disso ela
-    // cria um SetupIntent, só para guardar o cartão e cobrar depois do trial.
-    const invoice = subscription.latest_invoice as
-      | (Stripe.Invoice & { payment_intent: Stripe.PaymentIntent | null })
-      | null;
+    // Nesta versão da API da Stripe, o Invoice não tem mais campo
+    // `payment_intent` — o client_secret vem em `confirmation_secret`
+    // (https://docs.stripe.com/changelog/basil/2025-03-31/...). Quando o
+    // Price tem período de teste, a primeira fatura é de R$ 0,00 e não há
+    // nada a confirmar por essa via — a Stripe cria um SetupIntent em vez
+    // disso, só para guardar o cartão e cobrar depois do trial.
+    const invoice = subscription.latest_invoice as Stripe.Invoice | null;
     const pendingSetupIntent =
       typeof subscription.pending_setup_intent === "object"
         ? subscription.pending_setup_intent
         : null;
 
-    const clientSecret = invoice?.payment_intent?.client_secret ?? pendingSetupIntent?.client_secret;
-    const mode: "payment" | "setup" = invoice?.payment_intent ? "payment" : "setup";
+    const clientSecret = invoice?.confirmation_secret?.client_secret ?? pendingSetupIntent?.client_secret;
+    const mode: "payment" | "setup" = invoice?.confirmation_secret ? "payment" : "setup";
 
     if (!clientSecret) {
       console.error("Assinatura sem client secret:", {
