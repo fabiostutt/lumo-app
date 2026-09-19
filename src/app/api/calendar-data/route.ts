@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
   const { data: daySessions, error: dayError } = await supabase
     .from("sessions")
-    .select("id, date, time, notifications_enabled, status, meeting_link, clients(name)")
+    .select("id, date, time, notifications_enabled, status, meeting_link, clients(name, whatsapp)")
     .eq("owner_id", user.id)
     .eq("date", dateParam)
     .order("time", { ascending: true });
@@ -57,7 +57,8 @@ export async function GET(request: NextRequest) {
     id: s.id,
     time: (s.time as string).slice(0, 5),
     date: s.date as string,
-    clientName: (s.clients as unknown as { name: string })?.name ?? "Cliente",
+    clientName: (s.clients as unknown as { name: string; whatsapp: string | null })?.name ?? "Cliente",
+    clientWhatsapp: (s.clients as unknown as { name: string; whatsapp: string | null })?.whatsapp ?? null,
     status: (s.status as "pendente" | "confirmada" | "cancelada") ?? "pendente",
     notificationsOn: s.notifications_enabled ?? false,
     meetingUrl: s.meeting_link ?? null,

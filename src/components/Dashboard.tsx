@@ -61,6 +61,7 @@ export type Meeting = {
   time: string;
   date: string;
   clientName: string;
+  clientWhatsapp?: string | null;
   status: SessionStatus;
   notificationsOn: boolean;
   meetingUrl?: string | null;
