@@ -105,7 +105,7 @@ function CardFields() {
           <CardNumberElement options={{ style: CARD_ELEMENT_STYLE, showIcon: true, placeholder: "1234 1234 1234 1234" }} />
         </div>
       </div>
-      <div className="h-px w-full bg-[var(--border-subtle,#bdbdbd)]" />
+      <div className="h-px w-full bg-[var(--border-subtlest,#eee)]" />
       <div className="flex h-[48px] w-full min-w-0 items-center">
         <div className="min-w-0 flex-1 px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
           <CardExpiryElement options={{ style: CARD_ELEMENT_STYLE, placeholder: "MM / AA" }} />
