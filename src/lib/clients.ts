@@ -11,7 +11,7 @@ export async function getClientsForOwner() {
 
   const { data, error } = await supabase
     .from("clients")
-    .select("id, name, whatsapp")
+    .select("id, name, whatsapp, email")
     .eq("owner_id", user.id)
     .order("name", { ascending: true });
 
