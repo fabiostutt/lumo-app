@@ -10,7 +10,7 @@ import {
   PeopleIcon,
   OptionsIcon,
   VideoIcon,
-  SingleCheckIcon,
+  CircleCheckIcon,
 } from "@/components/icons";
 import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
 
@@ -308,8 +308,8 @@ function MeetingListItem({
         </div>
         <div className="flex shrink-0 items-center gap-[var(--spacing-xs,8px)]">
           {meeting.status === "confirmada" && (
-            <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)] text-green-700">
-              <SingleCheckIcon size={16} />
+            <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)] text-[color:var(--feedback-success-strongest,#1b6303)]">
+              <CircleCheckIcon size={16} />
             </div>
           )}
           <button
