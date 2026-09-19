@@ -7,10 +7,13 @@ import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
 export async function POST(request: Request) {
-  const { plan, name, cpf } = await request.json();
+  const { plan, name, cpf, paymentMethodId } = await request.json();
 
   if (plan !== "monthly" && plan !== "yearly") {
     return NextResponse.json({ error: "Invalid plan" }, { status: 400 });
+  }
+  if (!paymentMethodId) {
+    return NextResponse.json({ error: "Missing payment method" }, { status: 400 });
   }
 
   const supabase = await createClient();
@@ -44,11 +47,13 @@ export async function POST(request: Request) {
       });
     }
 
+    await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
+
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: PRICE_IDS[plan as "monthly" | "yearly"] }],
+      default_payment_method: paymentMethodId,
       payment_behavior: "default_incomplete",
-      payment_settings: { save_default_payment_method: "on_subscription" },
       expand: ["latest_invoice.payment_intent"],
       metadata: { supabase_user_id: user.id },
     });
