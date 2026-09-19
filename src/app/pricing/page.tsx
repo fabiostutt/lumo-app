@@ -68,11 +68,8 @@ export default function PricingPage() {
     }
   }
 
-  const monthlyEquivalent = prices
-    ? plan === "monthly"
-      ? prices.monthly
-      : Math.round(prices.yearly / 12)
-    : null;
+  const displayedAmount = prices ? (plan === "monthly" ? prices.monthly : prices.yearly) : null;
+  const displayedSuffix = plan === "monthly" ? "/mês" : "/ano";
 
   const savingsPercent =
     prices && prices.monthly > 0
@@ -80,7 +77,7 @@ export default function PricingPage() {
       : null;
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-[var(--screen-gap,24px)] bg-[var(--surface-subtle,#fafafa)] px-[var(--screen-padding,16px)] pb-[var(--screen-padding,16px)] pt-[66px]">
+    <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-subtle,#fafafa)] p-[var(--screen-padding,16px)]">
       <TitleAction title="Assinatura" href="/dashboard" />
 
       <div className="relative flex w-full flex-col rounded-[var(--sheet-border-radius,32px)] bg-[var(--surface-base,white)]">
@@ -116,12 +113,12 @@ export default function PricingPage() {
 
             <div className="flex items-baseline gap-[var(--spacing-xxs,4px)]">
               <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)] text-[color:var(--content-base,#212121)]">
-                {loadingPrices || monthlyEquivalent == null
+                {loadingPrices || displayedAmount == null
                   ? "—"
-                  : formatPrice(monthlyEquivalent, prices!.currency)}
+                  : formatPrice(displayedAmount, prices!.currency)}
               </p>
               <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-                /mês
+                {displayedSuffix}
               </p>
             </div>
 
