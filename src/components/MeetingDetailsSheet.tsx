@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { X, MessageCircle, Video, Check } from "lucide-react";
+import { X, MessageCircle, Video, Check, Share2 } from "lucide-react";
 import BottomSheet from "@/components/BottomSheet";
 
 export type SessionStatus = "pendente" | "confirmada" | "cancelada";
@@ -11,10 +11,18 @@ export type MeetingDetails = {
   time: string;
   date: string;
   clientName: string;
+  clientWhatsapp?: string | null;
   status: SessionStatus;
   notificationsOn: boolean;
   meetingUrl?: string | null;
 };
+
+function buildWhatsAppShareUrl(whatsapp: string, clientName: string, meetingUrl: string, time: string) {
+  const digits = whatsapp.replace(/\D/g, "");
+  const to = digits.startsWith("55") ? digits : `55${digits}`;
+  const text = `Olá, ${clientName}! Aqui está o link da nossa sessão de hoje às ${time}: ${meetingUrl}`;
+  return `https://wa.me/${to}?text=${encodeURIComponent(text)}`;
+}
 
 type MeetingDetailsSheetProps = {
   meeting: MeetingDetails | null;
@@ -142,6 +150,25 @@ export default function MeetingDetailsSheet({
               </p>
             </div>
           </div>
+
+          {meeting.meetingUrl && meeting.clientWhatsapp && (
+            <a
+              href={buildWhatsAppShareUrl(
+                meeting.clientWhatsapp,
+                meeting.clientName,
+                meeting.meetingUrl,
+                meeting.time
+              )}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] px-[var(--button-padding,16px)]"
+            >
+              <Share2 size={20} strokeWidth={1.75} className="text-[color:var(--content-base,#212121)]" />
+              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+                Compartilhar por WhatsApp
+              </span>
+            </a>
+          )}
 
           <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
             <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">

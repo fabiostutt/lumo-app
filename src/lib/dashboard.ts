@@ -41,7 +41,7 @@ type SessionRow = {
   notifications_enabled: boolean | null;
   status: string | null;
   meeting_link: string | null;
-  clients: { name: string } | null;
+  clients: { name: string; whatsapp: string | null } | null;
 };
 
 function mapRow(s: SessionRow) {
@@ -50,6 +50,7 @@ function mapRow(s: SessionRow) {
     time: s.time.slice(0, 5),
     date: s.date,
     clientName: s.clients?.name ?? "Cliente",
+    clientWhatsapp: s.clients?.whatsapp ?? null,
     status: (s.status as SessionStatus) ?? "pendente",
     notificationsOn: s.notifications_enabled ?? false,
     meetingUrl: s.meeting_link ?? null,
@@ -74,7 +75,8 @@ export async function getDashboardData() {
   const sunday = new Date(monday);
   sunday.setDate(monday.getDate() + 6);
 
-  const sessionSelect = "id, date, time, notifications_enabled, status, meeting_link, clients(name)";
+  const sessionSelect =
+    "id, date, time, notifications_enabled, status, meeting_link, clients(name, whatsapp)";
 
   const [weekResult, todayResult, nextResult] = await Promise.all([
     supabase
