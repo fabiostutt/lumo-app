@@ -15,7 +15,7 @@ type PricingData = {
 
 const FEATURES = [
   "Clientes ilimitados",
-  "Confirmação automática por WhatsApp",
+  "Integração com Google Meet",
   "Agenda sem limite de sessões",
   "Suporte prioritário",
 ];
@@ -87,7 +87,7 @@ export default function PricingPage() {
           <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
             {savingsPercent !== null && savingsPercent > 0 && (
               <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)]">
-                <SingleCheckIcon size={16} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
+                <VerifiedIcon size={16} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
                 <span className="font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--feedback-success-strongest,#1b6303)]">
                   Economize {savingsPercent}% no plano anual
                 </span>

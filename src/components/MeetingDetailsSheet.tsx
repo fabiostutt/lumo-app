@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { AppXIcon, WhatsAppIcon, VideoIcon, SingleCheckIcon } from "@/components/icons";
+import { AppXIcon, WhatsAppIcon, VideoIcon, CircleCheckIcon, AlertIcon, CancelIcon } from "@/components/icons";
 import BottomSheet from "@/components/BottomSheet";
 
 export type SessionStatus = "pendente" | "confirmada" | "cancelada";
@@ -43,21 +43,36 @@ function formatDateLabel(iso: string) {
 }
 
 function StatusChip({ status }: { status: SessionStatus }) {
-  const map: Record<SessionStatus, { bg: string; text: string; label: string }> = {
+  const map: Record<
+    SessionStatus,
+    { bg: string; text: string; label: string; icon: (props: { size: number; className?: string }) => React.ReactElement }
+  > = {
     confirmada: {
       bg: "bg-[var(--feedback-success-subtlest,#efffe5)]",
       text: "text-[var(--feedback-success-strongest,#1b6303)]",
       label: "Confirmada",
+      icon: CircleCheckIcon,
     },
-    pendente: { bg: "bg-[#f5f5f5]", text: "text-[#757575]", label: "Pendente" },
-    cancelada: { bg: "bg-[#ffece5]", text: "text-[#b3261e]", label: "Cancelada" },
+    pendente: {
+      bg: "bg-[var(--feedback-warning-subtlest,#fefbed)]",
+      text: "text-[var(--feedback-warning-strongest,#706121)]",
+      label: "Pendente",
+      icon: AlertIcon,
+    },
+    cancelada: {
+      bg: "bg-[var(--feedback-danger-subtlest,#fbe8e8)]",
+      text: "text-[var(--feedback-danger-strongest,#610d0d)]",
+      label: "Cancelada",
+      icon: CancelIcon,
+    },
   };
   const s = map[status];
+  const Icon = s.icon;
   return (
     <div
       className={`flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] p-[var(--spacing-xxs,4px)] ${s.bg}`}
     >
-      {status === "confirmada" && <SingleCheckIcon size={16} className={s.text} />}
+      <Icon size={16} className={s.text} />
       <span
         className={`font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] ${s.text}`}
       >
