@@ -11,7 +11,7 @@ export async function getSessionById(id: string) {
 
   const { data, error } = await supabase
     .from("sessions")
-    .select("id, client_id, date, time, notifications_enabled, meeting_link, status")
+    .select("id, client_id, date, time, notifications_enabled, meeting_link, status, platform, google_event_id")
     .eq("id", id)
     .eq("owner_id", user.id)
     .single();

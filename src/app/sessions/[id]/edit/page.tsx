@@ -25,6 +25,7 @@ export default async function EditSessionPage({
         initialTime={(session.time as string).slice(0, 5)}
         initialNotificationsOn={session.notifications_enabled ?? true}
         initialMeetingLink={session.meeting_link}
+        initialPlatform={session.platform === "Google" ? "google" : "whatsapp"}
       />
     </div>
   );

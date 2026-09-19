@@ -19,6 +19,7 @@ type ScheduleSessionFormProps = {
   initialTime?: string;
   initialNotificationsOn?: boolean;
   initialMeetingLink?: string | null;
+  initialPlatform?: "whatsapp" | "google";
 };
 
 export default function ScheduleSessionForm({
@@ -29,6 +30,7 @@ export default function ScheduleSessionForm({
   initialTime,
   initialNotificationsOn,
   initialMeetingLink,
+  initialPlatform,
 }: ScheduleSessionFormProps) {
   const isEditing = !!sessionId;
 
@@ -36,7 +38,7 @@ export default function ScheduleSessionForm({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [date, setDate] = useState(initialDate ?? "");
   const [time, setTime] = useState(initialTime ?? "");
-  const [platform, setPlatform] = useState<"whatsapp" | "google">("whatsapp");
+  const [platform, setPlatform] = useState<"whatsapp" | "google">(initialPlatform ?? "whatsapp");
   const [notificationsOn, setNotificationsOn] = useState(initialNotificationsOn ?? true);
   const [copied, setCopied] = useState(false);
 
