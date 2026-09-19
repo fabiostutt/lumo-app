@@ -404,6 +404,12 @@ export default function Dashboard({
     setSheetMeeting((prev) => (prev && prev.id === id ? { ...prev, notificationsOn: value } : prev));
   }
 
+  function handleStatusChange(id: string, status: Meeting["status"]) {
+    setMeetings((prev) => prev.map((m) => (m.id === id ? { ...m, status } : m)));
+    setNextMeeting((prev) => (prev && prev.id === id ? { ...prev, status } : prev));
+    setSheetMeeting((prev) => (prev && prev.id === id ? { ...prev, status } : prev));
+  }
+
   function handleEdit(id: string) {
     setSheetMeeting(null);
     router.push(`/sessions/${id}/edit`);
@@ -476,6 +482,7 @@ export default function Dashboard({
         onToggleNotifications={handleToggleNotifications}
         onEdit={handleEdit}
         onJoinCall={onJoinCall}
+        onStatusChange={handleStatusChange}
       />
     </>
   );

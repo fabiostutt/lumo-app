@@ -151,6 +151,26 @@ export async function updateCalendarEvent(
   return JSON.parse(body) as CalendarEvent;
 }
 
+type CalendarEventWithAttendees = CalendarEvent & {
+  attendees?: Array<{ email: string; responseStatus: string; self?: boolean }>;
+};
+
+export async function getCalendarEvent(
+  accessToken: string,
+  eventId: string
+): Promise<CalendarEventWithAttendees> {
+  const res = await fetch(`${CALENDAR_EVENTS_URL}/${eventId}`, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  });
+
+  const body = await res.text();
+  if (!res.ok) {
+    throw new Error(`Google Calendar API error ao buscar evento: ${body}`);
+  }
+
+  return JSON.parse(body) as CalendarEventWithAttendees;
+}
+
 export async function deleteCalendarEvent(accessToken: string, eventId: string) {
   const res = await fetch(`${CALENDAR_EVENTS_URL}/${eventId}?sendUpdates=all`, {
     method: "DELETE",
