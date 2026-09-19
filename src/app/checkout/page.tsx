@@ -2,9 +2,16 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { loadStripe, type StripeElementsOptions } from "@stripe/stripe-js";
-import { Elements, PaymentElement, useElements, useStripe } from "@stripe/react-stripe-js";
-import { Lock } from "lucide-react";
+import { loadStripe } from "@stripe/stripe-js";
+import {
+  CardCvcElement,
+  CardExpiryElement,
+  CardNumberElement,
+  Elements,
+  useElements,
+  useStripe,
+} from "@stripe/react-stripe-js";
+import { CreditCard, Lock } from "lucide-react";
 import TitleAction from "@/components/TitleAction";
 import { maskCPF } from "@/lib/masks";
 import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client";
@@ -25,36 +32,19 @@ function formatPrice(cents: number, currency: string) {
   });
 }
 
-// Tema do Payment Element ajustado para os tokens reais do Lumo (auditados no
-// Figma), já que os campos de cartão são renderizados pela própria Stripe.
-const STRIPE_APPEARANCE = {
-  theme: "stripe" as const,
-  variables: {
-    colorPrimary: "#212121",
-    colorBackground: "#fafafa",
-    colorText: "#212121",
-    colorTextPlaceholder: "#757575",
-    colorDanger: "#d71d1d",
+// Estilo dos Card Elements (número/validade/CVC) ajustado aos tokens reais do
+// Lumo — cada elemento é só o campo em si, sem chrome da Stripe; o cartão
+// (borda, raio, divisores) é montado com os nossos próprios tokens abaixo.
+const CARD_ELEMENT_STYLE = {
+  base: {
+    color: "#212121",
     fontFamily: "Inter, sans-serif",
-    fontSizeBase: "16px",
-    borderRadius: "16px",
+    fontSize: "16px",
+    fontWeight: "400",
+    letterSpacing: "-0.2px",
+    "::placeholder": { color: "#757575" },
   },
-  rules: {
-    ".Input": {
-      border: "0.5px solid #bdbdbd",
-      boxShadow: "none",
-      padding: "16px",
-    },
-    ".Input:focus": {
-      border: "0.5px solid #757575",
-      boxShadow: "none",
-    },
-    ".Label": {
-      fontWeight: "600",
-      fontSize: "16px",
-      color: "#212121",
-    },
-  },
+  invalid: { color: "#d71d1d" },
 };
 
 function OrderSummary({ plan, priceLabel }: { plan: Plan; priceLabel: string }) {
@@ -107,6 +97,31 @@ function LabeledInput({
   );
 }
 
+function CardFields() {
+  return (
+    <div className="flex w-full flex-col items-start overflow-clip rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)]">
+      <div className="flex h-[48px] w-full items-center gap-[var(--spacing-xs,8px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
+        <div className="flex-1">
+          <CardNumberElement options={{ style: CARD_ELEMENT_STYLE, showIcon: true, placeholder: "1234 1234 1234 1234" }} />
+        </div>
+      </div>
+      <div className="h-px w-full bg-[var(--border-subtle,#bdbdbd)]" />
+      <div className="flex w-full items-center">
+        <div className="flex-1 px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
+          <CardExpiryElement options={{ style: CARD_ELEMENT_STYLE, placeholder: "MM / AA" }} />
+        </div>
+        <div className="h-[24px] w-px shrink-0 bg-[var(--content-strong,#bdbdbd)]" />
+        <div className="flex flex-1 items-center gap-[var(--spacing-xs,8px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
+          <div className="flex-1">
+            <CardCvcElement options={{ style: CARD_ELEMENT_STYLE, placeholder: "CVC" }} />
+          </div>
+          <CreditCard size={20} strokeWidth={1.5} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function CheckoutFormBody({
   plan,
   email,
@@ -131,13 +146,20 @@ function CheckoutFormBody({
   const priceLabel = formatPrice(amount.value, amount.currency);
 
   async function handleSubmit() {
-    if (!stripe || !elements) return;
+    const cardNumberElement = elements?.getElement(CardNumberElement);
+    if (!stripe || !elements || !cardNumberElement) return;
+
     setSubmitting(true);
     onError(null);
 
-    const { error: submitError } = await elements.submit();
-    if (submitError) {
-      onError(submitError.message ?? "Verifique os dados do cartão");
+    const { paymentMethod, error: pmError } = await stripe.createPaymentMethod({
+      type: "card",
+      card: cardNumberElement,
+      billing_details: { name, email: email ?? undefined },
+    });
+
+    if (pmError || !paymentMethod) {
+      onError(pmError?.message ?? "Verifique os dados do cartão");
       setSubmitting(false);
       return;
     }
@@ -146,7 +168,12 @@ function CheckoutFormBody({
       const res = await fetch("/api/checkout/intent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ plan, name, cpf: cpf.replace(/\D/g, "") }),
+        body: JSON.stringify({
+          plan,
+          name,
+          cpf: cpf.replace(/\D/g, ""),
+          paymentMethodId: paymentMethod.id,
+        }),
       });
       const data = await res.json();
       if (!data.clientSecret) {
@@ -155,15 +182,7 @@ function CheckoutFormBody({
         return;
       }
 
-      const { error: confirmError } = await stripe.confirmPayment({
-        elements,
-        clientSecret: data.clientSecret,
-        confirmParams: {
-          return_url: `${window.location.origin}/success`,
-          payment_method_data: { billing_details: { name, email: email ?? undefined } },
-        },
-        redirect: "if_required",
-      });
+      const { error: confirmError } = await stripe.confirmCardPayment(data.clientSecret);
 
       if (confirmError) {
         onError(confirmError.message ?? "Não foi possível confirmar o pagamento");
@@ -191,9 +210,7 @@ function CheckoutFormBody({
         <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
           Dados do cartão
         </p>
-        <div className="w-full rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] p-[var(--spacing-md,16px)]">
-          <PaymentElement options={{ fields: { billingDetails: { name: "never", email: "never" } } }} />
-        </div>
+        <CardFields />
       </div>
 
       <p className="w-full font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--content-strongest,#757575)]">
@@ -272,25 +289,16 @@ function CheckoutInner() {
       .finally(() => setLoading(false));
   }, [plan]);
 
-  const elementsOptions: StripeElementsOptions | null = amount
-    ? {
-        mode: "subscription",
-        amount: amount.value,
-        currency: amount.currency,
-        appearance: STRIPE_APPEARANCE,
-      }
-    : null;
-
   return (
     <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding,16px)]">
       <TitleAction title="Checkout" href="/pricing" />
 
-      {loading || !elementsOptions || !amount ? (
+      {loading || !amount ? (
         <p className="w-full py-10 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
           {errorMsg ?? "Carregando..."}
         </p>
       ) : (
-        <Elements stripe={stripePromise} options={elementsOptions}>
+        <Elements stripe={stripePromise}>
           <CheckoutFormBody
             plan={plan}
             email={email}
