@@ -182,7 +182,10 @@ function CheckoutFormBody({
         return;
       }
 
-      const { error: confirmError } = await stripe.confirmCardPayment(data.clientSecret);
+      const { error: confirmError } =
+        data.mode === "setup"
+          ? await stripe.confirmCardSetup(data.clientSecret)
+          : await stripe.confirmCardPayment(data.clientSecret);
 
       if (confirmError) {
         onError(confirmError.message ?? "Não foi possível confirmar o pagamento");
