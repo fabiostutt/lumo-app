@@ -100,7 +100,7 @@ export default function PricingPage() {
                   ? "—"
                   : formatPrice(displayedAmount, prices!.currency)}
               </p>
-              <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+              <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
                 {displayedSuffix}
               </p>
             </div>
@@ -135,7 +135,7 @@ export default function PricingPage() {
             {FEATURES.map((feature) => (
               <div key={feature} className="flex w-full items-center gap-[var(--spacing-xs,8px)]">
                 <SingleCheckIcon size={24} className="shrink-0 text-[color:var(--feedback-success-strong,#2b9c04)]" />
-                <p className="flex-1 font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,24px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
+                <p className="flex-1 font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
                   {feature}
                 </p>
               </div>
