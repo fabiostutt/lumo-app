@@ -11,8 +11,31 @@ import {
   OptionsIcon,
   VideoIcon,
   CircleCheckIcon,
+  AlertIcon,
+  CancelIcon,
 } from "@/components/icons";
 import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
+
+const STATUS_CHIP_MAP: Record<
+  SessionStatus,
+  { bg: string; text: string; icon: (props: { size: number; className?: string }) => React.ReactElement }
+> = {
+  confirmada: {
+    bg: "bg-[var(--feedback-success-subtlest,#efffe5)]",
+    text: "text-[color:var(--feedback-success-strongest,#1b6303)]",
+    icon: CircleCheckIcon,
+  },
+  pendente: {
+    bg: "bg-[var(--feedback-warning-subtlest,#fefbed)]",
+    text: "text-[color:var(--feedback-warning-strongest,#706121)]",
+    icon: AlertIcon,
+  },
+  cancelada: {
+    bg: "bg-[var(--feedback-danger-subtlest,#fbe8e8)]",
+    text: "text-[color:var(--feedback-danger-strongest,#610d0d)]",
+    icon: CancelIcon,
+  },
+};
 
 const WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
 const MONTH_LABELS = [
@@ -307,11 +330,14 @@ function MeetingListItem({
           </div>
         </div>
         <div className="flex shrink-0 items-center gap-[var(--spacing-xs,8px)]">
-          {meeting.status === "confirmada" && (
-            <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)] text-[color:var(--feedback-success-strongest,#1b6303)]">
-              <CircleCheckIcon size={16} />
-            </div>
-          )}
+          {(() => {
+            const { bg, text, icon: Icon } = STATUS_CHIP_MAP[meeting.status];
+            return (
+              <div className={`flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] p-[var(--spacing-xxs,4px)] ${bg} ${text}`}>
+                <Icon size={16} />
+              </div>
+            );
+          })()}
           <button
             type="button"
             onClick={onOptions}
