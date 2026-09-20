@@ -495,9 +495,9 @@ export default function Dashboard({
             <QuickActionButton icon={<PeopleIcon size={24} />} label="Clientes" onClick={onClients ?? (() => router.push("/clients"))} />
             <QuickActionButton
               icon={<EngineIcon size={24} />}
-              label="Configurações"
+              label="Perfil"
               hasBadge
-              onClick={() => router.push("/pricing")}
+              onClick={() => router.push("/profile")}
             />
           </div>
 

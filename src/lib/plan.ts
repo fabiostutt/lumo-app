@@ -9,6 +9,11 @@ export type Profile = {
   stripe_customer_id: string | null;
   stripe_subscription_id: string | null;
   subscription_status: string | null;
+  whatsapp: string | null;
+  professional_name: string | null;
+  specialty: string | null;
+  default_duration_minutes: number;
+  default_session_type: string;
 };
 
 export async function getOrCreateProfile(): Promise<Profile> {
