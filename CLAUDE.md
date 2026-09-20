@@ -32,6 +32,10 @@ Three separate ways to talk to Supabase, chosen by execution context — use the
 - Writes go through Server Actions in `src/lib/actions/` (`"use server"`), which validate `FormData`, re-check auth, and call `revalidatePath` + `redirect` on success. Some (`createClientAction`) use the `useFormState`-style `(prevState, formData)` signature to return `{ error }` to the calling form instead of throwing.
 - `src/lib/plan.ts` implements the free/pro plan gate: `getOrCreateProfile()` lazily inserts a `profiles` row with a 14-day trial (`TRIAL_DAYS`) on first access; `getEffectivePlan()` treats an active/trialing Stripe subscription or an unexpired trial as `"pro"`, otherwise `"free"`. `FREE_CLIENT_LIMIT` (5) is enforced in `createClientAction` before inserting a new client.
 
+### Profile screen
+
+`/profile` (`src/app/profile/page.tsx` + `src/components/ProfileScreen.tsx`) shows the practitioner's own info: name/email/avatar read straight from the Google-populated `user.user_metadata`/`user.email` (not stored locally, not editable here), plus editable fields that live on `profiles` (`whatsapp`, `professional_name`, `specialty`, `default_duration_minutes`, `default_session_type`) saved one at a time via `updateProfileFieldAction` (`src/lib/actions/update-profile.ts`) through small `BottomSheet`-based edit sheets. `default_duration_minutes`/`default_session_type` are captured here but nothing in the scheduling flow (`ScheduleSessionForm`, `create-session.ts`) reads them yet — that wiring is a follow-up, not done. The dashboard's gear quick-action button now routes here (label changed from "Configurações" to "Perfil") instead of `/pricing`; `/pricing` is still reachable from the free-plan-limit upsell links in `ClientForm.tsx`/`clients/new`.
+
 ### Billing (Stripe)
 
 `src/app/api/checkout/route.ts` creates a Stripe Checkout session for the authenticated user (`client_reference_id` = Supabase user id) and redirects to `/success` or `/pricing`.
