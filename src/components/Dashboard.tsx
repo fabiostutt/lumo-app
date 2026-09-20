@@ -177,12 +177,14 @@ function HeadProfile({
 
 function WeekCalendar({
   month,
+  year,
   weekDays,
   onPrevWeek,
   onNextWeek,
   onSelectDay,
 }: {
   month: string;
+  year: number;
   weekDays: WeekDay[];
   onPrevWeek?: () => void;
   onNextWeek?: () => void;
@@ -191,9 +193,10 @@ function WeekCalendar({
   return (
     <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
       <div className="flex w-full items-center gap-[var(--spacing-xs,8px)] pl-[var(--spacing-xxs,4px)]">
-        <p className="flex-1 font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-strongest,#757575)]">
-          {month}
-        </p>
+        <div className="flex flex-1 items-center gap-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)]">
+          <p className="text-[color:var(--content-base,#212121)]">{month}</p>
+          <p className="text-[color:var(--content-strongest,#757575)]">{year}</p>
+        </div>
         <button
           type="button"
           onClick={onPrevWeek}
@@ -260,6 +263,36 @@ function WeekCalendar({
           </div>
         ))}
       </div>
+    </div>
+  );
+}
+
+// TODO: /components/icons.tsx precisa de um ícone "mailbox" permanente —
+// essa URL é hospedada pelo Figma e expira em ~7 dias.
+const MAILBOX_ICON_URL = "https://www.figma.com/api/mcp/asset/58416fac-4489-4ffd-a671-10a4c826218b.svg";
+
+function ScheduleMeetingEmpty({ onSchedule }: { onSchedule?: () => void }) {
+  return (
+    <div className="flex w-full flex-col items-center gap-[var(--sheet-gap,16px)] rounded-[var(--sheet-border-radius,32px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtle,#bdbdbd)] p-[var(--sheet-padding,24px)]">
+      <div className="flex w-full flex-col items-center gap-[var(--numbers-padding-xs,8px)]">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={MAILBOX_ICON_URL} alt="" className="size-[48px]" />
+        <p className="w-full text-center font-[family-name:var(--typography-heading-h3-font-family)] font-[var(--typography-heading-h3-font-weight,600)] text-[length:var(--typography-heading-h3-font-size,20px)] leading-[var(--typography-heading-h3-line-height,28px)] tracking-[var(--typography-heading-h3-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
+          Hoje você está com o dia livre
+        </p>
+        <p className="w-full text-center font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-strongest,#757575)]">
+          Aproveite para tomar um café e organize tua semana por aqui.
+        </p>
+      </div>
+      <button
+        type="button"
+        onClick={onSchedule}
+        className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)]"
+      >
+        <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
+          Agendar reunião
+        </span>
+      </button>
     </div>
   );
 }
@@ -386,6 +419,7 @@ export default function Dashboard({
   const [sheetMeeting, setSheetMeeting] = useState<Meeting | null>(null);
 
   const weekDays = buildWeekDays(selectedDate, eventDates);
+  const year = new Date(`${selectedDate}T00:00:00`).getFullYear();
 
   // A sessão em destaque no card "Próxima sessão" não deve se repetir na
   // lista "Sessões do dia" logo abaixo.
@@ -473,6 +507,7 @@ export default function Dashboard({
         <div className={`flex w-full flex-col gap-[var(--slot-gap-base,24px)] px-[var(--spacing-md,16px)] py-[var(--numbers-padding-xxxs,2px)] transition-opacity ${loading ? "opacity-60" : "opacity-100"}`}>
           <WeekCalendar
             month={month}
+            year={year}
             weekDays={weekDays}
             onPrevWeek={handlePrevWeek}
             onNextWeek={handleNextWeek}
@@ -501,9 +536,7 @@ export default function Dashboard({
                 />
               ))}
               {dayMeetings.length === 0 && !isNextMeetingShown && (
-                <p className="w-full py-6 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
-                  Nenhuma sessão neste dia.
-                </p>
+                <ScheduleMeetingEmpty onSchedule={onSchedule ?? (() => router.push("/sessions/new"))} />
               )}
             </div>
           </div>
