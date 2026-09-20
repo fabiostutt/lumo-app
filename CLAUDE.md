@@ -50,7 +50,7 @@ There used to be a second, older webhook route at `src/app/api/webhooks/stripe/r
 
 Two triggers call `sendPushToOwner`:
 - `src/app/api/sessions/[id]/sync-status/route.ts` — when a pending session's Google Calendar RSVP flips to accepted/declined.
-- `src/app/api/cron/session-reminders/route.ts` — a scheduled job (see `vercel.json`) that pushes a reminder ~15 minutes before each session and marks it via `sessions.reminder_sent_at` so it never double-sends. Vercel automatically sends `Authorization: Bearer $CRON_SECRET` for its own Cron Job invocations when `CRON_SECRET` is set — the route checks that. Note: Vercel's Hobby plan only runs cron jobs once a day; the 5-minute schedule in `vercel.json` requires a Pro plan (or an external scheduler hitting the same URL with the same header).
+- `src/app/api/cron/session-reminders/route.ts` — checks sessions starting in the next 15 minutes and marks each one via `sessions.reminder_sent_at` so it never double-sends. It's meant to run every few minutes, but **Vercel's Hobby plan only runs cron jobs once a day** — `vercel.json`'s own cron entry is set to `0 12 * * *` purely as a harmless daily fallback that satisfies the Hobby plan limit. The real, frequent trigger is an external scheduler (this project uses cron-job.org) hitting `GET https://<domain>/api/cron/session-reminders` every 5 minutes with header `Authorization: Bearer $CRON_SECRET` — the route checks that header itself, so it doesn't matter what calls it. Move the cadence back into `vercel.json` and drop the external scheduler if the project ever upgrades to Vercel Pro.
 
 ### Design tokens
 
