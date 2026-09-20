@@ -15,6 +15,7 @@ import {
   CancelIcon,
 } from "@/components/icons";
 import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
+import PushNotificationsPrompt from "@/components/PushNotificationsPrompt";
 
 const STATUS_CHIP_MAP: Record<
   SessionStatus,
@@ -451,6 +452,8 @@ export default function Dashboard({
       <div className="flex w-full flex-col bg-[var(--surface-base,white)]">
         <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
           <HeadProfile userName={userName} sessionsToday={sessionsToday} />
+
+          <PushNotificationsPrompt />
 
           <div className="flex w-full items-start justify-between">
             <QuickActionButton icon={<WatchIcon size={24} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />

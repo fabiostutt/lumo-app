@@ -12,7 +12,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 There is no test suite configured in this repo.
 
-Environment variables (copy `.env.local.example` to `.env.local`): Supabase URL/anon key, Google OAuth client id/secret (configured in Supabase Auth), Stripe publishable/secret keys + webhook secret. Additional vars used in code but not in the example file: `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `NEXT_PUBLIC_SITE_URL`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANG`.
+Environment variables (copy `.env.local.example` to `.env.local`): Supabase URL/anon key, Google OAuth client id/secret (configured in Supabase Auth), Stripe publishable/secret keys + webhook secret, Web Push VAPID keys. Additional vars used in code but not in the example file: `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_PRICE_MONTHLY`, `STRIPE_PRICE_YEARLY`, `NEXT_PUBLIC_SITE_URL`, `WHATSAPP_TOKEN`, `WHATSAPP_PHONE_NUMBER_ID`, `WHATSAPP_VERIFY_TOKEN`, `WHATSAPP_TEMPLATE_NAME`, `WHATSAPP_TEMPLATE_LANG`.
 
 ## Architecture
 
@@ -43,6 +43,14 @@ There used to be a second, older webhook route at `src/app/api/webhooks/stripe/r
 ### WhatsApp session confirmations
 
 `src/lib/whatsapp.ts` sends a template message (via Meta Graph API) with inline Confirm/Cancel quick-reply buttons whose payloads encode `confirm_<sessionId>` / `cancel_<sessionId>`. `src/app/api/whatsapp/webhook/route.ts` handles Meta's `GET` verification handshake and the `POST` callback that parses the button payload and updates `sessions.status` accordingly (`"confirmada"` / `"cancelada"`), using the admin client since there's no user session in a webhook.
+
+### Push notifications (Web Push)
+
+`src/lib/push/server.ts` (`sendPushToOwner`) sends Web Push notifications via the `web-push` package, reading subscriptions for a given `owner_id` from the `push_subscriptions` table (admin client — called from webhook-style routes with no user session) and pruning subscriptions the browser has invalidated (push service returns 404/410). `src/lib/push/client.ts` has the browser-side counterpart: registers `public/sw.js`, requests `Notification` permission, subscribes via `PushManager`, and POSTs the subscription to `/api/push/subscribe` (which upserts it scoped to `auth.getUser()`). `src/components/PushNotificationsPrompt.tsx` is the opt-in UI shown on the dashboard when the browser isn't subscribed yet.
+
+Two triggers call `sendPushToOwner`:
+- `src/app/api/sessions/[id]/sync-status/route.ts` — when a pending session's Google Calendar RSVP flips to accepted/declined.
+- `src/app/api/cron/session-reminders/route.ts` — a scheduled job (see `vercel.json`) that pushes a reminder ~15 minutes before each session and marks it via `sessions.reminder_sent_at` so it never double-sends. Vercel automatically sends `Authorization: Bearer $CRON_SECRET` for its own Cron Job invocations when `CRON_SECRET` is set — the route checks that. Note: Vercel's Hobby plan only runs cron jobs once a day; the 5-minute schedule in `vercel.json` requires a Pro plan (or an external scheduler hitting the same URL with the same header).
 
 ### Design tokens
 

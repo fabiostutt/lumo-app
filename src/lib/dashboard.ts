@@ -11,13 +11,13 @@ const WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
 // relógio local do servidor quebra em produção, onde o processo costuma
 // rodar em UTC (uma sessão às 22h BRT parecia "no passado" às 22h UTC, que
 // ainda são 19h em Brasília).
-const APP_TIME_ZONE = "America/Sao_Paulo";
+export const APP_TIME_ZONE = "America/Sao_Paulo";
 
 function toISO(d: Date) {
   return d.toISOString().slice(0, 10);
 }
 
-function getNowInAppTimeZone() {
+export function getNowInAppTimeZone() {
   const now = new Date();
   const dateStr = new Intl.DateTimeFormat("en-CA", {
     timeZone: APP_TIME_ZONE,
