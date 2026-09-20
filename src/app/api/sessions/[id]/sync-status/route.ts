@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { getCalendarEvent, getValidGoogleAccessToken } from "@/lib/google/calendar";
+import { sendPushToOwner } from "@/lib/push/server";
 import { revalidatePath } from "next/cache";
 
 // Chamado quando o bottom sheet de detalhes da sessão abre: puxa a resposta
@@ -20,7 +21,7 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
   const { data: session } = await supabase
     .from("sessions")
-    .select("id, status, platform, google_event_id")
+    .select("id, status, platform, google_event_id, time, clients(name)")
     .eq("id", id)
     .eq("owner_id", user.id)
     .single();
@@ -48,6 +49,16 @@ export async function POST(request: Request, { params }: { params: Promise<{ id:
 
     await supabase.from("sessions").update({ status: newStatus }).eq("id", id);
     revalidatePath("/dashboard");
+
+    const clientName = (session as unknown as { clients?: { name?: string } | null }).clients?.name ?? "cliente";
+    await sendPushToOwner(user.id, {
+      title: newStatus === "confirmada" ? "Sessão confirmada" : "Sessão recusada",
+      body:
+        newStatus === "confirmada"
+          ? `${clientName} confirmou a sessão das ${session.time}.`
+          : `${clientName} recusou a sessão das ${session.time}.`,
+      url: "/dashboard",
+    });
 
     return NextResponse.json({ status: newStatus });
   } catch (err) {
