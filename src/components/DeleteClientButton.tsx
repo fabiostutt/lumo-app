@@ -33,9 +33,9 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
       <button
         type="button"
         onClick={() => setOpen(true)}
-        className="flex h-[var(--button-height-large,56px)] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-large,16px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--button-danger-border,#ee9e9e)] bg-[var(--button-danger-surface-enabled,white)] px-[var(--button-padding,16px)]"
+        className="flex h-[var(--button-height-large,56px)] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-large,16px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--button-danger-secondary-border,#ee9e9e)] bg-[var(--button-danger-secondary-surface-enabled,white)] px-[var(--button-padding,16px)]"
       >
-        <span className="font-[family-name:var(--typography-label-large-font-family)] font-[var(--typography-label-large-font-weight,500)] text-[length:var(--typography-label-large-font-size,20px)] leading-[var(--typography-label-large-line-height,24px)] tracking-[var(--typography-label-large-letter-spacing,-0.4px)] text-[color:var(--button-danger-content-enabled,#d71d1d)]">
+        <span className="font-[family-name:var(--typography-label-large-font-family)] font-[var(--typography-label-large-font-weight,500)] text-[length:var(--typography-label-large-font-size,20px)] leading-[var(--typography-label-large-line-height,24px)] tracking-[var(--typography-label-large-letter-spacing,-0.4px)] text-[color:var(--button-danger-secondary-content-enabled,#d71d1d)]">
           Excluir cliente
         </span>
       </button>
@@ -81,9 +81,9 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
             type="button"
             onClick={handleConfirm}
             disabled={isPending}
-            className="flex h-[40px] items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--feedback-danger-strong,#991515)] px-[var(--button-padding-small,12px)]"
+            className="flex h-[40px] items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-danger-tertiary-surface-enabled,#d71d1d)] px-[var(--button-padding-small,12px)]"
           >
-            <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--feedback-danger-subtlest,#fbe8e8)] whitespace-nowrap">
+            <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-danger-tertiary-content-enabled,#fafafa)] whitespace-nowrap">
               {isPending ? "Excluindo..." : "Excluir"}
             </span>
           </button>
