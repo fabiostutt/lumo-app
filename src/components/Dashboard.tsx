@@ -292,16 +292,21 @@ function NextMeetingCard({
           <OptionsIcon size={24} className="text-white" />
         </button>
       </div>
-      <button
-        type="button"
+      <a
+        href={meeting.meetingUrl || undefined}
+        target="_blank"
+        rel="noopener noreferrer"
         onClick={onJoinCall}
-        className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding-small,12px)] text-[color:var(--button-secondary-content-enabled,#212121)]"
+        aria-disabled={!meeting.meetingUrl}
+        className={`flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding-small,12px)] text-[color:var(--button-secondary-content-enabled,#212121)] ${
+          !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
+        }`}
       >
         <VideoIcon size={24} />
         <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
-          Entrar na chamada
+          Entrar na reunião
         </span>
-      </button>
+      </a>
     </div>
   );
 }
