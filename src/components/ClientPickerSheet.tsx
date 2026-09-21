@@ -73,10 +73,10 @@ export default function ClientPickerSheet({
                 key={client.id}
                 type="button"
                 onClick={() => setSelectedId(client.id)}
-                className={`flex h-[72px] w-full items-center gap-[var(--spacing-md,16px)] rounded-[20px] border-solid bg-[var(--surface-base,white)] p-[var(--spacing-md,16px)] text-left ${
+                className={`flex h-[72px] w-full items-center gap-[var(--spacing-md,16px)] rounded-[20px] bg-[var(--surface-base,white)] p-[var(--spacing-md,16px)] text-left ${
                   isSelected
-                    ? "border-[length:var(--border-width-xs,2px)] border-[var(--border-strong,#212121)]"
-                    : "border-[length:var(--border-width-xxxs,0.5px)] border-[var(--border-subtlest,#eee)]"
+                    ? "shadow-[inset_0_0_0_var(--border-width-xs,2px)_var(--border-strong,#212121)]"
+                    : "shadow-[inset_0_0_0_var(--border-width-xxxs,0.5px)_var(--border-subtlest,#eee)]"
                 }`}
               >
                 <PeopleIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
