@@ -66,11 +66,11 @@ export default function PricingPage() {
       <TitleAction title="Benefícios" href="/dashboard" />
 
       <div className="flex w-full flex-col items-center gap-[var(--spacing-xs,8px)]">
-        <div className="flex w-full items-center gap-[var(--spacing-horizontal-sm,8px)] rounded-[var(--border-radius-xl,20px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtle,#bdbdbd)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-xs,4px)]">
+        <div className="flex items-center gap-[var(--spacing-horizontal-sm,8px)] rounded-[var(--border-radius-xl,20px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtle,#bdbdbd)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-xs,4px)]">
           <button
             type="button"
             onClick={() => setPlan("monthly")}
-            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
+            className={`flex items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
               plan === "monthly"
                 ? "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
                 : "text-[color:var(--content-base,#212121)]"
@@ -81,7 +81,7 @@ export default function PricingPage() {
           <button
             type="button"
             onClick={() => setPlan("yearly")}
-            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
+            className={`flex items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
               plan === "yearly"
                 ? "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
                 : "text-[color:var(--content-base,#212121)]"
