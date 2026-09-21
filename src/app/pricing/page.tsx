@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { AppXIcon, SingleCheckIcon, VerifiedIcon } from "@/components/icons";
+import { Percent } from "lucide-react";
+import { SingleCheckIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
 
 type Plan = "monthly" | "yearly";
@@ -16,7 +17,8 @@ type PricingData = {
 const FEATURES = [
   "Clientes ilimitados",
   "Integração com Google Meet",
-  "Agenda sem limite de sessões",
+  "Alertas e notificações por WhatsApp",
+  "Agenda sem limite de reuniões",
   "Suporte prioritário",
 ];
 
@@ -61,74 +63,64 @@ export default function PricingPage() {
 
   return (
     <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-subtle,#fafafa)] p-[var(--screen-padding,16px)]">
-      <TitleAction title="Assinatura" href="/dashboard" />
+      <TitleAction title="Benefícios" href="/dashboard" />
+
+      <div className="flex w-full flex-col items-center gap-[var(--spacing-xs,8px)]">
+        <div className="flex w-full items-center gap-[var(--spacing-horizontal-sm,8px)] rounded-[var(--border-radius-xl,20px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtle,#bdbdbd)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-xs,4px)]">
+          <button
+            type="button"
+            onClick={() => setPlan("monthly")}
+            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
+              plan === "monthly"
+                ? "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
+                : "text-[color:var(--content-base,#212121)]"
+            }`}
+          >
+            Mensal
+          </button>
+          <button
+            type="button"
+            onClick={() => setPlan("yearly")}
+            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
+              plan === "yearly"
+                ? "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
+                : "text-[color:var(--content-base,#212121)]"
+            }`}
+          >
+            Anual
+          </button>
+        </div>
+
+        {savingsPercent !== null && savingsPercent > 0 && (
+          <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)]">
+            <Percent size={16} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
+            <span className="font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--feedback-success-strongest,#1b6303)]">
+              Economize {savingsPercent}% no plano anual
+            </span>
+          </div>
+        )}
+
+        <div className="flex items-baseline gap-[var(--spacing-xxs,4px)]">
+          <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)] text-[color:var(--content-base,#212121)]">
+            {loadingPrices || displayedAmount == null
+              ? "—"
+              : formatPrice(displayedAmount, prices!.currency)}
+          </p>
+          <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+            {displayedSuffix}
+          </p>
+        </div>
+      </div>
 
       <div className="relative flex w-full flex-col rounded-[var(--sheet-border-radius,32px)] bg-[var(--surface-base,white)]">
-        <div className="flex w-full flex-col gap-[var(--sheet-gap,16px)] p-[var(--sheet-padding,24px)]">
-          <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
-            <div className="flex flex-1 flex-col items-start gap-[var(--spacing-xxs,4px)]">
-              <h1 className="font-[family-name:var(--typography-heading-h2-font-family)] font-[var(--typography-heading-h2-font-weight,600)] text-[length:var(--typography-heading-h2-font-size,24px)] leading-[var(--typography-heading-h2-line-height,32px)] tracking-[var(--typography-heading-h2-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
-                Lumo Pro
-              </h1>
-              <p className="font-[family-name:var(--typography-heading-h4-font-family)] font-[var(--typography-heading-h4-font-weight,600)] text-[length:var(--typography-heading-h4-font-size,16px)] leading-[var(--typography-heading-h4-line-height,24px)] tracking-[var(--typography-heading-h4-letter-spacing,-0.1px)] text-[color:var(--content-strongest,#757575)]">
-                Escolha o plano ideal para você.
-              </p>
-            </div>
-            <button
-              type="button"
-              onClick={() => router.push("/dashboard")}
-              aria-label="Fechar"
-              className="shrink-0 text-[color:var(--content-base,#212121)]"
-            >
-              <AppXIcon size={24} />
-            </button>
-          </div>
-
-          <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
-            {savingsPercent !== null && savingsPercent > 0 && (
-              <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)]">
-                <VerifiedIcon size={16} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
-                <span className="font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--feedback-success-strongest,#1b6303)]">
-                  Economize {savingsPercent}% no plano anual
-                </span>
-              </div>
-            )}
-
-            <div className="flex items-baseline gap-[var(--spacing-xxs,4px)]">
-              <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)] text-[color:var(--content-base,#212121)]">
-                {loadingPrices || displayedAmount == null
-                  ? "—"
-                  : formatPrice(displayedAmount, prices!.currency)}
-              </p>
-              <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-                {displayedSuffix}
-              </p>
-            </div>
-
-            <div className="flex w-full items-center gap-[var(--spacing-horizontal-sm,8px)] rounded-[var(--border-radius-xxxl,32px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtle,#bdbdbd)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-xs,4px)]">
-              <button
-                type="button"
-                onClick={() => setPlan("monthly")}
-                className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] p-[var(--spacing-md,16px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
-                  plan === "monthly"
-                    ? "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
-                    : "text-[color:var(--content-base,#212121)]"
-                }`}
-              >
-                Mensal
-              </button>
-              <button
-                type="button"
-                onClick={() => setPlan("yearly")}
-                className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] p-[var(--spacing-md,16px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
-                  plan === "yearly"
-                    ? "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
-                    : "text-[color:var(--content-base,#212121)]"
-                }`}
-              >
-                Anual
-              </button>
-            </div>
+        <div className="flex w-full flex-col gap-[var(--sheet-gap-large,24px)] p-[var(--sheet-padding,24px)]">
+          <div className="flex w-full flex-col items-start gap-[var(--spacing-xxs,4px)]">
+            <h1 className="font-[family-name:var(--typography-heading-h2-font-family)] font-[var(--typography-heading-h2-font-weight,600)] text-[length:var(--typography-heading-h2-font-size,24px)] leading-[var(--typography-heading-h2-line-height,32px)] tracking-[var(--typography-heading-h2-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
+              Lumo Pro
+            </h1>
+            <p className="font-[family-name:var(--typography-heading-h4-font-family)] font-[var(--typography-heading-h4-font-weight,600)] text-[length:var(--typography-heading-h4-font-size,16px)] leading-[var(--typography-heading-h4-line-height,24px)] tracking-[var(--typography-heading-h4-letter-spacing,-0.1px)] text-[color:var(--content-strongest,#757575)]">
+              Mais tempo para o que realmente importa.
+            </p>
           </div>
 
           <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
@@ -148,21 +140,22 @@ export default function PricingPage() {
             </p>
           )}
 
-          <button
-            type="button"
-            onClick={handleSubscribe}
-            disabled={submitting || loadingPrices}
-            className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--numbers-padding-md,16px)] disabled:opacity-60"
-          >
-            <VerifiedIcon size={24} className="text-[color:var(--button-primary-content-enabled,#fafafa)]" />
-            <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] whitespace-nowrap text-[color:var(--button-primary-content-enabled,#fafafa)]">
-              {submitting ? "Redirecionando..." : "Assinar agora"}
-            </span>
-          </button>
+          <div className="flex w-full flex-col items-start gap-[var(--spacing-md,16px)]">
+            <button
+              type="button"
+              onClick={handleSubscribe}
+              disabled={submitting || loadingPrices}
+              className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--numbers-padding-md,16px)] disabled:opacity-60"
+            >
+              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] whitespace-nowrap text-[color:var(--button-primary-content-enabled,#fafafa)]">
+                {submitting ? "Redirecionando..." : "Quero ser Lumo Pro"}
+              </span>
+            </button>
 
-          <p className="w-full text-center font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--content-strongest,#757575)]">
-            14 dias grátis. Cancele quando quiser.
-          </p>
+            <p className="w-full text-center font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--content-strongest,#757575)]">
+              7 dias grátis. Cancele quando quiser.
+            </p>
+          </div>
         </div>
       </div>
     </div>
