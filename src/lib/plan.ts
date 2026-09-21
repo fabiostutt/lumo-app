@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 
-const TRIAL_DAYS = 14;
+const TRIAL_DAYS = 7;
 export const FREE_CLIENT_LIMIT = 5;
 
 export type Profile = {

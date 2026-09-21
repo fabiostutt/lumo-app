@@ -30,7 +30,7 @@ Three separate ways to talk to Supabase, chosen by execution context — use the
 
 - Reads go through small query modules in `src/lib/` (e.g. `dashboard.ts`, `sessions.ts`, `clients.ts`) that each create their own Supabase server client, fetch the current user via `auth.getUser()`, and scope every query by `owner_id = user.id`.
 - Writes go through Server Actions in `src/lib/actions/` (`"use server"`), which validate `FormData`, re-check auth, and call `revalidatePath` + `redirect` on success. Some (`createClientAction`) use the `useFormState`-style `(prevState, formData)` signature to return `{ error }` to the calling form instead of throwing.
-- `src/lib/plan.ts` implements the free/pro plan gate: `getOrCreateProfile()` lazily inserts a `profiles` row with a 14-day trial (`TRIAL_DAYS`) on first access; `getEffectivePlan()` treats an active/trialing Stripe subscription or an unexpired trial as `"pro"`, otherwise `"free"`. `FREE_CLIENT_LIMIT` (5) is enforced in `createClientAction` before inserting a new client.
+- `src/lib/plan.ts` implements the free/pro plan gate: `getOrCreateProfile()` lazily inserts a `profiles` row with a 7-day trial (`TRIAL_DAYS`) on first access; `getEffectivePlan()` treats an active/trialing Stripe subscription or an unexpired trial as `"pro"`, otherwise `"free"`. `FREE_CLIENT_LIMIT` (5) is enforced in `createClientAction` before inserting a new client.
 
 ### Profile screen
 
