@@ -26,6 +26,7 @@ export default async function EditSessionPage({
         initialNotificationsOn={session.notifications_enabled ?? true}
         initialMeetingLink={session.meeting_link}
         initialPlatform={session.platform === "Google" ? "google" : "whatsapp"}
+        initialDurationMinutes={session.duration_minutes ?? 50}
       />
     </div>
   );

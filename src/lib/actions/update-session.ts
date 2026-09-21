@@ -10,11 +10,16 @@ import {
   getValidGoogleAccessToken,
   updateCalendarEvent,
 } from "@/lib/google/calendar";
+import { findConflicts, formatConflictsMessage } from "@/lib/scheduling";
 
-const SESSION_DURATION_MINUTES = 60;
 const APP_TIME_ZONE = "America/Sao_Paulo";
 
-export async function updateSessionAction(formData: FormData) {
+export type UpdateSessionState = { error?: string } | null;
+
+export async function updateSessionAction(
+  _prevState: UpdateSessionState,
+  formData: FormData
+): Promise<UpdateSessionState> {
   const supabase = await createClient();
 
   const {
@@ -30,9 +35,27 @@ export async function updateSessionAction(formData: FormData) {
   const platform = formData.get("platform") === "google" ? "google" : "whatsapp";
   let meetingLink = String(formData.get("meetingLink") || "").trim();
   const notificationsEnabled = formData.get("notificationsEnabled") === "true";
+  const durationMinutes = Number(formData.get("duration")) || 50;
 
   if (!sessionId || !clientId || !date || !time) {
-    throw new Error("Preencha participante, data e hora");
+    return { error: "Preencha participante, data e hora" };
+  }
+
+  const { data: existingSessions } = await supabase
+    .from("sessions")
+    .select("id, date, time, duration_minutes, clients(name)")
+    .eq("owner_id", user.id)
+    .neq("status", "cancelada")
+    .eq("date", date);
+
+  const conflicts = findConflicts(
+    [{ date, time, durationMinutes }],
+    (existingSessions ?? []) as unknown as Parameters<typeof findConflicts>[1],
+    sessionId
+  );
+
+  if (conflicts.length > 0) {
+    return { error: formatConflictsMessage(conflicts) };
   }
 
   const { data: existing } = await supabase
@@ -58,7 +81,7 @@ export async function updateSessionAction(formData: FormData) {
       } else {
         const timeHHMM = time.slice(0, 5);
         const start = new Date(`${date}T${timeHHMM}:00-03:00`);
-        const end = new Date(start.getTime() + SESSION_DURATION_MINUTES * 60 * 1000);
+        const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
 
         if (existingEventId) {
           const event = await updateCalendarEvent(accessToken, existingEventId, {
@@ -107,6 +130,7 @@ export async function updateSessionAction(formData: FormData) {
       client_id: clientId,
       date,
       time,
+      duration_minutes: durationMinutes,
       platform: platform === "google" ? "Google" : "WhatsApp",
       notifications_enabled: notificationsEnabled,
       meeting_link: meetingLink || null,

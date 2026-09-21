@@ -6,11 +6,16 @@ import { revalidatePath } from "next/cache";
 import { getClientById } from "@/lib/clients";
 import { sendSessionConfirmationMessage } from "@/lib/whatsapp";
 import { createCalendarEvent, getValidGoogleAccessToken } from "@/lib/google/calendar";
+import { findConflicts, formatConflictsMessage, generateRecurrenceDates } from "@/lib/scheduling";
 
-const SESSION_DURATION_MINUTES = 60;
 const APP_TIME_ZONE = "America/Sao_Paulo";
 
-export async function createSessionAction(formData: FormData) {
+export type CreateSessionState = { error?: string } | null;
+
+export async function createSessionAction(
+  _prevState: CreateSessionState,
+  formData: FormData
+): Promise<CreateSessionState> {
   const supabase = await createClient();
 
   const {
@@ -25,78 +30,119 @@ export async function createSessionAction(formData: FormData) {
   const platform = formData.get("platform") === "google" ? "google" : "whatsapp";
   let meetingLink = String(formData.get("meetingLink") || "").trim();
   const notificationsEnabled = formData.get("notificationsEnabled") === "true";
+  const durationMinutes = Number(formData.get("duration")) || 50;
+  const recurrenceEnabled = formData.get("recurrenceEnabled") === "true";
+  const recurrenceWeekdays = String(formData.get("recurrenceWeekdays") || "")
+    .split(",")
+    .filter(Boolean)
+    .map(Number);
 
   if (!clientId || !date || !time) {
-    throw new Error("Preencha participante, data e hora");
+    return { error: "Preencha participante, data e hora" };
   }
 
   const client = await getClientById(clientId);
-  let googleEventId: string | null = null;
 
-  if (notificationsEnabled && platform === "google") {
-    if (client?.email) {
+  const occurrenceDates = recurrenceEnabled
+    ? generateRecurrenceDates(date, recurrenceWeekdays)
+    : [date];
+  const isRecurring = occurrenceDates.length > 1;
+  const recurrenceGroupId = isRecurring ? crypto.randomUUID() : null;
+
+  // Conflito é checado contra TODAS as ocorrências da série de uma vez, antes
+  // de criar qualquer coisa — evita criar metade da série e falhar no meio.
+  const { data: existingSessions } = await supabase
+    .from("sessions")
+    .select("id, date, time, duration_minutes, clients(name)")
+    .eq("owner_id", user.id)
+    .neq("status", "cancelada")
+    .in("date", occurrenceDates);
+
+  const conflicts = findConflicts(
+    occurrenceDates.map((d) => ({ date: d, time, durationMinutes })),
+    (existingSessions ?? []) as unknown as Parameters<typeof findConflicts>[1]
+  );
+
+  if (conflicts.length > 0) {
+    return { error: formatConflictsMessage(conflicts) };
+  }
+
+  const timeHHMM = time.slice(0, 5);
+
+  // Um evento no Google Calendar por ocorrência, criados em paralelo — em
+  // série, uma recorrência de 12 sessões facilmente estouraria o timeout da
+  // função serverless.
+  const calendarResults = await Promise.all(
+    occurrenceDates.map(async (occurrenceDate) => {
+      if (!notificationsEnabled || platform !== "google" || !client?.email) return null;
+
       try {
         const accessToken = await getValidGoogleAccessToken(user.id);
         if (!accessToken) {
           console.warn(
             `[create-session] Usuário ${user.id} não tem o Google Calendar conectado (faça login novamente para autorizar).`
           );
-        } else {
-          const timeHHMM = time.slice(0, 5);
-          const start = new Date(`${date}T${timeHHMM}:00-03:00`);
-          const end = new Date(start.getTime() + SESSION_DURATION_MINUTES * 60 * 1000);
-
-          const event = await createCalendarEvent({
-            accessToken,
-            summary: `Sessão com ${client.name}`,
-            description: "Sessão agendada via Lumo.",
-            startDateTime: start.toISOString(),
-            endDateTime: end.toISOString(),
-            timeZone: APP_TIME_ZONE,
-            attendeeEmail: client.email,
-          });
-
-          googleEventId = event.id;
-          meetingLink = event.hangoutLink || event.htmlLink;
+          return null;
         }
+
+        const start = new Date(`${occurrenceDate}T${timeHHMM}:00-03:00`);
+        const end = new Date(start.getTime() + durationMinutes * 60 * 1000);
+
+        const event = await createCalendarEvent({
+          accessToken,
+          summary: `Sessão com ${client.name}`,
+          description: "Sessão agendada via Lumo.",
+          startDateTime: start.toISOString(),
+          endDateTime: end.toISOString(),
+          timeZone: APP_TIME_ZONE,
+          attendeeEmail: client.email,
+        });
+
+        return { eventId: event.id, link: event.hangoutLink || event.htmlLink };
       } catch (err) {
         // Não deixamos uma falha no Google Calendar derrubar o agendamento.
-        console.error("[create-session] Falha ao criar evento no Google Calendar:", err);
+        console.error(`[create-session] Falha ao criar evento no Google Calendar (${occurrenceDate}):`, err);
+        return null;
       }
-    } else {
-      console.warn(
-        `[create-session] Notificações via Google ligadas, mas cliente ${clientId} não tem e-mail cadastrado.`
-      );
-    }
+    })
+  );
+
+  if (platform === "google" && calendarResults[0]?.link) {
+    meetingLink = calendarResults[0].link;
   }
 
-  const { data, error } = await supabase
-    .from("sessions")
-    .insert({
-      owner_id: user.id,
-      client_id: clientId,
-      date,
-      time,
-      platform: platform === "google" ? "Google" : "WhatsApp",
-      status: "pendente",
-      notifications_enabled: notificationsEnabled,
-      meeting_link: meetingLink || null,
-      google_event_id: googleEventId,
-    })
-    .select("id")
-    .single();
+  const rows = occurrenceDates.map((occurrenceDate, index) => ({
+    owner_id: user.id,
+    client_id: clientId,
+    date: occurrenceDate,
+    time,
+    duration_minutes: durationMinutes,
+    platform: platform === "google" ? "Google" : "WhatsApp",
+    status: "pendente",
+    notifications_enabled: notificationsEnabled,
+    meeting_link: platform === "google" ? calendarResults[index]?.link ?? null : meetingLink || null,
+    google_event_id: calendarResults[index]?.eventId ?? null,
+    recurrence_group_id: recurrenceGroupId,
+    recurrence_rule: isRecurring ? { weekdays: recurrenceWeekdays } : null,
+  }));
+
+  const { data: inserted, error } = await supabase.from("sessions").insert(rows).select("id, date");
 
   if (error) throw error;
 
-  if (notificationsEnabled && platform === "whatsapp" && client?.whatsapp) {
+  const firstOccurrence = inserted?.find((row) => row.date === date);
+
+  // Confirmação por WhatsApp só na primeira ocorrência — mandar N mensagens
+  // de uma vez pro mesmo cliente na criação de uma série seria spam.
+  if (notificationsEnabled && platform === "whatsapp" && client?.whatsapp && firstOccurrence) {
     const [, month, day] = date.split("-");
     try {
       await sendSessionConfirmationMessage({
         toRaw: client.whatsapp,
         clientName: client.name,
         date: `${day}/${month}`,
-        time: time.slice(0, 5),
-        sessionId: data.id,
+        time: timeHHMM,
+        sessionId: firstOccurrence.id,
       });
     } catch (err) {
       // Não deixamos uma falha no envio do WhatsApp derrubar o agendamento —
