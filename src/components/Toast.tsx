@@ -16,7 +16,7 @@ export default function Toast({ show, message }: ToastProps) {
       aria-live="polite"
     >
       <div
-        className={`flex items-center justify-center gap-[var(--spacing-xs,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--surface-strongest,#212121)]/95 px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] backdrop-blur-[4px] transition-all duration-300 ${
+        className={`flex items-center justify-center gap-[var(--spacing-sm,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--surface-strongest,#212121)]/95 px-[var(--spacing-md,16px)] py-[var(--spacing-sm,8px)] backdrop-blur-[4px] transition-all duration-300 ${
           show ? "translate-y-0 opacity-100" : "translate-y-full opacity-0"
         }`}
       >
