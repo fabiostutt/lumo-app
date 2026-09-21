@@ -36,6 +36,7 @@ export async function createSessionAction(
     .split(",")
     .filter(Boolean)
     .map(Number);
+  const recurrenceInterval = Number(formData.get("recurrenceInterval")) || 1;
 
   if (!clientId || !date || !time) {
     return { error: "Preencha participante, data e hora" };
@@ -44,7 +45,7 @@ export async function createSessionAction(
   const client = await getClientById(clientId);
 
   const occurrenceDates = recurrenceEnabled
-    ? generateRecurrenceDates(date, recurrenceWeekdays)
+    ? generateRecurrenceDates(date, recurrenceWeekdays, recurrenceInterval)
     : [date];
   const isRecurring = occurrenceDates.length > 1;
   const recurrenceGroupId = isRecurring ? crypto.randomUUID() : null;
@@ -123,7 +124,7 @@ export async function createSessionAction(
     meeting_link: platform === "google" ? calendarResults[index]?.link ?? null : meetingLink || null,
     google_event_id: calendarResults[index]?.eventId ?? null,
     recurrence_group_id: recurrenceGroupId,
-    recurrence_rule: isRecurring ? { weekdays: recurrenceWeekdays } : null,
+    recurrence_rule: isRecurring ? { weekdays: recurrenceWeekdays, interval: recurrenceInterval } : null,
   }));
 
   const { data: inserted, error } = await supabase.from("sessions").insert(rows).select("id, date");
