@@ -378,7 +378,7 @@ function MeetingListItem({
           <button
             type="button"
             onClick={onOptions}
-            className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-[var(--border-subtlest,#eee)] border-solid bg-[var(--surface-subtle,#fafafa)]"
+            className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)]"
             aria-label="Opções"
           >
             <OptionsIcon size={24} />
