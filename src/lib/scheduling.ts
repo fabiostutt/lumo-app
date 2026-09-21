@@ -20,23 +20,39 @@ function toISO(d: Date) {
   return d.toISOString().slice(0, 10);
 }
 
+function sundayOf(d: Date) {
+  const copy = new Date(d);
+  copy.setDate(copy.getDate() - copy.getDay());
+  return copy;
+}
+
+const MS_PER_WEEK = 7 * 24 * 60 * 60 * 1000;
+
 // Sempre inclui a data inicial (é o dia que o profissional escolheu
 // explicitamente), depois avança dia a dia procurando os weekdays marcados
-// até bater o limite de ocorrências.
+// até bater o limite de ocorrências. `interval` cobre o caso "toda quarta,
+// mas só de 15 em 15 dias" (interval=2) — só conta semanas cujo início
+// (domingo) esteja a um múltiplo de `interval` semanas da semana inicial.
 export function generateRecurrenceDates(
   startDate: string,
   weekdays: number[],
+  interval: number = 1,
   maxOccurrences: number = MAX_RECURRENCE_OCCURRENCES
 ): string[] {
   const dates = [startDate];
   if (weekdays.length === 0) return dates;
 
+  const safeInterval = Math.max(1, interval);
   const weekdaySet = new Set(weekdays);
+  const startWeekStart = sundayOf(toLocalDate(startDate));
   const cursor = toLocalDate(startDate);
 
   for (let i = 1; dates.length < maxOccurrences && i <= MAX_SCAN_DAYS; i++) {
     cursor.setDate(cursor.getDate() + 1);
-    if (weekdaySet.has(cursor.getDay())) {
+    if (!weekdaySet.has(cursor.getDay())) continue;
+
+    const weeksSinceStart = Math.round((sundayOf(cursor).getTime() - startWeekStart.getTime()) / MS_PER_WEEK);
+    if (weeksSinceStart % safeInterval === 0) {
       dates.push(toISO(cursor));
     }
   }
