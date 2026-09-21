@@ -47,7 +47,9 @@ export default function ScheduleSessionForm({
   const [pickerOpen, setPickerOpen] = useState(false);
   const [date, setDate] = useState(initialDate ?? "");
   const [time, setTime] = useState(initialTime ?? "");
-  const [duration, setDuration] = useState(String(initialDurationMinutes ?? 50));
+  // Duração fica de fora da UI por enquanto — vai ser definida no onboarding
+  // do profissional; aqui só repassamos o padrão do perfil pro backend.
+  const duration = String(initialDurationMinutes ?? 50);
   const [platform, setPlatform] = useState<"whatsapp" | "google">(initialPlatform ?? "whatsapp");
   const [notificationsOn, setNotificationsOn] = useState(initialNotificationsOn ?? true);
   const [copied, setCopied] = useState(false);
@@ -169,15 +171,7 @@ export default function ScheduleSessionForm({
         </div>
       </div>
 
-      <TextField
-        label="Duração (minutos)"
-        name="duration"
-        type="number"
-        placeholder="50"
-        icon={<WatchIcon size={24} />}
-        value={duration}
-        onChange={setDuration}
-      />
+      <input type="hidden" name="duration" value={duration} />
 
       {!isEditing && (
         <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
@@ -212,20 +206,41 @@ export default function ScheduleSessionForm({
           {recurrenceEnabled && (
             <div className="flex w-full flex-col gap-[var(--spacing-md,16px)] pt-[var(--spacing-md,16px)]">
               <div className="flex w-full gap-[var(--spacing-xs,8px)]">
-                <button
-                  type="button"
-                  onClick={() => date && setRecurrenceWeekdays([new Date(`${date}T00:00:00`).getDay()])}
-                  className="flex-1 rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold text-[color:var(--button-tertiary-content-enabled,#212121)]"
-                >
-                  Semanal
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setRecurrenceWeekdays(WEEKDAYS_BUSINESS)}
-                  className="flex-1 rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold text-[color:var(--button-tertiary-content-enabled,#212121)]"
-                >
-                  Dias úteis
-                </button>
+                {(() => {
+                  const weeklyDay = date ? new Date(`${date}T00:00:00`).getDay() : new Date().getDay();
+                  const isWeeklySelected =
+                    recurrenceWeekdays.length === 1 && recurrenceWeekdays[0] === weeklyDay;
+                  const isBusinessSelected =
+                    recurrenceWeekdays.length === WEEKDAYS_BUSINESS.length &&
+                    WEEKDAYS_BUSINESS.every((d) => recurrenceWeekdays.includes(d));
+
+                  return (
+                    <>
+                      <button
+                        type="button"
+                        onClick={() => setRecurrenceWeekdays([weeklyDay])}
+                        className={`flex-1 rounded-[var(--button-border-radius-small,8px)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold ${
+                          isWeeklySelected
+                            ? "bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
+                            : "bg-[var(--button-tertiary-surface-enabled,#eee)] text-[color:var(--button-tertiary-content-enabled,#212121)]"
+                        }`}
+                      >
+                        Semanal
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setRecurrenceWeekdays(WEEKDAYS_BUSINESS)}
+                        className={`flex-1 rounded-[var(--button-border-radius-small,8px)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold ${
+                          isBusinessSelected
+                            ? "bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
+                            : "bg-[var(--button-tertiary-surface-enabled,#eee)] text-[color:var(--button-tertiary-content-enabled,#212121)]"
+                        }`}
+                      >
+                        Dias úteis
+                      </button>
+                    </>
+                  );
+                })()}
               </div>
 
               <div className="flex w-full items-center justify-between gap-[4px]">
