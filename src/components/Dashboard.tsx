@@ -219,9 +219,7 @@ function WeekCalendar({
         {weekDays.map((day) => (
           <div
             key={day.iso}
-            className={`flex flex-col items-center ${
-              day.selected ? "gap-[var(--spacing-xs,8px)]" : "gap-[var(--spacing-200,8px)]"
-            }`}
+            className="flex flex-col items-center gap-[var(--spacing-sm,8px)]"
           >
             <p
               className={`font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] ${
