@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useActionState, useMemo, useState } from "react";
 import { ChevronRight } from "lucide-react";
 import { PeopleIcon, ScheduleIcon, WatchIcon, WhatsAppIcon } from "@/components/icons";
 import { createSessionAction } from "@/lib/actions/create-session";
@@ -9,6 +9,7 @@ import ClientPickerSheet from "@/components/ClientPickerSheet";
 import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
+import { WEEKDAY_LABELS, WEEKDAYS_BUSINESS, generateRecurrenceDates } from "@/lib/scheduling";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null; email?: string | null };
 
@@ -21,6 +22,7 @@ type ScheduleSessionFormProps = {
   initialNotificationsOn?: boolean;
   initialMeetingLink?: string | null;
   initialPlatform?: "whatsapp" | "google";
+  initialDurationMinutes?: number;
 };
 
 export default function ScheduleSessionForm({
@@ -32,16 +34,36 @@ export default function ScheduleSessionForm({
   initialNotificationsOn,
   initialMeetingLink,
   initialPlatform,
+  initialDurationMinutes,
 }: ScheduleSessionFormProps) {
   const isEditing = !!sessionId;
+
+  const [state, formAction, pending] = useActionState(
+    isEditing ? updateSessionAction : createSessionAction,
+    null
+  );
 
   const [clientId, setClientId] = useState(initialClientId ?? "");
   const [pickerOpen, setPickerOpen] = useState(false);
   const [date, setDate] = useState(initialDate ?? "");
   const [time, setTime] = useState(initialTime ?? "");
+  const [duration, setDuration] = useState(String(initialDurationMinutes ?? 50));
   const [platform, setPlatform] = useState<"whatsapp" | "google">(initialPlatform ?? "whatsapp");
   const [notificationsOn, setNotificationsOn] = useState(initialNotificationsOn ?? true);
   const [copied, setCopied] = useState(false);
+  const [recurrenceEnabled, setRecurrenceEnabled] = useState(false);
+  const [recurrenceWeekdays, setRecurrenceWeekdays] = useState<number[]>([]);
+
+  function toggleWeekday(day: number) {
+    setRecurrenceWeekdays((prev) =>
+      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day].sort()
+    );
+  }
+
+  const recurrencePreviewDates = useMemo(() => {
+    if (!recurrenceEnabled || !date) return [];
+    return generateRecurrenceDates(date, recurrenceWeekdays);
+  }, [recurrenceEnabled, date, recurrenceWeekdays]);
 
   const selectedClient = clients.find((c) => c.id === clientId) ?? null;
 
@@ -76,15 +98,24 @@ export default function ScheduleSessionForm({
   }
 
   return (
-    <form
-      action={isEditing ? updateSessionAction : createSessionAction}
-      className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]"
-    >
+    <form action={formAction} className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
       {isEditing && <input type="hidden" name="sessionId" value={sessionId} />}
       <input type="hidden" name="clientId" value={clientId} />
       <input type="hidden" name="meetingLink" value={meetingLink} />
       <input type="hidden" name="notificationsEnabled" value={String(notificationsOn)} />
       <input type="hidden" name="platform" value={platform} />
+      {!isEditing && (
+        <>
+          <input type="hidden" name="recurrenceEnabled" value={String(recurrenceEnabled)} />
+          <input type="hidden" name="recurrenceWeekdays" value={recurrenceWeekdays.join(",")} />
+        </>
+      )}
+
+      {state?.error && (
+        <p className="w-full rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-danger-subtlest,#fbe8e8)] p-[var(--spacing-padding-lg,16px)] text-[14px] text-[color:var(--feedback-danger-strongest,#610d0d)]">
+          {state.error}
+        </p>
+      )}
 
       <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
         <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
@@ -137,6 +168,97 @@ export default function ScheduleSessionForm({
           />
         </div>
       </div>
+
+      <TextField
+        label="Duração (minutos)"
+        name="duration"
+        type="number"
+        placeholder="50"
+        icon={<WatchIcon size={24} />}
+        value={duration}
+        onChange={setDuration}
+      />
+
+      {!isEditing && (
+        <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
+          <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
+            <div className="flex flex-1 flex-col items-start">
+              <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--action-secondary-strongest,#212121)]">
+                Repetir sessão
+              </p>
+              <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+                Cria as próximas sessões automaticamente
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={recurrenceEnabled}
+              onClick={() => setRecurrenceEnabled((v) => !v)}
+              className={`flex shrink-0 flex-col items-center rounded-[var(--border-radius-10,10px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-base,#757575)] px-[var(--spacing-xxxs,2px)] transition-all ${
+                recurrenceEnabled
+                  ? "bg-[var(--surface-strongest,#212121)] pt-[var(--spacing-xxxs,2px)] pb-[var(--spacing-md,16px)]"
+                  : "bg-[var(--surface-base,white)] pt-[var(--spacing-md,16px)] pb-[var(--spacing-xxxs,2px)]"
+              }`}
+            >
+              <span
+                className={`size-[24px] rounded-[var(--border-radius-8,8px)] ${
+                  recurrenceEnabled ? "bg-[var(--content-subtle,white)]" : "bg-[var(--content-base,#212121)]"
+                }`}
+              />
+            </button>
+          </div>
+
+          {recurrenceEnabled && (
+            <div className="flex w-full flex-col gap-[var(--spacing-md,16px)] pt-[var(--spacing-md,16px)]">
+              <div className="flex w-full gap-[var(--spacing-xs,8px)]">
+                <button
+                  type="button"
+                  onClick={() => date && setRecurrenceWeekdays([new Date(`${date}T00:00:00`).getDay()])}
+                  className="flex-1 rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold text-[color:var(--button-tertiary-content-enabled,#212121)]"
+                >
+                  Semanal
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setRecurrenceWeekdays(WEEKDAYS_BUSINESS)}
+                  className="flex-1 rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold text-[color:var(--button-tertiary-content-enabled,#212121)]"
+                >
+                  Dias úteis
+                </button>
+              </div>
+
+              <div className="flex w-full items-center justify-between gap-[4px]">
+                {WEEKDAY_LABELS.map((label, index) => (
+                  <button
+                    key={label}
+                    type="button"
+                    onClick={() => toggleWeekday(index)}
+                    className={`flex size-[40px] items-center justify-center rounded-full text-[14px] font-semibold ${
+                      recurrenceWeekdays.includes(index)
+                        ? "bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
+                        : "bg-[var(--surface-subtle,#fafafa)] text-[color:var(--content-strongest,#757575)]"
+                    }`}
+                  >
+                    {label[0]}
+                  </button>
+                ))}
+              </div>
+
+              {recurrencePreviewDates.length > 1 && (
+                <p className="w-full font-[family-name:var(--typography-body-small-font-family)] text-[14px] text-[color:var(--content-strongest,#757575)]">
+                  Serão criadas {recurrencePreviewDates.length} sessões, até{" "}
+                  {(() => {
+                    const [, m, d] = recurrencePreviewDates[recurrencePreviewDates.length - 1].split("-");
+                    return `${d}/${m}`;
+                  })()}
+                  .
+                </p>
+              )}
+            </div>
+          )}
+        </div>
+      )}
 
       <SegmentedToggle
         label="Plataforma"
@@ -225,14 +347,14 @@ export default function ScheduleSessionForm({
       <div className="flex w-full flex-col gap-[var(--stacks-gap-vertical,8px)]">
         <button
           type="submit"
-          disabled={!isValid}
+          disabled={!isValid || pending}
           className={`flex h-[56px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-large,16px)] px-[var(--button-padding,16px)] text-[20px] font-medium leading-[24px] tracking-[-0.4px] ${
-            isValid
+            isValid && !pending
               ? "bg-[var(--button-primary-surface-enabled,#212121)] text-[color:var(--button-primary-content-enabled,#fafafa)]"
               : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
           }`}
         >
-          {isEditing ? "Salvar alterações" : "Salvar sessão"}
+          {pending ? "Salvando..." : isEditing ? "Salvar alterações" : "Salvar sessão"}
         </button>
 
         {isEditing && <DeleteSessionButton sessionId={sessionId!} />}
