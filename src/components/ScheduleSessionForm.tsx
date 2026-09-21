@@ -10,6 +10,8 @@ import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
 import { WEEKDAY_LABELS, WEEKDAYS_BUSINESS, generateRecurrenceDates } from "@/lib/scheduling";
+import Toast from "@/components/Toast";
+import { useToast } from "@/hooks/useToast";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null; email?: string | null };
 
@@ -52,7 +54,7 @@ export default function ScheduleSessionForm({
   const duration = String(initialDurationMinutes ?? 50);
   const [platform, setPlatform] = useState<"whatsapp" | "google">(initialPlatform ?? "whatsapp");
   const [notificationsOn, setNotificationsOn] = useState(initialNotificationsOn ?? true);
-  const [copied, setCopied] = useState(false);
+  const { show: toastShow, message: toastMessage, showToast } = useToast();
   const [recurrenceEnabled, setRecurrenceEnabled] = useState(false);
   const [recurrenceWeekdays, setRecurrenceWeekdays] = useState<number[]>([]);
   const [recurrenceInterval, setRecurrenceInterval] = useState(1);
@@ -93,8 +95,7 @@ export default function ScheduleSessionForm({
     if (!meetingLink) return;
     try {
       await navigator.clipboard.writeText(meetingLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      showToast("Link copiado");
     } catch {
       // clipboard indisponível — ignora
     }
@@ -346,7 +347,7 @@ export default function ScheduleSessionForm({
                 : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
             }`}
           >
-            {copied ? "Copiado!" : "Copiar"}
+            Copiar
           </button>
         </div>
       ) : (
@@ -411,6 +412,8 @@ export default function ScheduleSessionForm({
           setPickerOpen(false);
         }}
       />
+
+      <Toast show={toastShow} message={toastMessage} />
     </form>
   );
 }
