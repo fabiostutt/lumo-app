@@ -2,8 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, CreditCardX, ChevronRight } from "lucide-react";
-import { AlertIcon, CircleCheckIcon } from "@/components/icons";
+import { CreditCard, CreditCardX, ChevronRight, BadgeCheck } from "lucide-react";
+import { AlertIcon } from "@/components/icons";
 import { getPushSubscriptionState, subscribeToPush } from "@/lib/push/client";
 import type { DisclaimerTone, ServerDisclaimerTone } from "@/lib/disclaimer";
 
@@ -54,8 +54,8 @@ const CONTENT: Record<ServerDisclaimerTone, { title: string; description: string
 };
 
 const ICONS: Record<ServerDisclaimerTone, React.ComponentType<{ size?: number; className?: string }>> = {
-  "lumo-pro": CircleCheckIcon,
-  "two-days": CircleCheckIcon,
+  "lumo-pro": BadgeCheck,
+  "two-days": BadgeCheck,
   "last-day": AlertIcon,
   growth: AlertIcon,
   "payment-failed": CreditCardX,
