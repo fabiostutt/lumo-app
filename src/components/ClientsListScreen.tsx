@@ -75,7 +75,7 @@ export default function ClientsListScreen({
                   {!returnTo && (
                     <Link
                       href={`/clients/${client.id}/edit`}
-                      className="flex size-[40px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]"
+                      className="flex size-[40px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)]"
                       aria-label="Editar cliente"
                     >
                       <Pencil size={20} strokeWidth={1.75} />
