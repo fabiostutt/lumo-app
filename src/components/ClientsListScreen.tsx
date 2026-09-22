@@ -8,6 +8,23 @@ import { maskPhone } from "@/lib/masks";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
+// `clients` já chega ordenado alfabeticamente (ver getClientsForOwner), então
+// agrupar por primeira letra é só colapsar entradas consecutivas com a mesma
+// letra — não precisa reordenar nada aqui.
+function groupByFirstLetter(clients: ClientOption[]) {
+  const groups: { letter: string; clients: ClientOption[] }[] = [];
+  for (const client of clients) {
+    const letter = client.name.trim().charAt(0).toUpperCase() || "#";
+    const lastGroup = groups[groups.length - 1];
+    if (lastGroup && lastGroup.letter === letter) {
+      lastGroup.clients.push(client);
+    } else {
+      groups.push({ letter, clients: [client] });
+    }
+  }
+  return groups;
+}
+
 export default function ClientsListScreen({
   clients,
   returnTo,
@@ -38,38 +55,45 @@ export default function ClientsListScreen({
           {filtered.length} {filtered.length === 1 ? "cliente cadastrado" : "clientes cadastrados"}
         </p>
 
-        {filtered.map((client) => {
-          const row = (
-            <div className="flex h-[72px] w-full items-center gap-[var(--spacing-md,16px)] rounded-[20px] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-md,16px)]">
-              <PeopleIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-              <div className="flex flex-1 flex-col items-start overflow-hidden">
-                <p className="w-full truncate font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-                  {client.name}
-                </p>
-                <p className="w-full truncate font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-                  {client.whatsapp ? maskPhone(client.whatsapp) : "Sem WhatsApp cadastrado"}
-                </p>
-              </div>
-              {!returnTo && (
-                <Link
-                  href={`/clients/${client.id}/edit`}
-                  className="flex size-[40px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]"
-                  aria-label="Editar cliente"
-                >
-                  <Pencil size={20} strokeWidth={1.75} />
-                </Link>
-              )}
-            </div>
-          );
+        {groupByFirstLetter(filtered).map((group) => (
+          <div key={group.letter} className="contents">
+            <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+              {group.letter}
+            </p>
+            {group.clients.map((client) => {
+              const row = (
+                <div className="flex h-[72px] w-full items-center gap-[var(--spacing-md,16px)] rounded-[20px] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-md,16px)]">
+                  <PeopleIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+                  <div className="flex flex-1 flex-col items-start overflow-hidden">
+                    <p className="w-full truncate font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+                      {client.name}
+                    </p>
+                    <p className="w-full truncate font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+                      {client.whatsapp ? maskPhone(client.whatsapp) : "Sem WhatsApp cadastrado"}
+                    </p>
+                  </div>
+                  {!returnTo && (
+                    <Link
+                      href={`/clients/${client.id}/edit`}
+                      className="flex size-[40px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]"
+                      aria-label="Editar cliente"
+                    >
+                      <Pencil size={20} strokeWidth={1.75} />
+                    </Link>
+                  )}
+                </div>
+              );
 
-          return returnTo ? (
-            <Link key={client.id} href={`${returnTo}?clientId=${client.id}`}>
-              {row}
-            </Link>
-          ) : (
-            <div key={client.id}>{row}</div>
-          );
-        })}
+              return returnTo ? (
+                <Link key={client.id} href={`${returnTo}?clientId=${client.id}`}>
+                  {row}
+                </Link>
+              ) : (
+                <div key={client.id}>{row}</div>
+              );
+            })}
+          </div>
+        ))}
 
         {filtered.length === 0 && (
           <p className="w-full py-8 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
