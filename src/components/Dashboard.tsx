@@ -15,7 +15,8 @@ import {
   CancelIcon,
 } from "@/components/icons";
 import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
-import PushNotificationsPrompt from "@/components/PushNotificationsPrompt";
+import Disclaimer from "@/components/Disclaimer";
+import type { ServerDisclaimerTone } from "@/lib/disclaimer";
 
 const STATUS_CHIP_MAP: Record<
   SessionStatus,
@@ -98,6 +99,7 @@ type DashboardProps = {
   nextMeeting: Meeting | null;
   meetings: Meeting[];
   initialEventDates?: string[];
+  disclaimerTone: ServerDisclaimerTone | null;
   onSchedule?: () => void;
   onNewClient?: () => void;
   onClients?: () => void;
@@ -397,6 +399,7 @@ export default function Dashboard({
   nextMeeting: initialNextMeeting,
   meetings: initialMeetings,
   initialEventDates,
+  disclaimerTone,
   onSchedule,
   onNewClient,
   onClients,
@@ -485,7 +488,7 @@ export default function Dashboard({
         <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
           <HeadProfile userName={userName} sessionsToday={sessionsToday} />
 
-          <PushNotificationsPrompt />
+          <Disclaimer serverTone={disclaimerTone} />
 
           <div className="flex w-full items-start justify-between">
             <QuickActionButton icon={<WatchIcon size={24} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />

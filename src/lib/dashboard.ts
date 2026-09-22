@@ -1,5 +1,7 @@
 import { createClient } from "@/lib/supabase/server";
 import type { SessionStatus } from "@/components/MeetingDetailsSheet";
+import { getOrCreateProfile } from "@/lib/plan";
+import { getServerDisclaimerTone } from "@/lib/disclaimer";
 
 const MONTH_LABELS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -78,7 +80,7 @@ export async function getDashboardData() {
   const sessionSelect =
     "id, date, time, notifications_enabled, status, meeting_link, clients(name, whatsapp)";
 
-  const [weekResult, todayResult, nextResult] = await Promise.all([
+  const [weekResult, todayResult, nextResult, clientCountResult, profile] = await Promise.all([
     supabase
       .from("sessions")
       .select("date")
@@ -99,11 +101,20 @@ export async function getDashboardData() {
       .order("date", { ascending: true })
       .order("time", { ascending: true })
       .limit(1),
+    supabase.from("clients").select("id", { count: "exact", head: true }).eq("owner_id", user.id),
+    getOrCreateProfile(),
   ]);
 
   if (weekResult.error) throw weekResult.error;
   if (todayResult.error) throw todayResult.error;
   if (nextResult.error) throw nextResult.error;
+  if (clientCountResult.error) throw clientCountResult.error;
+
+  const disclaimerTone = getServerDisclaimerTone({
+    subscriptionStatus: profile.subscription_status,
+    trialEndsAt: profile.trial_ends_at,
+    clientCount: clientCountResult.count ?? 0,
+  });
 
   const eventDates = Array.from(new Set((weekResult.data ?? []).map((s) => s.date as string)));
   const eventDatesSet = new Set(eventDates);
@@ -135,5 +146,6 @@ export async function getDashboardData() {
     nextMeeting,
     meetings,
     initialEventDates: eventDates,
+    disclaimerTone,
   };
 }
