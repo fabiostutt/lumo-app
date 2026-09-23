@@ -6,11 +6,17 @@ import { notFound } from "next/navigation";
 
 export default async function EditSessionPage({
   params,
+  searchParams,
 }: {
   params: Promise<{ id: string }>;
+  searchParams: Promise<{ clientId?: string }>;
 }) {
   const { id } = await params;
-  const [clients, session] = await Promise.all([getClientsForOwner(), getSessionById(id)]);
+  const [{ clientId }, clients, session] = await Promise.all([
+    searchParams,
+    getClientsForOwner(),
+    getSessionById(id),
+  ]);
 
   if (!session) notFound();
 
@@ -20,7 +26,7 @@ export default async function EditSessionPage({
       <ScheduleSessionForm
         clients={clients}
         sessionId={session.id}
-        initialClientId={session.client_id ?? undefined}
+        initialClientId={clientId ?? session.client_id ?? undefined}
         initialDate={session.date}
         initialTime={(session.time as string).slice(0, 5)}
         initialNotificationsOn={session.notifications_enabled ?? true}
