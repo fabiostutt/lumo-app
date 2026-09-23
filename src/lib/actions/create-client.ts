@@ -56,19 +56,29 @@ export async function createClientAction(
     }
   }
 
-  const { error } = await supabase.from("clients").insert({
-    owner_id: user.id,
-    name,
-    whatsapp: whatsapp || null,
-    email: email || null,
-    cpf: cpf || null,
-    session_type: sessionType,
-  });
+  const { data: created, error } = await supabase
+    .from("clients")
+    .insert({
+      owner_id: user.id,
+      name,
+      whatsapp: whatsapp || null,
+      email: email || null,
+      cpf: cpf || null,
+      session_type: sessionType,
+    })
+    .select("id")
+    .single();
 
   if (error) {
     return { error: error.message };
   }
 
   revalidatePath("/dashboard");
+
+  // Só aceita paths relativos internos — evita open redirect via formData.
+  const returnTo = String(formData.get("returnTo") || "").trim();
+  if (returnTo.startsWith("/") && !returnTo.startsWith("//")) {
+    redirect(`${returnTo}?clientId=${created.id}`);
+  }
   redirect("/dashboard");
 }

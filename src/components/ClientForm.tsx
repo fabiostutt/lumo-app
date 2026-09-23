@@ -15,6 +15,7 @@ type ClientFormProps = {
   initialWhatsapp?: string;
   initialEmail?: string;
   initialCpf?: string;
+  returnTo?: string;
 };
 
 export default function ClientForm({
@@ -23,6 +24,7 @@ export default function ClientForm({
   initialWhatsapp,
   initialEmail,
   initialCpf,
+  returnTo,
 }: ClientFormProps) {
   const isEditing = !!clientId;
   const [state, formAction, pending] = useActionState(
@@ -39,6 +41,7 @@ export default function ClientForm({
   return (
     <form action={formAction} className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
       {isEditing && <input type="hidden" name="clientId" value={clientId} />}
+      {!isEditing && returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
 
       <TextField
         label="Nome do cliente"

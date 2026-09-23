@@ -1,8 +1,10 @@
 "use client";
 
 import { useActionState, useMemo, useState } from "react";
+import { usePathname } from "next/navigation";
+import Link from "next/link";
 import { ChevronRight } from "lucide-react";
-import { PeopleIcon, ScheduleIcon, WatchIcon, WhatsAppIcon } from "@/components/icons";
+import { AddUserIcon, PeopleIcon, ScheduleIcon, WatchIcon, WhatsAppIcon } from "@/components/icons";
 import { createSessionAction } from "@/lib/actions/create-session";
 import { updateSessionAction } from "@/lib/actions/update-session";
 import ClientPickerSheet from "@/components/ClientPickerSheet";
@@ -39,6 +41,7 @@ export default function ScheduleSessionForm({
   initialDurationMinutes,
 }: ScheduleSessionFormProps) {
   const isEditing = !!sessionId;
+  const pathname = usePathname();
 
   const [state, formAction, pending] = useActionState(
     isEditing ? updateSessionAction : createSessionAction,
@@ -122,31 +125,40 @@ export default function ScheduleSessionForm({
         </p>
       )}
 
-      <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
-        <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-          Adicionar participante
-        </p>
-        <button
-          type="button"
-          onClick={() => setPickerOpen(true)}
-          className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
-            selectedClient
-              ? "border-[var(--input-filled-border-default,#757575)]"
-              : "border-[var(--input-default-border-default,#bdbdbd)]"
-          }`}
-        >
-          <PeopleIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-          <span
-            className={`flex-1 text-left font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+      <div className="flex w-full items-end gap-[var(--spacing-xs,8px)]">
+        <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
+          <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+            Adicionar participante
+          </p>
+          <button
+            type="button"
+            onClick={() => setPickerOpen(true)}
+            className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
               selectedClient
-                ? "text-[color:var(--input-filled-content-value,#212121)]"
-                : "text-[color:var(--input-default-content-placeholder,#757575)]"
+                ? "border-[var(--input-filled-border-default,#757575)]"
+                : "border-[var(--input-default-border-default,#bdbdbd)]"
             }`}
           >
-            {selectedClient ? selectedClient.name : "Selecionar"}
-          </span>
-          <ChevronRight size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-        </button>
+            <PeopleIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+            <span
+              className={`flex-1 text-left font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+                selectedClient
+                  ? "text-[color:var(--input-filled-content-value,#212121)]"
+                  : "text-[color:var(--input-default-content-placeholder,#757575)]"
+              }`}
+            >
+              {selectedClient ? selectedClient.name : "Selecionar"}
+            </span>
+            <ChevronRight size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+          </button>
+        </div>
+        <Link
+          href={`/clients/new?returnTo=${encodeURIComponent(pathname)}`}
+          className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]"
+          aria-label="Cadastrar novo cliente"
+        >
+          <AddUserIcon size={24} className="text-[color:var(--content-base,#212121)]" />
+        </Link>
       </div>
 
       <div className="flex w-full gap-[var(--stacks-gap-horizontal,16px)]">

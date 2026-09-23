@@ -4,7 +4,12 @@ import TitleAction from "@/components/TitleAction";
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateProfile, getEffectivePlan, FREE_CLIENT_LIMIT } from "@/lib/plan";
 
-export default async function NewClientPage() {
+export default async function NewClientPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ returnTo?: string }>;
+}) {
+  const { returnTo } = await searchParams;
   const supabase = await createClient();
 
   const {
@@ -29,7 +34,7 @@ export default async function NewClientPage() {
 
   return (
     <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding,16px)]">
-      <TitleAction title="Cadastrar cliente" href="/dashboard" />
+      <TitleAction title="Cadastrar cliente" href={returnTo || "/dashboard"} />
 
       {blocked ? (
         <div className="flex w-full flex-col items-start gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
@@ -44,7 +49,7 @@ export default async function NewClientPage() {
           </Link>
         </div>
       ) : (
-        <ClientForm />
+        <ClientForm returnTo={returnTo} />
       )}
     </div>
   );
