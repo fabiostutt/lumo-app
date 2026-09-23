@@ -485,7 +485,7 @@ export default function Dashboard({
   return (
     <>
       <div className="flex w-full flex-col bg-[var(--surface-base,white)]">
-        <div className="flex w-full flex-col gap-[var(--spacing-xl,24px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
+        <div className="flex w-full flex-col gap-[var(--semantic-spacing-md,16px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
           <HeadProfile userName={userName} sessionsToday={sessionsToday} />
 
           <Disclaimer serverTone={disclaimerTone} />
