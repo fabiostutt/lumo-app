@@ -2,7 +2,7 @@
 
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
-import { getOrCreateProfile, getEffectivePlan, FREE_CLIENT_LIMIT } from "@/lib/plan";
+import { getOrCreateProfile, hasActiveSubscription, FREE_CLIENT_LIMIT } from "@/lib/plan";
 import { revalidatePath } from "next/cache";
 
 export type CreateClientState = { error?: string } | null;
@@ -43,9 +43,10 @@ export async function createClientAction(
   }
 
   const profile = await getOrCreateProfile();
-  const plan = getEffectivePlan(profile);
 
-  if (plan === "free") {
+  // O trial local (7 dias) não isenta do limite — só uma assinatura Stripe
+  // ativa/trialing de verdade permite passar de 5 clientes.
+  if (!hasActiveSubscription(profile)) {
     const { count } = await supabase
       .from("clients")
       .select("id", { count: "exact", head: true })

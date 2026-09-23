@@ -46,8 +46,15 @@ export async function getOrCreateProfile(): Promise<Profile> {
   return created as Profile;
 }
 
+// Assinatura Stripe de verdade (paga ou em trialing do próprio Stripe) —
+// diferente do trial local de 7 dias (trial_ends_at), que não deve contar
+// como "assinante" para gates como o limite de clientes do plano Free.
+export function hasActiveSubscription(profile: Profile): boolean {
+  return profile.subscription_status === "active" || profile.subscription_status === "trialing";
+}
+
 export function getEffectivePlan(profile: Profile): "pro" | "free" {
-  if (profile.subscription_status === "active" || profile.subscription_status === "trialing") {
+  if (hasActiveSubscription(profile)) {
     return "pro";
   }
   if (profile.trial_ends_at && new Date(profile.trial_ends_at) > new Date()) {
