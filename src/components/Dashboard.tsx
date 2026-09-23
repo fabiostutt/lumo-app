@@ -100,6 +100,7 @@ type DashboardProps = {
   meetings: Meeting[];
   initialEventDates?: string[];
   disclaimerTone: ServerDisclaimerTone | null;
+  disclaimerClientCount: number;
   onSchedule?: () => void;
   onNewClient?: () => void;
   onClients?: () => void;
@@ -400,6 +401,7 @@ export default function Dashboard({
   meetings: initialMeetings,
   initialEventDates,
   disclaimerTone,
+  disclaimerClientCount,
   onSchedule,
   onNewClient,
   onClients,
@@ -488,7 +490,7 @@ export default function Dashboard({
         <div className="flex w-full flex-col gap-[var(--semantic-spacing-md,16px)] px-[var(--spacing-md,16px)] pt-[var(--spacing-xl,24px)]">
           <HeadProfile userName={userName} sessionsToday={sessionsToday} />
 
-          <Disclaimer serverTone={disclaimerTone} />
+          <Disclaimer serverTone={disclaimerTone} clientCount={disclaimerClientCount} />
 
           <div className="flex w-full items-start justify-between">
             <QuickActionButton icon={<WatchIcon size={24} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />

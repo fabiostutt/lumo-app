@@ -110,10 +110,11 @@ export async function getDashboardData() {
   if (nextResult.error) throw nextResult.error;
   if (clientCountResult.error) throw clientCountResult.error;
 
+  const clientCount = clientCountResult.count ?? 0;
   const disclaimerTone = getServerDisclaimerTone({
     subscriptionStatus: profile.subscription_status,
     trialEndsAt: profile.trial_ends_at,
-    clientCount: clientCountResult.count ?? 0,
+    clientCount,
   });
 
   const eventDates = Array.from(new Set((weekResult.data ?? []).map((s) => s.date as string)));
@@ -147,5 +148,6 @@ export async function getDashboardData() {
     meetings,
     initialEventDates: eventDates,
     disclaimerTone,
+    disclaimerClientCount: clientCount,
   };
 }
