@@ -29,27 +29,29 @@ function getIsReturningSession() {
   }
 }
 
-const CONTENT: Record<ServerDisclaimerTone, { title: string; description: string }> = {
+const CONTENT: Record<ServerDisclaimerTone, { title: string; description: (clientCount: number) => string }> = {
   "lumo-pro": {
     title: "Conheça o Lumo Pro",
-    description: "Clientes ilimitados, agenda sem limite de sessões, suporte dedicado e muito mais.",
+    description: () => "Clientes ilimitados, agenda sem limite de sessões, suporte dedicado e muito mais.",
   },
   "two-days": {
     title: "Continue com tudo liberado",
-    description:
+    description: () =>
       "Faltam 2 dias do seu teste gratuito. Assine e mantenha clientes ilimitados e notificações automáticas.",
   },
   "last-day": {
     title: "Último dia do seu teste",
-    description: "Assine agora e siga com acesso completo ao Lumo Pro.",
+    description: () => "Assine agora e siga com acesso completo ao Lumo Pro.",
   },
   growth: {
     title: "Seu negócio está crescendo",
-    description: "Você já tem 4 clientes cadastrados. Assine o Pro e continue crescendo sem limites.",
+    description: (clientCount) =>
+      `Você já tem ${clientCount} ${clientCount === 1 ? "cliente cadastrado" : "clientes cadastrados"}. Assine o Pro e continue crescendo sem limites.`,
   },
   "payment-failed": {
     title: "Atualize sua forma de pagamento",
-    description: "O processamento do pagamento falhou. Atualize seus dados pra continuar com o Lumo Pro sem interrupções.",
+    description: () =>
+      "O processamento do pagamento falhou. Atualize seus dados pra continuar com o Lumo Pro sem interrupções.",
   },
 };
 
@@ -105,7 +107,13 @@ function NotificationDisclaimer({
   );
 }
 
-export default function Disclaimer({ serverTone }: { serverTone: ServerDisclaimerTone | null }) {
+export default function Disclaimer({
+  serverTone,
+  clientCount,
+}: {
+  serverTone: ServerDisclaimerTone | null;
+  clientCount: number;
+}) {
   const router = useRouter();
   const [pushState, setPushState] = useState<"loading" | "unsupported" | "denied" | "unsubscribed" | "subscribed">(
     "loading"
@@ -158,7 +166,7 @@ export default function Disclaimer({ serverTone }: { serverTone: ServerDisclaime
       <Icon size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <DisclaimerTitle>{content.title}</DisclaimerTitle>
-        <DisclaimerDescription>{content.description}</DisclaimerDescription>
+        <DisclaimerDescription>{content.description(clientCount)}</DisclaimerDescription>
       </div>
       <ChevronRight size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
     </button>
