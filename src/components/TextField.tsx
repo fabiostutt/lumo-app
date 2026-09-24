@@ -39,6 +39,8 @@ export default function TextField({
     ? "border-[var(--input-disabled-border-default,#bdbdbd)]"
     : isError
     ? "border-[var(--input-error-border-default,#d71d1d)]"
+    : focused
+    ? "border-[var(--border-strong,#212121)]"
     : isFilled
     ? "border-[var(--input-filled-border-default,#757575)]"
     : "border-[var(--input-default-border-default,#bdbdbd)]";

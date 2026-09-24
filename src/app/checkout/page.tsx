@@ -11,8 +11,9 @@ import {
   useElements,
   useStripe,
 } from "@stripe/react-stripe-js";
-import { IdIcon, LockIcon } from "@/components/icons";
+import { IdIcon, LockIcon, PeopleIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
+import TextField from "@/components/TextField";
 import { maskCPF } from "@/lib/masks";
 import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client";
 
@@ -65,55 +66,74 @@ function OrderSummary({ plan, priceLabel }: { plan: Plan; priceLabel: string }) 
   );
 }
 
-function LabeledInput({
-  id,
-  label,
-  value,
-  onChange,
-  placeholder,
-}: {
-  id: string;
-  label: string;
-  value: string;
-  onChange: (value: string) => void;
-  placeholder: string;
-}) {
-  return (
-    <div className="flex w-full flex-col items-start gap-[var(--input-gap,4px)]">
-      <label
-        htmlFor={id}
-        className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--input-default-label,#212121)]"
-      >
-        {label}
-      </label>
-      <input
-        id={id}
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        placeholder={placeholder}
-        className="h-[48px] w-full rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[16px] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)] outline-none placeholder:text-[color:var(--input-default-content-placeholder,#757575)]"
-      />
-    </div>
-  );
-}
 
+type CardSubField = "number" | "expiry" | "cvc";
+
+// Os três Stripe Elements são iframes independentes — não dá pra usar um
+// único onFocus/onChange no wrapper. Rastreamos foco e "completude" de cada
+// um pra decidir a borda do container, espelhando os states reais do Input
+// (Default/Filled/Focused → Border/Subtle, Border/Base, Border/Strong).
 function CardFields() {
+  const [focusedField, setFocusedField] = useState<CardSubField | null>(null);
+  const [completeMap, setCompleteMap] = useState<Record<CardSubField, boolean>>({
+    number: false,
+    expiry: false,
+    cvc: false,
+  });
+
+  const isFocused = focusedField !== null;
+  const isFilled = !isFocused && Object.values(completeMap).some(Boolean);
+
+  const borderColor = isFocused
+    ? "border-[var(--border-strong,#212121)]"
+    : isFilled
+    ? "border-[var(--input-filled-border-default,#757575)]"
+    : "border-[var(--input-default-border-default,#bdbdbd)]";
+
+  function handleFocus(field: CardSubField) {
+    return () => setFocusedField(field);
+  }
+  function handleBlur(field: CardSubField) {
+    return () => setFocusedField((current) => (current === field ? null : current));
+  }
+  function handleChange(field: CardSubField) {
+    return (event: { complete: boolean }) =>
+      setCompleteMap((prev) => ({ ...prev, [field]: event.complete }));
+  }
+
   return (
-    <div className="flex w-full flex-col items-start overflow-clip rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-default-border-default,#bdbdbd)] bg-[var(--input-default-surface,#fafafa)]">
+    <div
+      className={`flex w-full flex-col items-start overflow-clip rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] ${borderColor}`}
+    >
       <div className="flex h-[48px] w-full min-w-0 items-center gap-[var(--spacing-xs,8px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
         <div className="min-w-0 flex-1">
-          <CardNumberElement options={{ style: CARD_ELEMENT_STYLE, showIcon: true, placeholder: "1234 1234 1234 1234" }} />
+          <CardNumberElement
+            options={{ style: CARD_ELEMENT_STYLE, showIcon: true, placeholder: "1234 1234 1234 1234" }}
+            onFocus={handleFocus("number")}
+            onBlur={handleBlur("number")}
+            onChange={handleChange("number")}
+          />
         </div>
       </div>
       <div className="h-px w-full bg-[var(--border-subtlest,#eee)]" />
       <div className="flex h-[48px] w-full min-w-0 items-center">
         <div className="min-w-0 flex-1 px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
-          <CardExpiryElement options={{ style: CARD_ELEMENT_STYLE, placeholder: "MM / AA" }} />
+          <CardExpiryElement
+            options={{ style: CARD_ELEMENT_STYLE, placeholder: "MM / AA" }}
+            onFocus={handleFocus("expiry")}
+            onBlur={handleBlur("expiry")}
+            onChange={handleChange("expiry")}
+          />
         </div>
         <div className="h-[24px] w-px shrink-0 bg-[var(--content-strong,#bdbdbd)]" />
         <div className="flex min-w-0 flex-1 items-center gap-[var(--spacing-xs,8px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)]">
           <div className="min-w-0 flex-1">
-            <CardCvcElement options={{ style: CARD_ELEMENT_STYLE, placeholder: "CVC" }} />
+            <CardCvcElement
+              options={{ style: CARD_ELEMENT_STYLE, placeholder: "CVC" }}
+              onFocus={handleFocus("cvc")}
+              onBlur={handleBlur("cvc")}
+              onChange={handleChange("cvc")}
+            />
           </div>
           <IdIcon size={20} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
         </div>
@@ -220,19 +240,21 @@ function CheckoutFormBody({
         Processado com segurança pelo Stripe — seus dados de cartão nunca passam pelo nosso servidor.
       </p>
 
-      <LabeledInput
-        id="cardholder-name"
+      <TextField
         label="Nome do titular do cartão"
+        name="cardholder-name"
+        placeholder="Nome completo"
+        icon={<PeopleIcon size={24} />}
         value={name}
         onChange={setName}
-        placeholder="Nome completo"
       />
-      <LabeledInput
-        id="cardholder-cpf"
+      <TextField
         label="CPF"
+        name="cardholder-cpf"
+        placeholder="Digite o CPF do titular"
+        icon={<IdIcon size={24} />}
         value={cpf}
         onChange={(v) => setCpf(maskCPF(v))}
-        placeholder="Digite o CPF do titular"
       />
 
       {errorMsg && (
