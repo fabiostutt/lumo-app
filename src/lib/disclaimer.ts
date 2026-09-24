@@ -4,6 +4,7 @@ export type DisclaimerTone =
   | "two-days"
   | "last-day"
   | "growth"
+  | "client-limit"
   | "payment-failed";
 
 const GROWTH_CLIENT_THRESHOLD = 4;
@@ -18,11 +19,13 @@ export function getServerDisclaimerTone({
   subscriptionStatus,
   trialEndsAt,
   clientCount,
+  clientLimit,
   now = new Date(),
 }: {
   subscriptionStatus: string | null;
   trialEndsAt: string | null;
   clientCount: number;
+  clientLimit: number;
   now?: Date;
 }): ServerDisclaimerTone | null {
   if (subscriptionStatus && FAILED_PAYMENT_STATUSES.has(subscriptionStatus)) {
@@ -38,6 +41,7 @@ export function getServerDisclaimerTone({
     if (hoursRemaining > 24 && hoursRemaining <= 48) return "two-days";
   }
 
+  if (clientCount >= clientLimit) return "client-limit";
   if (clientCount >= GROWTH_CLIENT_THRESHOLD) return "growth";
 
   return "lumo-pro";
