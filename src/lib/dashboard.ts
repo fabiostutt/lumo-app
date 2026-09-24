@@ -1,6 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import type { SessionStatus } from "@/components/MeetingDetailsSheet";
-import { getOrCreateProfile } from "@/lib/plan";
+import { getOrCreateProfile, FREE_CLIENT_LIMIT } from "@/lib/plan";
 import { getServerDisclaimerTone } from "@/lib/disclaimer";
 
 const MONTH_LABELS = [
@@ -115,6 +115,7 @@ export async function getDashboardData() {
     subscriptionStatus: profile.subscription_status,
     trialEndsAt: profile.trial_ends_at,
     clientCount,
+    clientLimit: FREE_CLIENT_LIMIT,
   });
 
   const eventDates = Array.from(new Set((weekResult.data ?? []).map((s) => s.date as string)));

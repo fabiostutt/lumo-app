@@ -48,6 +48,10 @@ const CONTENT: Record<ServerDisclaimerTone, { title: string; description: (clien
     description: (clientCount) =>
       `Você já tem ${clientCount} ${clientCount === 1 ? "cliente cadastrado" : "clientes cadastrados"}. Assine o Pro e continue crescendo sem limites.`,
   },
+  "client-limit": {
+    title: "Seu negócio está crescendo",
+    description: () => "Você não pode mais cadastrar clientes. Assine o Pro e continue crescendo sem limites.",
+  },
   "payment-failed": {
     title: "Atualize sua forma de pagamento",
     description: () =>
@@ -60,6 +64,7 @@ const ICONS: Record<ServerDisclaimerTone, React.ComponentType<{ size?: number; c
   "two-days": BadgeCheck,
   "last-day": AlertIcon,
   growth: AlertIcon,
+  "client-limit": AlertIcon,
   "payment-failed": CreditCardX,
 };
 
