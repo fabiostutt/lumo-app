@@ -3,15 +3,16 @@
 import { useActionState, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
-import { ChevronRight } from "lucide-react";
+import { ChevronDown, ChevronRight } from "lucide-react";
 import { AddUserIcon, PeopleIcon, ScheduleIcon, WatchIcon, WhatsAppIcon } from "@/components/icons";
 import { createSessionAction } from "@/lib/actions/create-session";
 import { updateSessionAction } from "@/lib/actions/update-session";
 import ClientPickerSheet from "@/components/ClientPickerSheet";
+import RecurrenceSheet from "@/components/RecurrenceSheet";
 import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
-import { WEEKDAY_LABELS, WEEKDAYS_BUSINESS, generateRecurrenceDates } from "@/lib/scheduling";
+import { RECURRENCE_PRESET_LABELS, type RecurrencePreset } from "@/lib/scheduling";
 import Toast from "@/components/Toast";
 import { useToast } from "@/hooks/useToast";
 
@@ -58,20 +59,8 @@ export default function ScheduleSessionForm({
   const [platform, setPlatform] = useState<"whatsapp" | "google">(initialPlatform ?? "whatsapp");
   const [notificationsOn, setNotificationsOn] = useState(initialNotificationsOn ?? true);
   const { show: toastShow, message: toastMessage, showToast } = useToast();
-  const [recurrenceEnabled, setRecurrenceEnabled] = useState(false);
-  const [recurrenceWeekdays, setRecurrenceWeekdays] = useState<number[]>([]);
-  const [recurrenceInterval, setRecurrenceInterval] = useState(1);
-
-  function toggleWeekday(day: number) {
-    setRecurrenceWeekdays((prev) =>
-      prev.includes(day) ? prev.filter((d) => d !== day) : [...prev, day].sort()
-    );
-  }
-
-  const recurrencePreviewDates = useMemo(() => {
-    if (!recurrenceEnabled || !date) return [];
-    return generateRecurrenceDates(date, recurrenceWeekdays, recurrenceInterval);
-  }, [recurrenceEnabled, date, recurrenceWeekdays, recurrenceInterval]);
+  const [recurrencePreset, setRecurrencePreset] = useState<RecurrencePreset>("none");
+  const [recurrenceSheetOpen, setRecurrenceSheetOpen] = useState(false);
 
   const selectedClient = clients.find((c) => c.id === clientId) ?? null;
 
@@ -111,13 +100,7 @@ export default function ScheduleSessionForm({
       <input type="hidden" name="meetingLink" value={meetingLink} />
       <input type="hidden" name="notificationsEnabled" value={String(notificationsOn)} />
       <input type="hidden" name="platform" value={platform} />
-      {!isEditing && (
-        <>
-          <input type="hidden" name="recurrenceEnabled" value={String(recurrenceEnabled)} />
-          <input type="hidden" name="recurrenceWeekdays" value={recurrenceWeekdays.join(",")} />
-          <input type="hidden" name="recurrenceInterval" value={recurrenceInterval} />
-        </>
-      )}
+      {!isEditing && <input type="hidden" name="recurrencePreset" value={recurrencePreset} />}
 
       {state?.error && (
         <p className="w-full rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-danger-subtlest,#fbe8e8)] p-[var(--spacing-padding-lg,16px)] text-[14px] text-[color:var(--feedback-danger-strongest,#610d0d)]">
@@ -189,128 +172,30 @@ export default function ScheduleSessionForm({
       <input type="hidden" name="duration" value={duration} />
 
       {!isEditing && (
-        <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
-          <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
-            <div className="flex flex-1 flex-col items-start">
-              <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--action-secondary-strongest,#212121)]">
-                Repetir sessão
-              </p>
-              <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-                Cria as próximas sessões automaticamente
-              </p>
-            </div>
-            <button
-              type="button"
-              role="switch"
-              aria-checked={recurrenceEnabled}
-              onClick={() => setRecurrenceEnabled((v) => !v)}
-              className={`flex shrink-0 flex-col items-center rounded-[var(--border-radius-10,10px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-base,#757575)] px-[var(--spacing-xxxs,2px)] transition-all ${
-                recurrenceEnabled
-                  ? "bg-[var(--surface-strongest,#212121)] pt-[var(--spacing-xxxs,2px)] pb-[var(--spacing-md,16px)]"
-                  : "bg-[var(--surface-base,white)] pt-[var(--spacing-md,16px)] pb-[var(--spacing-xxxs,2px)]"
+        <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
+          <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+            Recorrência
+          </p>
+          <button
+            type="button"
+            onClick={() => setRecurrenceSheetOpen(true)}
+            className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
+              recurrencePreset !== "none"
+                ? "border-[var(--input-filled-border-default,#757575)]"
+                : "border-[var(--input-default-border-default,#bdbdbd)]"
+            }`}
+          >
+            <span
+              className={`flex-1 text-left font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+                recurrencePreset !== "none"
+                  ? "text-[color:var(--input-filled-content-value,#212121)]"
+                  : "text-[color:var(--input-default-content-placeholder,#757575)]"
               }`}
             >
-              <span
-                className={`size-[24px] rounded-[var(--border-radius-8,8px)] ${
-                  recurrenceEnabled ? "bg-[var(--content-subtle,white)]" : "bg-[var(--content-base,#212121)]"
-                }`}
-              />
-            </button>
-          </div>
-
-          {recurrenceEnabled && (
-            <div className="flex w-full flex-col gap-[var(--spacing-md,16px)] pt-[var(--spacing-md,16px)]">
-              <div className="flex w-full gap-[var(--spacing-xs,8px)]">
-                {(() => {
-                  const weeklyDay = date ? new Date(`${date}T00:00:00`).getDay() : null;
-                  const isWeeklySelected =
-                    weeklyDay !== null && recurrenceWeekdays.length === 1 && recurrenceWeekdays[0] === weeklyDay;
-                  const isBusinessSelected =
-                    recurrenceWeekdays.length === WEEKDAYS_BUSINESS.length &&
-                    WEEKDAYS_BUSINESS.every((d) => recurrenceWeekdays.includes(d));
-
-                  return (
-                    <>
-                      <button
-                        type="button"
-                        disabled={weeklyDay === null}
-                        onClick={() => weeklyDay !== null && setRecurrenceWeekdays([weeklyDay])}
-                        title={weeklyDay === null ? "Escolha a data primeiro" : undefined}
-                        className={`flex-1 rounded-[var(--button-border-radius-small,8px)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold disabled:opacity-40 ${
-                          isWeeklySelected
-                            ? "bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
-                            : "bg-[var(--button-tertiary-surface-enabled,#eee)] text-[color:var(--button-tertiary-content-enabled,#212121)]"
-                        }`}
-                      >
-                        Semanal
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setRecurrenceWeekdays(WEEKDAYS_BUSINESS)}
-                        className={`flex-1 rounded-[var(--button-border-radius-small,8px)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold ${
-                          isBusinessSelected
-                            ? "bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
-                            : "bg-[var(--button-tertiary-surface-enabled,#eee)] text-[color:var(--button-tertiary-content-enabled,#212121)]"
-                        }`}
-                      >
-                        Dias úteis
-                      </button>
-                    </>
-                  );
-                })()}
-              </div>
-
-              <div className="flex w-full items-center justify-between gap-[4px]">
-                {WEEKDAY_LABELS.map((label, index) => (
-                  <button
-                    key={label}
-                    type="button"
-                    onClick={() => toggleWeekday(index)}
-                    className={`flex size-[40px] items-center justify-center rounded-full text-[14px] font-semibold ${
-                      recurrenceWeekdays.includes(index)
-                        ? "bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
-                        : "bg-[var(--surface-subtle,#fafafa)] text-[color:var(--content-strongest,#757575)]"
-                    }`}
-                  >
-                    {label[0]}
-                  </button>
-                ))}
-              </div>
-
-              <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
-                <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] text-[color:var(--content-base,#212121)]">
-                  Repetir a cada
-                </p>
-                <div className="flex w-full gap-[var(--spacing-xs,8px)]">
-                  {[1, 2, 3, 4].map((n) => (
-                    <button
-                      key={n}
-                      type="button"
-                      onClick={() => setRecurrenceInterval(n)}
-                      className={`flex-1 rounded-[var(--button-border-radius-small,8px)] px-[var(--button-padding-small,12px)] py-[8px] text-[14px] font-semibold ${
-                        recurrenceInterval === n
-                          ? "bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
-                          : "bg-[var(--button-tertiary-surface-enabled,#eee)] text-[color:var(--button-tertiary-content-enabled,#212121)]"
-                      }`}
-                    >
-                      {n === 1 ? "1 semana" : `${n} semanas`}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {recurrencePreviewDates.length > 1 && (
-                <p className="w-full font-[family-name:var(--typography-body-small-font-family)] text-[14px] text-[color:var(--content-strongest,#757575)]">
-                  Serão criadas {recurrencePreviewDates.length} sessões, até{" "}
-                  {(() => {
-                    const [, m, d] = recurrencePreviewDates[recurrencePreviewDates.length - 1].split("-");
-                    return `${d}/${m}`;
-                  })()}
-                  .
-                </p>
-              )}
-            </div>
-          )}
+              {RECURRENCE_PRESET_LABELS[recurrencePreset]}
+            </span>
+            <ChevronDown size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+          </button>
         </div>
       )}
 
@@ -422,6 +307,16 @@ export default function ScheduleSessionForm({
         onConfirm={(id) => {
           setClientId(id);
           setPickerOpen(false);
+        }}
+      />
+
+      <RecurrenceSheet
+        open={recurrenceSheetOpen}
+        selected={recurrencePreset}
+        onClose={() => setRecurrenceSheetOpen(false)}
+        onSelect={(preset) => {
+          setRecurrencePreset(preset);
+          setRecurrenceSheetOpen(false);
         }}
       />
 
