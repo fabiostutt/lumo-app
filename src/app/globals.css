@@ -24,11 +24,15 @@
   --color-action-secondary: var(--color-root-9);
 
   /* --- Semantic: Numbers (Size / Padding / Gap) --- */
-  --space-xs: 4px;
-  --space-sm: 8px;
+  --space-xxxs: 2px;
+  --space-xxs: 4px;
+  --space-xs: 8px;
+  --space-sm: 12px;
   --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
+  --space-lg: 20px;
+  --space-xl: 24px;
+  --space-xxl: 40px;
+  --space-xxxl: 80px;
 
   /* --- Global: Font families --- */
   --font-primary: "TT Hoves Pro Trial", sans-serif;
@@ -47,11 +51,15 @@
   --color-action-secondary: var(--color-action-secondary);
   --font-sans: var(--font-secondary);
   --font-heading: var(--font-primary);
+  --spacing-xxxs: var(--space-xxxs);
+  --spacing-xxs: var(--space-xxs);
   --spacing-xs: var(--space-xs);
   --spacing-sm: var(--space-sm);
   --spacing-md: var(--space-md);
   --spacing-lg: var(--space-lg);
   --spacing-xl: var(--space-xl);
+  --spacing-xxl: var(--space-xxl);
+  --spacing-xxxl: var(--space-xxxl);
 }
 
 body {

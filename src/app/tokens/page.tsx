@@ -1,5 +1,5 @@
 const grayscale = Array.from({ length: 10 }, (_, i) => i + 1);
-const spacingKeys = ["xs", "sm", "md", "lg", "xl"] as const;
+const spacingKeys = ["xxxs", "xxs", "xs", "sm", "md", "lg", "xl", "xxl", "xxxl"] as const;
 
 export default function TokensPreviewPage() {
   return (
