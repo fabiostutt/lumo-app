@@ -224,7 +224,7 @@ function WeekCalendar({
         {weekDays.map((day) => (
           <div
             key={day.iso}
-            className="flex flex-col items-center gap-[var(--spacing-sm,8px)]"
+            className="flex flex-col items-center gap-[var(--spacing-sm,12px)]"
           >
             <p
               className={`font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] ${
@@ -547,7 +547,7 @@ export default function Dashboard({
           <div className="h-px w-full bg-[var(--border-subtlest,#eee)]" />
         </div>
 
-        <div className={`flex w-full flex-col gap-[var(--slot-gap-base,24px)] px-[var(--spacing-md,16px)] py-[var(--numbers-padding-xxxs,2px)] transition-opacity ${loading ? "opacity-60" : "opacity-100"}`}>
+        <div className={`flex w-full flex-col gap-[var(--slot-gap-base,24px)] px-[var(--spacing-md,16px)] pb-[var(--spacing-md,16px)] transition-opacity ${loading ? "opacity-60" : "opacity-100"}`}>
           <WeekCalendar
             month={month}
             year={year}
