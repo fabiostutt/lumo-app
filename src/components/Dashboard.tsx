@@ -85,6 +85,7 @@ export type Meeting = {
   id: string;
   time: string;
   date: string;
+  durationMinutes: number;
   clientName: string;
   clientWhatsapp?: string | null;
   status: SessionStatus;
@@ -171,7 +172,7 @@ function HeadProfile({
       <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
         Você tem{" "}
         <span className="text-[color:var(--content-base,#212121)]">
-          {sessionsToday} sessões
+          {sessionsToday} reuniões
         </span>{" "}
         agendadas para hoje
       </p>
@@ -443,20 +444,30 @@ export default function Dashboard({
   const weekDays = buildWeekDays(selectedDate, eventDates);
   const year = new Date(`${selectedDate}T00:00:00`).getFullYear();
 
-  // A sessão em destaque no card "Próxima sessão" não deve se repetir na
-  // lista "Sessões do dia" logo abaixo.
+  // A reunião em destaque no card "Próxima reunião" não deve se repetir na
+  // lista "Reuniões do dia" logo abaixo.
   const isNextMeetingShown = Boolean(nextMeeting) && selectedDate === todayIso;
   const dayMeetings = isNextMeetingShown
     ? meetings.filter((meeting) => meeting.id !== nextMeeting!.id)
     : meetings;
 
-  // "Concluída" não é um status salvo — é uma sessão já confirmada cujo
-  // horário já passou. Os demais filtros batem direto no status.
+  // "Concluída" não é um status salvo — é uma reunião cujo horário final
+  // (início + duração) já passou. Uma vez concluída, ela some dos filtros de
+  // "Confirmadas"/"Pendentes" (só aparece em "Concluídas"/"Todas");
+  // "Canceladas" fica de fora dessa reclassificação, já que uma reunião
+  // cancelada nunca chega a ser "concluída".
+  function isMeetingCompleted(meeting: Meeting) {
+    if (meeting.status === "cancelada") return false;
+    const start = new Date(`${meeting.date}T${meeting.time}:00`);
+    const end = new Date(start.getTime() + meeting.durationMinutes * 60 * 1000);
+    return end < new Date();
+  }
+
   const filteredDayMeetings = dayMeetings.filter((meeting) => {
+    const completed = isMeetingCompleted(meeting);
     if (meetingFilter === "all") return true;
-    if (meetingFilter === "completed") {
-      return meeting.status === "confirmada" && new Date(`${meeting.date}T${meeting.time}:00`) < new Date();
-    }
+    if (meetingFilter === "completed") return completed;
+    if (completed) return false;
     return meeting.status === meetingFilter;
   });
 
@@ -470,7 +481,7 @@ export default function Dashboard({
       setSessionsToday(data.sessionsToday);
       setMeetings(data.meetings);
       setMonth(MONTH_LABELS[new Date(`${dateStr}T00:00:00`).getMonth()]);
-      // "Próxima sessão" fica fixa (não depende do dia selecionado no calendário)
+      // "Próxima reunião" fica fixa (não depende do dia selecionado no calendário)
     } finally {
       setLoading(false);
     }
@@ -548,7 +559,7 @@ export default function Dashboard({
 
           {nextMeeting && selectedDate === todayIso && (
             <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-              <SectionTitle text="Próxima sessão" />
+              <SectionTitle text="Próxima reunião" />
               <NextMeetingCard
                 meeting={nextMeeting}
                 onJoinCall={() => onJoinCall?.(nextMeeting.id)}
@@ -559,7 +570,7 @@ export default function Dashboard({
 
           <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
             <div className="flex w-full items-center justify-between">
-              <SectionTitle text="Sessões do dia" />
+              <SectionTitle text="Reuniões do dia" />
               <button
                 type="button"
                 onClick={() => setFilterSheetOpen(true)}
@@ -585,7 +596,7 @@ export default function Dashboard({
               {dayMeetings.length === 0 && isNextMeetingShown && <NoOtherMeetingsDisclaimer />}
               {dayMeetings.length > 0 && filteredDayMeetings.length === 0 && (
                 <p className="w-full py-8 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
-                  Nenhuma sessão encontrada para esse filtro.
+                  Nenhuma reunião encontrada para esse filtro.
                 </p>
               )}
             </div>

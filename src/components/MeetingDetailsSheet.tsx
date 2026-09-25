@@ -20,7 +20,7 @@ export type MeetingDetails = {
 function buildWhatsAppShareUrl(whatsapp: string, clientName: string, meetingUrl: string, time: string) {
   const digits = whatsapp.replace(/\D/g, "");
   const to = digits.startsWith("55") ? digits : `55${digits}`;
-  const text = `Olá, ${clientName}! Aqui está o link da nossa sessão de hoje às ${time}: ${meetingUrl}`;
+  const text = `Olá, ${clientName}! Aqui está o link da nossa reunião de hoje às ${time}: ${meetingUrl}`;
   return `https://wa.me/${to}?text=${encodeURIComponent(text)}`;
 }
 
@@ -140,7 +140,7 @@ export default function MeetingDetailsSheet({
 
           <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
             <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--input-default-label,#212121)]">
-              Link da sessão
+              Link da reunião
             </p>
             <div
               className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${

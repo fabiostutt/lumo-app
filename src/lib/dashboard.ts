@@ -40,6 +40,7 @@ type SessionRow = {
   id: string;
   date: string;
   time: string;
+  duration_minutes: number | null;
   notifications_enabled: boolean | null;
   status: string | null;
   meeting_link: string | null;
@@ -51,6 +52,7 @@ function mapRow(s: SessionRow) {
     id: s.id,
     time: s.time.slice(0, 5),
     date: s.date,
+    durationMinutes: s.duration_minutes ?? 50,
     clientName: s.clients?.name ?? "Cliente",
     clientWhatsapp: s.clients?.whatsapp ?? null,
     status: (s.status as SessionStatus) ?? "pendente",
@@ -78,7 +80,7 @@ export async function getDashboardData() {
   sunday.setDate(monday.getDate() + 6);
 
   const sessionSelect =
-    "id, date, time, notifications_enabled, status, meeting_link, clients(name, whatsapp)";
+    "id, date, time, duration_minutes, notifications_enabled, status, meeting_link, clients(name, whatsapp)";
 
   const [weekResult, todayResult, nextResult, clientCountResult, profile] = await Promise.all([
     supabase
