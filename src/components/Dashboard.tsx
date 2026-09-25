@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, VideoOff } from "lucide-react";
 import {
   EngineIcon,
   WatchIcon,
@@ -298,15 +298,18 @@ function ScheduleMeetingEmpty({ onSchedule }: { onSchedule?: () => void }) {
   );
 }
 
-// Placeholder simples — o visual final ainda vai ser desenhado no Figma e
-// este componente será atualizado para bater com ele.
 function NoOtherMeetingsDisclaimer() {
   return (
-    <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
-      <CircleCheckIcon size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
-      <p className="flex-1 font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-        Não há outras reuniões marcadas hoje.
-      </p>
+    <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
+      <VideoOff size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-base,#212121)]" />
+      <div className="flex flex-1 flex-col items-start">
+        <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+          Não há mais reuniões hoje
+        </p>
+        <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+          Você pode agendar outras, se precisar
+        </p>
+      </div>
     </div>
   );
 }
@@ -346,7 +349,7 @@ function NextMeetingCard({
         rel="noopener noreferrer"
         onClick={onJoinCall}
         aria-disabled={!meeting.meetingUrl}
-        className={`flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding-small,12px)] text-[color:var(--button-secondary-content-enabled,#212121)] ${
+        className={`flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding,16px)] text-[color:var(--button-secondary-content-enabled,#212121)] ${
           !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
         }`}
       >
