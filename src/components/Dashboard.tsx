@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronLeft, ChevronRight, VideoOff } from "lucide-react";
+import { ChevronDown, ChevronLeft, ChevronRight, VideoOff } from "lucide-react";
 import {
   EngineIcon,
   WatchIcon,
@@ -17,6 +17,7 @@ import {
 import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
 import Disclaimer from "@/components/Disclaimer";
 import type { ServerDisclaimerTone } from "@/lib/disclaimer";
+import FilterMeetingsSheet, { MEETING_FILTER_LABELS, type MeetingFilter } from "@/components/FilterMeetingsSheet";
 
 const STATUS_CHIP_MAP: Record<
   SessionStatus,
@@ -436,6 +437,8 @@ export default function Dashboard({
   const [meetings, setMeetings] = useState<Meeting[]>(initialMeetings);
   const [loading, setLoading] = useState(false);
   const [sheetMeeting, setSheetMeeting] = useState<Meeting | null>(null);
+  const [meetingFilter, setMeetingFilter] = useState<MeetingFilter>("all");
+  const [filterSheetOpen, setFilterSheetOpen] = useState(false);
 
   const weekDays = buildWeekDays(selectedDate, eventDates);
   const year = new Date(`${selectedDate}T00:00:00`).getFullYear();
@@ -446,6 +449,16 @@ export default function Dashboard({
   const dayMeetings = isNextMeetingShown
     ? meetings.filter((meeting) => meeting.id !== nextMeeting!.id)
     : meetings;
+
+  // "Concluída" não é um status salvo — é uma sessão já confirmada cujo
+  // horário já passou. Os demais filtros batem direto no status.
+  const filteredDayMeetings = dayMeetings.filter((meeting) => {
+    if (meetingFilter === "all") return true;
+    if (meetingFilter === "completed") {
+      return meeting.status === "confirmada" && new Date(`${meeting.date}T${meeting.time}:00`) < new Date();
+    }
+    return meeting.status === meetingFilter;
+  });
 
   async function loadDay(dateStr: string) {
     setLoading(true);
@@ -545,9 +558,21 @@ export default function Dashboard({
           )}
 
           <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-            <SectionTitle text="Sessões do dia" />
+            <div className="flex w-full items-center justify-between">
+              <SectionTitle text="Sessões do dia" />
+              <button
+                type="button"
+                onClick={() => setFilterSheetOpen(true)}
+                className="flex items-center gap-[var(--spacing-xs,8px)]"
+              >
+                <span className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-strongest,#757575)]">
+                  {MEETING_FILTER_LABELS[meetingFilter]}
+                </span>
+                <ChevronDown size={24} strokeWidth={1.75} className="text-[color:var(--content-strongest,#757575)]" />
+              </button>
+            </div>
             <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-              {dayMeetings.map((meeting) => (
+              {filteredDayMeetings.map((meeting) => (
                 <MeetingListItem
                   key={meeting.id}
                   meeting={meeting}
@@ -558,8 +583,23 @@ export default function Dashboard({
                 <ScheduleMeetingEmpty onSchedule={onSchedule ?? (() => router.push("/sessions/new"))} />
               )}
               {dayMeetings.length === 0 && isNextMeetingShown && <NoOtherMeetingsDisclaimer />}
+              {dayMeetings.length > 0 && filteredDayMeetings.length === 0 && (
+                <p className="w-full py-8 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
+                  Nenhuma sessão encontrada para esse filtro.
+                </p>
+              )}
             </div>
           </div>
+
+          <FilterMeetingsSheet
+            open={filterSheetOpen}
+            selected={meetingFilter}
+            onClose={() => setFilterSheetOpen(false)}
+            onSelect={(filter) => {
+              setMeetingFilter(filter);
+              setFilterSheetOpen(false);
+            }}
+          />
         </div>
       </div>
 
