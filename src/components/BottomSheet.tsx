@@ -21,7 +21,7 @@ export default function BottomSheet({
         aria-hidden="true"
       />
       <div
-        className={`relative mx-4 mb-10 w-full max-w-[398px] rounded-[var(--sheet-border-radius,32px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
+        className={`relative mx-4 mb-4 w-full max-w-[398px] rounded-[var(--sheet-border-radius,32px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-[120%]"
         }`}
       >

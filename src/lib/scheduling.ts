@@ -2,9 +2,6 @@
 // formulário (preview client-side) quanto pela Server Action (checagem real
 // de conflito), pra manter os dois cálculos sempre idênticos.
 
-export const WEEKDAY_LABELS = ["Dom", "Seg", "Ter", "Qua", "Qui", "Sex", "Sáb"];
-export const WEEKDAYS_BUSINESS = [1, 2, 3, 4, 5];
-
 // Limite deliberado: gerar a série toda de uma vez (sem data-fim, já que o
 // profissional raramente sabe até quando vai repetir) tem que ficar dentro do
 // tempo de execução de uma Server Action e não pode virar centenas de
@@ -58,6 +55,50 @@ export function generateRecurrenceDates(
   }
 
   return dates;
+}
+
+// A UI agora oferece só esses 5 presets (bottom sheet "Selecione a
+// recorrência"), sem seleção manual de weekdays/intervalo.
+export type RecurrencePreset = "none" | "daily" | "weekly" | "biweekly" | "monthly";
+
+export const RECURRENCE_PRESET_LABELS: Record<RecurrencePreset, string> = {
+  none: "Não se repete",
+  daily: "Todos os dias",
+  weekly: "Semanal",
+  biweekly: "Quinzenal",
+  monthly: "Mensal",
+};
+
+// "Mensal" não é um múltiplo de semanas — não dá pra expressar via
+// weekdays+interval, então avança mês a mês preservando o dia (clampando pro
+// último dia do mês quando ele não existir, ex: 31/jan -> 28 ou 29/fev).
+function generateMonthlyDates(startDate: string, maxOccurrences: number): string[] {
+  const start = toLocalDate(startDate);
+  const day = start.getDate();
+  const dates = [startDate];
+
+  for (let i = 1; dates.length < maxOccurrences; i++) {
+    const targetMonth = start.getMonth() + i;
+    const lastDayOfTargetMonth = new Date(start.getFullYear(), targetMonth + 1, 0).getDate();
+    const next = new Date(start.getFullYear(), targetMonth, Math.min(day, lastDayOfTargetMonth));
+    dates.push(toISO(next));
+  }
+
+  return dates;
+}
+
+export function generateRecurrenceDatesForPreset(
+  startDate: string,
+  preset: RecurrencePreset,
+  maxOccurrences: number = MAX_RECURRENCE_OCCURRENCES
+): string[] {
+  if (preset === "none") return [startDate];
+  if (preset === "monthly") return generateMonthlyDates(startDate, maxOccurrences);
+
+  const weekday = toLocalDate(startDate).getDay();
+  const weekdays = preset === "daily" ? [0, 1, 2, 3, 4, 5, 6] : [weekday];
+  const interval = preset === "biweekly" ? 2 : 1;
+  return generateRecurrenceDates(startDate, weekdays, interval, maxOccurrences);
 }
 
 function timeToMinutes(time: string) {

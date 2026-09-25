@@ -6,7 +6,13 @@ import { revalidatePath } from "next/cache";
 import { getClientById } from "@/lib/clients";
 import { sendSessionConfirmationMessage } from "@/lib/whatsapp";
 import { createCalendarEvent, getValidGoogleAccessToken } from "@/lib/google/calendar";
-import { findConflicts, formatConflictsMessage, generateRecurrenceDates } from "@/lib/scheduling";
+import {
+  findConflicts,
+  formatConflictsMessage,
+  generateRecurrenceDatesForPreset,
+  RECURRENCE_PRESET_LABELS,
+  type RecurrencePreset,
+} from "@/lib/scheduling";
 
 const APP_TIME_ZONE = "America/Sao_Paulo";
 
@@ -31,12 +37,9 @@ export async function createSessionAction(
   let meetingLink = String(formData.get("meetingLink") || "").trim();
   const notificationsEnabled = formData.get("notificationsEnabled") === "true";
   const durationMinutes = Number(formData.get("duration")) || 50;
-  const recurrenceEnabled = formData.get("recurrenceEnabled") === "true";
-  const recurrenceWeekdays = String(formData.get("recurrenceWeekdays") || "")
-    .split(",")
-    .filter(Boolean)
-    .map(Number);
-  const recurrenceInterval = Number(formData.get("recurrenceInterval")) || 1;
+  const submittedPreset = String(formData.get("recurrencePreset") || "none");
+  const recurrencePreset: RecurrencePreset =
+    submittedPreset in RECURRENCE_PRESET_LABELS ? (submittedPreset as RecurrencePreset) : "none";
 
   if (!clientId || !date || !time) {
     return { error: "Preencha participante, data e hora" };
@@ -44,9 +47,7 @@ export async function createSessionAction(
 
   const client = await getClientById(clientId);
 
-  const occurrenceDates = recurrenceEnabled
-    ? generateRecurrenceDates(date, recurrenceWeekdays, recurrenceInterval)
-    : [date];
+  const occurrenceDates = generateRecurrenceDatesForPreset(date, recurrencePreset);
   const isRecurring = occurrenceDates.length > 1;
   const recurrenceGroupId = isRecurring ? crypto.randomUUID() : null;
 
@@ -124,7 +125,7 @@ export async function createSessionAction(
     meeting_link: platform === "google" ? calendarResults[index]?.link ?? null : meetingLink || null,
     google_event_id: calendarResults[index]?.eventId ?? null,
     recurrence_group_id: recurrenceGroupId,
-    recurrence_rule: isRecurring ? { weekdays: recurrenceWeekdays, interval: recurrenceInterval } : null,
+    recurrence_rule: isRecurring ? { preset: recurrencePreset } : null,
   }));
 
   const { data: inserted, error } = await supabase.from("sessions").insert(rows).select("id, date");
