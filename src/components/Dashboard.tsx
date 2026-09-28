@@ -419,7 +419,7 @@ function NextMeetingCard({
       >
         {isGoogle ? <VideoIcon size={24} /> : <WhatsAppIcon size={24} />}
         <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
-          {isGoogle ? "Entrar na reunião" : "Chamar no WhatsApp"}
+          {isGoogle ? "Entrar na reunião" : "Abrir no WhatsApp"}
         </span>
       </a>
     </div>
