@@ -94,6 +94,7 @@ export default function MeetingDetailsSheet({
   const isFilled = !!meeting?.meetingUrl;
   const meetingId = meeting?.id;
   const meetingStatus = meeting?.status;
+  const hasWhatsAppShare = !!(meeting?.meetingUrl && meeting?.clientWhatsapp);
 
   useEffect(() => {
     if (!meetingId || meetingStatus !== "pendente") return;
@@ -141,7 +142,7 @@ export default function MeetingDetailsSheet({
 
           <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
             <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--input-default-label,#212121)]">
-              Link da reunião
+              {hasWhatsAppShare ? `Conversa com ${meeting.clientName}` : "Link da reunião"}
             </p>
             <div
               className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
@@ -162,25 +163,6 @@ export default function MeetingDetailsSheet({
               </p>
             </div>
           </div>
-
-          {meeting.meetingUrl && meeting.clientWhatsapp && (
-            <a
-              href={buildWhatsAppShareUrl(
-                meeting.clientWhatsapp,
-                meeting.clientName,
-                meeting.meetingUrl,
-                meeting.time
-              )}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] px-[var(--button-padding,16px)]"
-            >
-              <WhatsAppIcon size={20} className="text-[color:var(--content-base,#212121)]" />
-              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-                Compartilhar por WhatsApp
-              </span>
-            </a>
-          )}
 
           <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
             <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
@@ -224,22 +206,48 @@ export default function MeetingDetailsSheet({
                 Editar reunião
               </span>
             </button>
-            <a
-              href={meeting.meetingUrl || undefined}
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => onJoinCall?.(meeting.id)}
-              aria-disabled={!meeting.meetingUrl}
-              className={`flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)] ${
-                !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
-              }`}
-            >
-              <VideoIcon size={24} className="text-[color:var(--button-primary-content-enabled,#fafafa)]" />
-              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
-                Entrar na reunião
-              </span>
-            </a>
+            {hasWhatsAppShare ? (
+              <a
+                href={buildWhatsAppShareUrl(
+                  meeting.clientWhatsapp!,
+                  meeting.clientName,
+                  meeting.meetingUrl!,
+                  meeting.time
+                )}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => onJoinCall?.(meeting.id)}
+                className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)]"
+              >
+                <WhatsAppIcon size={24} className="text-[color:var(--button-primary-content-enabled,#fafafa)]" />
+                <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
+                  Abrir no WhatsApp
+                </span>
+              </a>
+            ) : (
+              <a
+                href={meeting.meetingUrl || undefined}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => onJoinCall?.(meeting.id)}
+                aria-disabled={!meeting.meetingUrl}
+                className={`flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)] ${
+                  !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
+                }`}
+              >
+                <VideoIcon size={24} className="text-[color:var(--button-primary-content-enabled,#fafafa)]" />
+                <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
+                  Entrar na reunião
+                </span>
+              </a>
+            )}
           </div>
+
+          {hasWhatsAppShare && (
+            <p className="w-full text-center font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+              Ao abrir a conversa no WhatsApp, toque no ícone de vídeo para ligar.
+            </p>
+          )}
         </>
       )}
     </BottomSheet>
