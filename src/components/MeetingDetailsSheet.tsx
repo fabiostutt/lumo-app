@@ -19,11 +19,25 @@ export type MeetingDetails = {
   platform: "whatsapp" | "google";
 };
 
-function buildWhatsAppShareUrl(whatsapp: string, clientName: string, meetingUrl: string, time: string) {
+function buildWhatsAppTo(whatsapp: string) {
   const digits = whatsapp.replace(/\D/g, "");
-  const to = digits.startsWith("55") ? digits : `55${digits}`;
+  return digits.startsWith("55") ? digits : `55${digits}`;
+}
+
+// Usada pro botão "Compartilhar" (reuniões no Google Meet) — aqui o link
+// é de fato útil, porque é o link externo do Meet, não o próprio wa.me do
+// destinatário.
+function buildWhatsAppShareUrl(whatsapp: string, clientName: string, meetingUrl: string, time: string) {
   const text = `Olá, ${clientName}! Aqui está o link da nossa reunião de hoje às ${time}: ${meetingUrl}`;
-  return `https://wa.me/${to}?text=${encodeURIComponent(text)}`;
+  return `https://wa.me/${buildWhatsAppTo(whatsapp)}?text=${encodeURIComponent(text)}`;
+}
+
+// Usada pro botão "Chamar no WhatsApp"/"Abrir no WhatsApp" (reuniões no
+// WhatsApp) — sem link, porque o "link da reunião" nesse caso é o próprio
+// wa.me do destinatário, e mandar de volta pra ele não faz sentido.
+function buildWhatsAppReminderUrl(whatsapp: string, clientName: string, time: string) {
+  const text = `Olá, ${clientName}! Passando para lembrar da nossa reunião hoje às ${time}. Até já!`;
+  return `https://wa.me/${buildWhatsAppTo(whatsapp)}?text=${encodeURIComponent(text)}`;
 }
 
 type MeetingDetailsSheetProps = {
@@ -227,7 +241,7 @@ export default function MeetingDetailsSheet({
             <button
               type="button"
               onClick={() => onEdit?.(meeting.id)}
-              className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)]"
+              className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding,16px)]"
             >
               <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-tertiary-content-enabled,#212121)]">
                 Editar reunião
@@ -235,16 +249,11 @@ export default function MeetingDetailsSheet({
             </button>
             {!isGoogle && canShareByWhatsApp ? (
               <a
-                href={buildWhatsAppShareUrl(
-                  meeting.clientWhatsapp!,
-                  meeting.clientName,
-                  meeting.meetingUrl!,
-                  meeting.time
-                )}
+                href={buildWhatsAppReminderUrl(meeting.clientWhatsapp!, meeting.clientName, meeting.time)}
                 target="_blank"
                 rel="noopener noreferrer"
                 onClick={() => onJoinCall?.(meeting.id)}
-                className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)]"
+                className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding,16px)]"
               >
                 <WhatsAppIcon size={24} className="text-[color:var(--button-primary-content-enabled,#fafafa)]" />
                 <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
@@ -258,7 +267,7 @@ export default function MeetingDetailsSheet({
                 rel="noopener noreferrer"
                 onClick={() => onJoinCall?.(meeting.id)}
                 aria-disabled={!meeting.meetingUrl}
-                className={`flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)] ${
+                className={`flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding,16px)] ${
                   !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
                 }`}
               >
