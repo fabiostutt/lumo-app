@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { ChevronDown, ChevronLeft, ChevronRight, VideoOff } from "lucide-react";
+import { Calendar, ChevronDown, ChevronLeft, ChevronRight, VideoOff } from "lucide-react";
 import {
   EngineIcon,
   WatchIcon,
@@ -39,6 +39,57 @@ const STATUS_CHIP_MAP: Record<
     icon: CancelIcon,
   },
 };
+
+// Chip "inverse" (Figma node 59:520) — mesmo mapeamento de tom do
+// STATUS_CHIP_MAP acima, mas com fundo/texto invertidos, pra ficar legível
+// sobre o fundo escuro do card "Próxima reunião".
+const STATUS_LABELS: Record<SessionStatus, string> = {
+  confirmada: "Confirmada",
+  pendente: "Pendente",
+  cancelada: "Cancelada",
+};
+
+const STATUS_CHIP_MAP_INVERSE: Record<
+  SessionStatus,
+  { bg: string; text: string; icon: (props: { size: number; className?: string }) => React.ReactElement }
+> = {
+  confirmada: {
+    bg: "bg-[var(--feedback-success-strongest,#1b6303)]",
+    text: "text-[color:var(--feedback-success-subtlest,#efffe5)]",
+    icon: CircleCheckIcon,
+  },
+  pendente: {
+    bg: "bg-[var(--feedback-warning-strongest,#706121)]",
+    text: "text-[color:var(--feedback-warning-subtlest,#fefbed)]",
+    icon: AlertIcon,
+  },
+  cancelada: {
+    bg: "bg-[var(--feedback-danger-strongest,#610d0d)]",
+    text: "text-[color:var(--feedback-danger-subtlest,#fbe8e8)]",
+    icon: CancelIcon,
+  },
+};
+
+function NextMeetingStatusChip({ status }: { status: SessionStatus }) {
+  const { bg, text, icon: Icon } = STATUS_CHIP_MAP_INVERSE[status];
+  return (
+    <div className={`flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] p-[var(--spacing-xxs,4px)] ${bg}`}>
+      <Icon size={16} className={text} />
+      <span
+        className={`font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] whitespace-nowrap ${text}`}
+      >
+        {STATUS_LABELS[status]}
+      </span>
+    </div>
+  );
+}
+
+function formatShortDate(iso: string) {
+  const d = new Date(`${iso}T00:00:00`);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  return `${dd}/${mm}`;
+}
 
 const WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
 const MONTH_LABELS = [
@@ -327,8 +378,8 @@ function NextMeetingCard({
 }) {
   return (
     <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-base,#757575)] border-solid bg-[var(--next-meeting-surface-base,#212121)] p-[var(--next-meeting-padding-large,24px)]">
-      <div className="flex w-full items-center gap-[var(--next-meeting-gap,16px)]">
-        <div className="flex flex-1 flex-col items-start justify-center text-[color:var(--next-meeting-content-base,#fafafa)]">
+      <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
+        <div className="flex flex-col items-start text-[color:var(--next-meeting-content-base,#fafafa)]">
           <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
             {meeting.time}
           </p>
@@ -336,6 +387,30 @@ function NextMeetingCard({
             {meeting.clientName}
           </p>
         </div>
+        <div className="flex items-center gap-[var(--spacing-xs,8px)]">
+          <Calendar size={16} strokeWidth={1.75} className="shrink-0 text-[color:var(--next-meeting-content-subtle,#9e9e9e)]" />
+          <p className="font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] text-[color:var(--next-meeting-content-subtle,#9e9e9e)]">
+            {formatShortDate(meeting.date)}
+          </p>
+          <NextMeetingStatusChip status={meeting.status} />
+        </div>
+      </div>
+      <div className="flex w-full items-center gap-[var(--spacing-xs,8px)]">
+        <a
+          href={meeting.meetingUrl || undefined}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={onJoinCall}
+          aria-disabled={!meeting.meetingUrl}
+          className={`flex h-[48px] flex-1 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding,16px)] text-[color:var(--button-secondary-content-enabled,#212121)] ${
+            !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
+          }`}
+        >
+          <VideoIcon size={24} />
+          <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
+            Entrar na reunião
+          </span>
+        </a>
         <button
           type="button"
           onClick={onOptions}
@@ -345,21 +420,6 @@ function NextMeetingCard({
           <OptionsIcon size={24} className="text-white" />
         </button>
       </div>
-      <a
-        href={meeting.meetingUrl || undefined}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={onJoinCall}
-        aria-disabled={!meeting.meetingUrl}
-        className={`flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding,16px)] text-[color:var(--button-secondary-content-enabled,#212121)] ${
-          !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
-        }`}
-      >
-        <VideoIcon size={24} />
-        <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
-          Entrar na reunião
-        </span>
-      </a>
     </div>
   );
 }
@@ -372,14 +432,14 @@ function MeetingListItem({
   onOptions?: () => void;
 }) {
   return (
-    <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-inverse,#eee)] border-solid bg-[var(--next-meeting-surface-inverse,white)] p-[var(--next-meeting-padding-small,16px)]">
+    <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-strongest,#eee)] border-solid bg-[var(--next-meeting-surface-strongest,white)] p-[var(--next-meeting-padding-small,16px)]">
       <div className="flex w-full items-center gap-[var(--next-meeting-gap,16px)]">
         <div className="flex flex-1 items-center gap-[var(--next-meeting-padding-small,16px)]">
-          <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)] text-[color:var(--next-meeting-content-inverse,#212121)]">
+          <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)] text-[color:var(--next-meeting-content-strongest,#212121)]">
             {meeting.time}
           </p>
           <div className="flex flex-1 flex-col items-start justify-center">
-            <p className="w-full truncate font-[family-name:var(--typography-body-large-font-family)] font-[var(--typography-body-large-font-weight,500)] text-[length:var(--typography-body-large-font-size,18px)] leading-[var(--typography-body-large-line-height,24px)] tracking-[var(--typography-body-large-letter-spacing,-0.2px)] text-[color:var(--next-meeting-content-inverse,#212121)]">
+            <p className="w-full truncate font-[family-name:var(--typography-body-large-font-family)] font-[var(--typography-body-large-font-weight,500)] text-[length:var(--typography-body-large-font-size,18px)] leading-[var(--typography-body-large-line-height,24px)] tracking-[var(--typography-body-large-letter-spacing,-0.2px)] text-[color:var(--next-meeting-content-strongest,#212121)]">
               {meeting.clientName}
             </p>
             <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--meeting-list-item-content-inverse,#212121)]">
