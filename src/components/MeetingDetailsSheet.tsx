@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { AppXIcon, WhatsAppIcon, VideoIcon, CircleCheckIcon, AlertIcon, CancelIcon } from "@/components/icons";
+import { CircleAlert } from "lucide-react";
+import { AppXIcon, WhatsAppIcon, VideoIcon, CircleCheckIcon, CancelIcon } from "@/components/icons";
 import BottomSheet from "@/components/BottomSheet";
 
 export type SessionStatus = "pendente" | "confirmada" | "cancelada";
@@ -57,7 +58,7 @@ function StatusChip({ status }: { status: SessionStatus }) {
       bg: "bg-[var(--feedback-warning-subtlest,#fefbed)]",
       text: "text-[var(--feedback-warning-strongest,#706121)]",
       label: "Pendente",
-      icon: AlertIcon,
+      icon: (props) => <CircleAlert strokeWidth={1.75} {...props} />,
     },
     cancelada: {
       bg: "bg-[var(--feedback-danger-subtlest,#fbe8e8)]",
