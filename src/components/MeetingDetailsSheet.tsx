@@ -32,7 +32,7 @@ function buildWhatsAppShareUrl(whatsapp: string, clientName: string, meetingUrl:
   return `https://wa.me/${buildWhatsAppTo(whatsapp)}?text=${encodeURIComponent(text)}`;
 }
 
-// Usada pro botão "Chamar no WhatsApp"/"Abrir no WhatsApp" (reuniões no
+// Usada pro botão "Abrir no WhatsApp" (reuniões no
 // WhatsApp) — sem link, porque o "link da reunião" nesse caso é o próprio
 // wa.me do destinatário, e mandar de volta pra ele não faz sentido.
 function buildWhatsAppReminderUrl(whatsapp: string, clientName: string, time: string) {
