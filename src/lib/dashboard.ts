@@ -44,6 +44,7 @@ type SessionRow = {
   notifications_enabled: boolean | null;
   status: string | null;
   meeting_link: string | null;
+  platform: string | null;
   clients: { name: string; whatsapp: string | null } | null;
 };
 
@@ -58,6 +59,7 @@ function mapRow(s: SessionRow) {
     status: (s.status as SessionStatus) ?? "pendente",
     notificationsOn: s.notifications_enabled ?? false,
     meetingUrl: s.meeting_link ?? null,
+    platform: (s.platform === "Google" ? "google" : "whatsapp") as "whatsapp" | "google",
   };
 }
 
@@ -80,7 +82,7 @@ export async function getDashboardData() {
   sunday.setDate(monday.getDate() + 6);
 
   const sessionSelect =
-    "id, date, time, duration_minutes, notifications_enabled, status, meeting_link, clients(name, whatsapp)";
+    "id, date, time, duration_minutes, notifications_enabled, status, meeting_link, platform, clients(name, whatsapp)";
 
   const [weekResult, todayResult, nextResult, clientCountResult, profile] = await Promise.all([
     supabase

@@ -44,7 +44,7 @@ export async function GET(request: NextRequest) {
 
   const { data: daySessions, error: dayError } = await supabase
     .from("sessions")
-    .select("id, date, time, duration_minutes, notifications_enabled, status, meeting_link, clients(name, whatsapp)")
+    .select("id, date, time, duration_minutes, notifications_enabled, status, meeting_link, platform, clients(name, whatsapp)")
     .eq("owner_id", user.id)
     .eq("date", dateParam)
     .order("time", { ascending: true });
@@ -63,6 +63,7 @@ export async function GET(request: NextRequest) {
     status: (s.status as "pendente" | "confirmada" | "cancelada") ?? "pendente",
     notificationsOn: s.notifications_enabled ?? false,
     meetingUrl: s.meeting_link ?? null,
+    platform: (s.platform === "Google" ? "google" : "whatsapp") as "whatsapp" | "google",
   }));
 
   return NextResponse.json({
