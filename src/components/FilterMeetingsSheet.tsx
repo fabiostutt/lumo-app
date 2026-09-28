@@ -3,17 +3,18 @@
 import { AppXIcon } from "@/components/icons";
 import BottomSheet from "@/components/BottomSheet";
 
-export type MeetingFilter = "all" | "completed" | "confirmada" | "pendente" | "cancelada";
+export type MeetingFilter = "all" | "upcoming" | "completed" | "confirmada" | "pendente" | "cancelada";
 
 export const MEETING_FILTER_LABELS: Record<MeetingFilter, string> = {
   all: "Todas",
+  upcoming: "Seguintes",
   completed: "Concluídas",
   confirmada: "Confirmadas",
   pendente: "Pendentes",
   cancelada: "Canceladas",
 };
 
-const FILTERS: MeetingFilter[] = ["all", "completed", "confirmada", "pendente", "cancelada"];
+const FILTERS: MeetingFilter[] = ["all", "upcoming", "completed", "confirmada", "pendente", "cancelada"];
 
 type FilterMeetingsSheetProps = {
   open: boolean;

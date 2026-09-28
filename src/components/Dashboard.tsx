@@ -528,6 +528,7 @@ export default function Dashboard({
   const filteredDayMeetings = dayMeetings.filter((meeting) => {
     const completed = isMeetingCompleted(meeting);
     if (meetingFilter === "all") return true;
+    if (meetingFilter === "upcoming") return !completed;
     if (meetingFilter === "completed") return completed;
     if (completed) return false;
     return meeting.status === meetingFilter;
