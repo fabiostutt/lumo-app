@@ -10,6 +10,7 @@ import {
   PeopleIcon,
   OptionsIcon,
   VideoIcon,
+  WhatsAppIcon,
   CircleCheckIcon,
   CancelIcon,
 } from "@/components/icons";
@@ -136,6 +137,7 @@ export type Meeting = {
   time: string;
   date: string;
   durationMinutes: number;
+  platform: "whatsapp" | "google";
   clientName: string;
   clientWhatsapp?: string | null;
   status: SessionStatus;
@@ -375,41 +377,27 @@ function NextMeetingCard({
   onJoinCall?: () => void;
   onOptions?: () => void;
 }) {
+  const isGoogle = meeting.platform === "google";
   return (
     <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-base,#757575)] border-solid bg-[var(--next-meeting-surface-base,#212121)] p-[var(--next-meeting-padding-large,24px)]">
-      <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
-        <div className="flex flex-col items-start text-[color:var(--next-meeting-content-base,#fafafa)]">
-          <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
-            {meeting.time}
-          </p>
-          <p className="font-[family-name:var(--typography-body-large-font-family)] font-[var(--typography-body-large-font-weight,500)] text-[length:var(--typography-body-large-font-size,18px)] leading-[var(--typography-body-large-line-height,24px)] tracking-[var(--typography-body-large-letter-spacing,-0.2px)]">
-            {meeting.clientName}
-          </p>
+      <div className="flex w-full items-start gap-[var(--next-meeting-gap,16px)]">
+        <div className="flex flex-1 flex-col items-start gap-[var(--spacing-xs,8px)]">
+          <div className="flex flex-col items-start text-[color:var(--next-meeting-content-base,#fafafa)]">
+            <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
+              {meeting.time}
+            </p>
+            <p className="font-[family-name:var(--typography-body-large-font-family)] font-[var(--typography-body-large-font-weight,500)] text-[length:var(--typography-body-large-font-size,18px)] leading-[var(--typography-body-large-line-height,24px)] tracking-[var(--typography-body-large-letter-spacing,-0.2px)]">
+              {meeting.clientName}
+            </p>
+          </div>
+          <div className="flex items-center gap-[var(--spacing-xs,8px)]">
+            <Calendar size={16} strokeWidth={1.75} className="shrink-0 text-[color:var(--next-meeting-content-subtle,#9e9e9e)]" />
+            <p className="font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] text-[color:var(--next-meeting-content-subtle,#9e9e9e)]">
+              {formatShortDate(meeting.date)}
+            </p>
+            <NextMeetingStatusChip status={meeting.status} />
+          </div>
         </div>
-        <div className="flex items-center gap-[var(--spacing-xs,8px)]">
-          <Calendar size={16} strokeWidth={1.75} className="shrink-0 text-[color:var(--next-meeting-content-subtle,#9e9e9e)]" />
-          <p className="font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] text-[color:var(--next-meeting-content-subtle,#9e9e9e)]">
-            {formatShortDate(meeting.date)}
-          </p>
-          <NextMeetingStatusChip status={meeting.status} />
-        </div>
-      </div>
-      <div className="flex w-full items-center gap-[var(--spacing-xs,8px)]">
-        <a
-          href={meeting.meetingUrl || undefined}
-          target="_blank"
-          rel="noopener noreferrer"
-          onClick={onJoinCall}
-          aria-disabled={!meeting.meetingUrl}
-          className={`flex h-[48px] flex-1 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding,16px)] text-[color:var(--button-secondary-content-enabled,#212121)] ${
-            !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
-          }`}
-        >
-          <VideoIcon size={24} />
-          <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
-            Entrar na reunião
-          </span>
-        </a>
         <button
           type="button"
           onClick={onOptions}
@@ -419,6 +407,21 @@ function NextMeetingCard({
           <OptionsIcon size={24} className="text-white" />
         </button>
       </div>
+      <a
+        href={meeting.meetingUrl || undefined}
+        target="_blank"
+        rel="noopener noreferrer"
+        onClick={onJoinCall}
+        aria-disabled={!meeting.meetingUrl}
+        className={`flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding,16px)] text-[color:var(--button-secondary-content-enabled,#212121)] ${
+          !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
+        }`}
+      >
+        {isGoogle ? <VideoIcon size={24} /> : <WhatsAppIcon size={24} />}
+        <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
+          {isGoogle ? "Entrar na reunião" : "Chamar no WhatsApp"}
+        </span>
+      </a>
     </div>
   );
 }
