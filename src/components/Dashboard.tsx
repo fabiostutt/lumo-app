@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, ChevronDown, ChevronLeft, ChevronRight, VideoOff } from "lucide-react";
+import { Calendar, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, VideoOff } from "lucide-react";
 import {
   EngineIcon,
   WatchIcon,
@@ -11,7 +11,6 @@ import {
   OptionsIcon,
   VideoIcon,
   CircleCheckIcon,
-  AlertIcon,
   CancelIcon,
 } from "@/components/icons";
 import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
@@ -31,7 +30,7 @@ const STATUS_CHIP_MAP: Record<
   pendente: {
     bg: "bg-[var(--feedback-warning-subtlest,#fefbed)]",
     text: "text-[color:var(--feedback-warning-strongest,#706121)]",
-    icon: AlertIcon,
+    icon: (props) => <CircleAlert strokeWidth={1.75} {...props} />,
   },
   cancelada: {
     bg: "bg-[var(--feedback-danger-subtlest,#fbe8e8)]",
@@ -61,7 +60,7 @@ const STATUS_CHIP_MAP_INVERSE: Record<
   pendente: {
     bg: "bg-[var(--feedback-warning-strongest,#706121)]",
     text: "text-[color:var(--feedback-warning-subtlest,#fefbed)]",
-    icon: AlertIcon,
+    icon: (props) => <CircleAlert strokeWidth={1.75} {...props} />,
   },
   cancelada: {
     bg: "bg-[var(--feedback-danger-strongest,#610d0d)]",
