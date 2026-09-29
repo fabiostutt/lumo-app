@@ -29,9 +29,9 @@ function GoogleIcon() {
 // Apple" pela indústria) — não conseguimos baixar o asset exato do Figma
 // porque o acesso a www.figma.com está bloqueado pelo proxy de rede deste
 // ambiente.
-function AppleIcon() {
+function AppleIcon({ className }: { className?: string }) {
   return (
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" aria-hidden="true" className={className}>
       <path
         d="M16.365 1.43c0 1.14-.493 2.27-1.177 3.08-.744.9-1.99 1.57-2.987 1.57-.12 0-.23-.02-.3-.03-.01-.06-.04-.22-.04-.39 0-1.15.572-2.27 1.207-2.98.804-.94 2.142-1.64 3.248-1.68.03.13.05.28.05.43zm4.565 15.71c-.03.07-.463 1.58-1.518 3.12-.945 1.34-1.94 2.68-3.43 2.71-1.517.03-2.02-.677-3.75-.677-1.734 0-2.294.65-3.743.71-1.44.05-2.53-1.45-3.47-2.78-1.94-2.75-3.43-7.75-1.44-11.14.98-1.68 2.75-2.75 4.66-2.78 1.46-.02 2.83.977 3.75.977.9 0 2.55-1.21 4.31-1.03.73.03 2.79.29 4.11 2.21-.11.07-2.45 1.42-2.42 4.25.03 3.38 2.98 4.51 3.02 4.53z"
         fill="currentColor"
@@ -92,7 +92,7 @@ export default function LoginPage() {
               type="button"
               className="flex h-[56px] w-full items-center justify-center gap-[var(--spacing-sm,12px)] rounded-[var(--border-radius-xl,20px)] bg-[var(--surface-strongest,#212121)]"
             >
-              <AppleIcon />
+              <AppleIcon className="text-[color:var(--content-subtle,white)]" />
               <span className="text-[16px] font-semibold leading-[24px] tracking-[-0.2px] text-[color:var(--content-subtle,white)]">
                 Continuar com Apple
               </span>
