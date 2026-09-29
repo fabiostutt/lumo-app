@@ -375,11 +375,13 @@ function NextMeetingCard({
   onJoinCall,
   onOptions,
   onViewDetails,
+  isMenuOpen,
 }: {
   meeting: Meeting;
   onJoinCall?: () => void;
   onOptions?: (anchor: DOMRect) => void;
   onViewDetails?: () => void;
+  isMenuOpen?: boolean;
 }) {
   const isGoogle = meeting.platform === "google";
   return (
@@ -411,7 +413,9 @@ function NextMeetingCard({
             e.stopPropagation();
             onOptions?.(e.currentTarget.getBoundingClientRect());
           }}
-          className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--border-base,#757575)] border-solid bg-[var(--surface-strongest,#212121)]"
+          className={`flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--border-base,#757575)] border-solid bg-[var(--surface-strongest,#212121)] ${
+            isMenuOpen ? "relative z-50" : ""
+          }`}
           aria-label="Opções"
         >
           <OptionsIcon size={24} className="text-white" />
@@ -642,8 +646,13 @@ export default function Dashboard({
                 onJoinCall={() => onJoinCall?.(nextMeeting.id)}
                 onViewDetails={() => setSheetMeeting(nextMeeting)}
                 onOptions={(anchor) =>
-                  setActionsMenu({ meeting: nextMeeting, top: anchor.top, right: window.innerWidth - anchor.left + 8 })
+                  setActionsMenu((prev) =>
+                    prev?.meeting.id === nextMeeting.id
+                      ? null
+                      : { meeting: nextMeeting, top: anchor.top, right: window.innerWidth - anchor.left + 8 }
+                  )
                 }
+                isMenuOpen={actionsMenu?.meeting.id === nextMeeting.id}
               />
             </div>
           )}
