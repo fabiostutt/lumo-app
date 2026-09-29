@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
-import { CircleAlert } from "lucide-react";
+import { Calendar, CircleAlert } from "lucide-react";
 import { AppXIcon, WhatsAppIcon, VideoIcon, CircleCheckIcon, CancelIcon } from "@/components/icons";
 import BottomSheet from "@/components/BottomSheet";
 
@@ -49,13 +49,11 @@ type MeetingDetailsSheetProps = {
   onStatusChange?: (id: string, status: SessionStatus) => void;
 };
 
-const WEEKDAYS = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-
-function formatDateLabel(iso: string) {
+function formatShortDate(iso: string) {
   const d = new Date(`${iso}T00:00:00`);
   const dd = String(d.getDate()).padStart(2, "0");
   const mm = String(d.getMonth() + 1).padStart(2, "0");
-  return `${dd}/${mm} • ${WEEKDAYS[d.getDay()]}`;
+  return `${dd}/${mm}`;
 }
 
 function StatusChip({ status }: { status: SessionStatus }) {
@@ -136,16 +134,22 @@ export default function MeetingDetailsSheet({
       {meeting && (
         <>
           <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
-            <div className="flex flex-1 flex-col items-start justify-end gap-[var(--spacing-xxs,4px)]">
-              <div className="flex flex-col items-start">
-                <p className="font-[family-name:var(--typography-heading-h2-font-family)] font-[var(--typography-heading-h2-font-weight,600)] text-[length:var(--typography-heading-h2-font-size,24px)] leading-[var(--typography-heading-h2-line-height,32px)] tracking-[var(--typography-heading-h2-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
+            <div className="flex flex-1 flex-col items-start gap-[var(--spacing-xxs,4px)]">
+              <div className="flex flex-col items-start text-[color:var(--content-base,#212121)]">
+                <p className="font-[family-name:var(--typography-heading-h2-font-family)] font-[var(--typography-heading-h2-font-weight,600)] text-[length:var(--typography-heading-h2-font-size,24px)] leading-[var(--typography-heading-h2-line-height,32px)] tracking-[var(--typography-heading-h2-letter-spacing,-0.2px)]">
                   {meeting.time}
                 </p>
-                <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-strongest,#757575)]">
-                  {formatDateLabel(meeting.date)}
+                <p className="font-[family-name:var(--typography-body-large-font-family)] font-[var(--typography-body-large-font-weight,500)] text-[length:var(--typography-body-large-font-size,18px)] leading-[var(--typography-body-large-line-height,24px)] tracking-[var(--typography-body-large-letter-spacing,-0.2px)]">
+                  {meeting.clientName}
                 </p>
               </div>
-              <StatusChip status={meeting.status} />
+              <div className="flex items-center gap-[var(--spacing-xs,8px)]">
+                <Calendar size={16} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+                <p className="font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+                  {formatShortDate(meeting.date)}
+                </p>
+                <StatusChip status={meeting.status} />
+              </div>
             </div>
             <button
               type="button"
