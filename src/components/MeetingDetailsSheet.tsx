@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Calendar, CircleAlert } from "lucide-react";
 import { AppXIcon, WhatsAppIcon, VideoIcon, CircleCheckIcon, CancelIcon } from "@/components/icons";
 import BottomSheet from "@/components/BottomSheet";
+import { buildWhatsAppShareUrl, buildWhatsAppReminderUrl } from "@/lib/whatsapp-links";
 
 export type SessionStatus = "pendente" | "confirmada" | "cancelada";
 
@@ -18,27 +19,6 @@ export type MeetingDetails = {
   meetingUrl?: string | null;
   platform: "whatsapp" | "google";
 };
-
-function buildWhatsAppTo(whatsapp: string) {
-  const digits = whatsapp.replace(/\D/g, "");
-  return digits.startsWith("55") ? digits : `55${digits}`;
-}
-
-// Usada pro botão "Compartilhar" (reuniões no Google Meet) — aqui o link
-// é de fato útil, porque é o link externo do Meet, não o próprio wa.me do
-// destinatário.
-function buildWhatsAppShareUrl(whatsapp: string, clientName: string, meetingUrl: string, time: string) {
-  const text = `Olá, ${clientName}! Aqui está o link da nossa reunião de hoje às ${time}: ${meetingUrl}`;
-  return `https://wa.me/${buildWhatsAppTo(whatsapp)}?text=${encodeURIComponent(text)}`;
-}
-
-// Usada pro botão "Abrir no WhatsApp" (reuniões no
-// WhatsApp) — sem link, porque o "link da reunião" nesse caso é o próprio
-// wa.me do destinatário, e mandar de volta pra ele não faz sentido.
-function buildWhatsAppReminderUrl(whatsapp: string, clientName: string, time: string) {
-  const text = `Olá, ${clientName}! Passando para lembrar da nossa reunião hoje às ${time}. Até já!`;
-  return `https://wa.me/${buildWhatsAppTo(whatsapp)}?text=${encodeURIComponent(text)}`;
-}
 
 type MeetingDetailsSheetProps = {
   meeting: MeetingDetails | null;

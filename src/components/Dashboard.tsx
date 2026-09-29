@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, VideoOff } from "lucide-react";
+import { Calendar, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, Eye, Pencil, VideoOff } from "lucide-react";
 import {
   EngineIcon,
   WatchIcon,
@@ -11,6 +11,7 @@ import {
   OptionsIcon,
   VideoIcon,
   WhatsAppIcon,
+  AppXIcon,
   CircleCheckIcon,
   CancelIcon,
 } from "@/components/icons";
@@ -18,6 +19,7 @@ import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDet
 import Disclaimer from "@/components/Disclaimer";
 import type { ServerDisclaimerTone } from "@/lib/disclaimer";
 import FilterMeetingsSheet, { MEETING_FILTER_LABELS, type MeetingFilter } from "@/components/FilterMeetingsSheet";
+import { buildWhatsAppReminderUrl } from "@/lib/whatsapp-links";
 
 const STATUS_CHIP_MAP: Record<
   SessionStatus,
@@ -372,14 +374,19 @@ function NextMeetingCard({
   meeting,
   onJoinCall,
   onOptions,
+  onViewDetails,
 }: {
   meeting: Meeting;
   onJoinCall?: () => void;
-  onOptions?: () => void;
+  onOptions?: (anchor: DOMRect) => void;
+  onViewDetails?: () => void;
 }) {
   const isGoogle = meeting.platform === "google";
   return (
-    <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-base,#757575)] border-solid bg-[var(--next-meeting-surface-base,#212121)] p-[var(--next-meeting-padding-large,24px)]">
+    <div
+      onClick={onViewDetails}
+      className="flex w-full cursor-pointer flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-base,#757575)] border-solid bg-[var(--next-meeting-surface-base,#212121)] p-[var(--next-meeting-padding-large,24px)]"
+    >
       <div className="flex w-full items-start gap-[var(--next-meeting-gap,16px)]">
         <div className="flex flex-1 flex-col items-start gap-[var(--spacing-xs,8px)]">
           <div className="flex flex-col items-start text-[color:var(--next-meeting-content-base,#fafafa)]">
@@ -400,7 +407,10 @@ function NextMeetingCard({
         </div>
         <button
           type="button"
-          onClick={onOptions}
+          onClick={(e) => {
+            e.stopPropagation();
+            onOptions?.(e.currentTarget.getBoundingClientRect());
+          }}
           className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--border-base,#757575)] border-solid bg-[var(--surface-strongest,#212121)]"
           aria-label="Opções"
         >
@@ -411,7 +421,10 @@ function NextMeetingCard({
         href={meeting.meetingUrl || undefined}
         target="_blank"
         rel="noopener noreferrer"
-        onClick={onJoinCall}
+        onClick={(e) => {
+          e.stopPropagation();
+          onJoinCall?.();
+        }}
         aria-disabled={!meeting.meetingUrl}
         className={`flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding,16px)] text-[color:var(--button-secondary-content-enabled,#212121)] ${
           !meeting.meetingUrl ? "pointer-events-none opacity-60" : ""
@@ -502,6 +515,7 @@ export default function Dashboard({
   const [sheetMeeting, setSheetMeeting] = useState<Meeting | null>(null);
   const [meetingFilter, setMeetingFilter] = useState<MeetingFilter>("all");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
+  const [actionsMenu, setActionsMenu] = useState<{ meeting: Meeting; top: number; right: number } | null>(null);
 
   const weekDays = buildWeekDays(selectedDate, eventDates);
   const year = new Date(`${selectedDate}T00:00:00`).getFullYear();
@@ -626,7 +640,10 @@ export default function Dashboard({
               <NextMeetingCard
                 meeting={nextMeeting}
                 onJoinCall={() => onJoinCall?.(nextMeeting.id)}
-                onOptions={() => setSheetMeeting(nextMeeting)}
+                onViewDetails={() => setSheetMeeting(nextMeeting)}
+                onOptions={(anchor) =>
+                  setActionsMenu({ meeting: nextMeeting, top: anchor.top, right: window.innerWidth - anchor.left + 8 })
+                }
               />
             </div>
           )}
@@ -685,6 +702,71 @@ export default function Dashboard({
         onJoinCall={onJoinCall}
         onStatusChange={handleStatusChange}
       />
+
+      {actionsMenu && (
+        <>
+          <div
+            className="fixed inset-0 z-40 bg-[var(--overlay-base,#212121cc)] backdrop-blur-[4px]"
+            onClick={() => setActionsMenu(null)}
+          />
+          <div
+            className="fixed z-50 flex flex-col items-end gap-[var(--spacing-xs,8px)]"
+            style={{ top: actionsMenu.top, right: actionsMenu.right }}
+          >
+            <button
+              type="button"
+              onClick={() => {
+                setSheetMeeting(actionsMenu.meeting);
+                setActionsMenu(null);
+              }}
+              className="flex h-[40px] items-center justify-center gap-[var(--button-gap,8px)] whitespace-nowrap rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)] text-[color:var(--button-tertiary-content-enabled,#212121)]"
+            >
+              <Eye size={24} strokeWidth={1.75} />
+              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
+                Ver detalhes
+              </span>
+            </button>
+            {actionsMenu.meeting.clientWhatsapp && (
+              <a
+                href={buildWhatsAppReminderUrl(actionsMenu.meeting.clientWhatsapp, actionsMenu.meeting.clientName, actionsMenu.meeting.time)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setActionsMenu(null)}
+                className="flex h-[40px] items-center justify-center gap-[var(--button-gap,8px)] whitespace-nowrap rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-tertiary-surface-enabled,#eee)] px-[var(--button-padding-small,12px)] text-[color:var(--button-tertiary-content-enabled,#212121)]"
+              >
+                <WhatsAppIcon size={24} />
+                <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
+                  Enviar notificação
+                </span>
+              </a>
+            )}
+            <button
+              type="button"
+              onClick={() => {
+                const id = actionsMenu.meeting.id;
+                setActionsMenu(null);
+                handleEdit(id);
+              }}
+              className="flex h-[40px] items-center justify-center gap-[var(--button-gap,8px)] whitespace-nowrap rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding-small,12px)] text-[color:var(--button-secondary-content-enabled,#212121)]"
+            >
+              <Pencil size={24} strokeWidth={1.75} />
+              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
+                Editar reunião
+              </span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActionsMenu(null)}
+              className="flex h-[40px] items-center justify-center gap-[var(--button-gap,8px)] whitespace-nowrap rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-secondary-surface-enabled,#fafafa)] px-[var(--button-padding-small,12px)] text-[color:var(--button-secondary-content-enabled,#212121)]"
+            >
+              <AppXIcon size={24} />
+              <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
+                Fechar
+              </span>
+            </button>
+          </div>
+        </>
+      )}
     </>
   );
 }
