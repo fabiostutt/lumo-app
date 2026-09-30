@@ -672,7 +672,7 @@ export default function Dashboard({
                   setActionsMenu((prev) =>
                     prev?.meeting.id === nextMeeting.id
                       ? null
-                      : { meeting: nextMeeting, top: anchor.top, right: window.innerWidth - anchor.left + 8 }
+                      : { meeting: nextMeeting, top: anchor.top, right: window.innerWidth - anchor.left + 16 }
                   )
                 }
                 isMenuOpen={actionsMenu?.meeting.id === nextMeeting.id}
@@ -703,7 +703,7 @@ export default function Dashboard({
                     setActionsMenu((prev) =>
                       prev?.meeting.id === meeting.id
                         ? null
-                        : { meeting, top: anchor.top, right: window.innerWidth - anchor.left + 8 }
+                        : { meeting, top: anchor.top, right: window.innerWidth - anchor.left + 16 }
                     )
                   }
                   isMenuOpen={actionsMenu?.meeting.id === meeting.id}
@@ -745,7 +745,7 @@ export default function Dashboard({
             onClick={() => setActionsMenu(null)}
           />
           <div
-            className="fixed z-50 flex flex-col items-end gap-[var(--spacing-xs,8px)]"
+            className="fixed z-50 flex flex-col items-end gap-[var(--components-stack-gap-vertical,8px)]"
             style={{ top: actionsMenu.top, right: actionsMenu.right }}
           >
             <button
