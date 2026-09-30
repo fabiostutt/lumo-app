@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sendPushToOwner } from "@/lib/push/server";
+import { sendSessionReminderMessage } from "@/lib/whatsapp";
 import { APP_TIME_ZONE, getNowInAppTimeZone } from "@/lib/dashboard";
 
 // Job agendado (ver vercel.json) que roda a cada poucos minutos e avisa o
@@ -29,7 +30,7 @@ export async function GET(request: NextRequest) {
 
   const { data: sessions, error } = await admin
     .from("sessions")
-    .select("id, owner_id, time, status, reminder_sent_at, clients(name)")
+    .select("id, owner_id, date, time, status, reminder_sent_at, notifications_enabled, platform, clients(name, whatsapp)")
     .eq("date", dateStr)
     .is("reminder_sent_at", null)
     .neq("status", "cancelada");
@@ -45,13 +46,39 @@ export async function GET(request: NextRequest) {
   });
 
   await Promise.all(
-    due.map(async (session) => {
-      const clientName = (session as unknown as { clients?: { name?: string } | null }).clients?.name ?? "cliente";
+    due.map(async (rawSession) => {
+      const session = rawSession as unknown as {
+        id: string;
+        owner_id: string;
+        date: string;
+        time: string;
+        notifications_enabled: boolean;
+        platform: string;
+        clients?: { name?: string; whatsapp?: string | null } | null;
+      };
+      const clientName = session.clients?.name ?? "cliente";
+
       await sendPushToOwner(session.owner_id, {
         title: "Sessão em breve",
         body: `${clientName} às ${session.time} (em até ${REMINDER_MINUTES_BEFORE} min).`,
         url: "/dashboard",
       });
+
+      if (session.notifications_enabled && session.platform === "WhatsApp" && session.clients?.whatsapp) {
+        const [, month, day] = session.date.split("-");
+        try {
+          await sendSessionReminderMessage({
+            toRaw: session.clients.whatsapp,
+            clientName,
+            date: `${day}/${month}`,
+            time: session.time.slice(0, 5),
+            sessionId: session.id,
+          });
+        } catch (err) {
+          console.error("[cron/session-reminders] Falha ao enviar lembrete por WhatsApp:", err);
+        }
+      }
+
       await admin.from("sessions").update({ reminder_sent_at: new Date().toISOString() }).eq("id", session.id);
     })
   );
