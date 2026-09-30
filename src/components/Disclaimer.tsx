@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { CreditCard, CreditCardX, ChevronRight, BadgeCheck } from "lucide-react";
+import { Bell, CreditCardX, ChevronRight, BadgeCheck } from "lucide-react";
 import { AlertIcon } from "@/components/icons";
 import { getPushSubscriptionState, subscribeToPush } from "@/lib/push/client";
 import type { DisclaimerTone, ServerDisclaimerTone } from "@/lib/disclaimer";
@@ -93,7 +93,7 @@ function NotificationDisclaimer({
 }) {
   return (
     <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
-      <CreditCard size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
+      <Bell size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <DisclaimerTitle>Ative as notificações</DisclaimerTitle>
         <DisclaimerDescription>Receba alertas de confirmações e de próximas sessões.</DisclaimerDescription>
