@@ -376,10 +376,10 @@ function NoFilterResultsDisclaimer() {
       <SearchX size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-          Este filtro não encontrou resultados
+          Nenhum resultado para este filtro
         </p>
         <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-          Não há sessões listadas nesta categoria.
+          Selecione outro filtro para ver as sessões disponíveis.
         </p>
       </div>
     </div>
