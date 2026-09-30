@@ -462,9 +462,11 @@ function NextMeetingCard({
 function MeetingListItem({
   meeting,
   onOptions,
+  isMenuOpen,
 }: {
   meeting: Meeting;
-  onOptions?: () => void;
+  onOptions?: (anchor: DOMRect) => void;
+  isMenuOpen?: boolean;
 }) {
   return (
     <div className="flex w-full flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-strongest,#eee)] border-solid bg-[var(--next-meeting-surface-strongest,white)] p-[var(--next-meeting-padding-small,16px)]">
@@ -493,8 +495,13 @@ function MeetingListItem({
           })()}
           <button
             type="button"
-            onClick={onOptions}
-            className="flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)]"
+            onClick={(e) => {
+              e.stopPropagation();
+              onOptions?.(e.currentTarget.getBoundingClientRect());
+            }}
+            className={`flex size-[48px] items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)] ${
+              isMenuOpen ? "relative z-50" : ""
+            }`}
             aria-label="Opções"
           >
             <OptionsIcon size={24} />
@@ -692,7 +699,14 @@ export default function Dashboard({
                 <MeetingListItem
                   key={meeting.id}
                   meeting={meeting}
-                  onOptions={() => setSheetMeeting(meeting)}
+                  onOptions={(anchor) =>
+                    setActionsMenu((prev) =>
+                      prev?.meeting.id === meeting.id
+                        ? null
+                        : { meeting, top: anchor.top, right: window.innerWidth - anchor.left + 8 }
+                    )
+                  }
+                  isMenuOpen={actionsMenu?.meeting.id === meeting.id}
                 />
               ))}
               {dayMeetings.length === 0 && !isNextMeetingShown && (
