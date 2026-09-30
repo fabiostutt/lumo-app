@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Calendar, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, Eye, Pencil, VideoOff } from "lucide-react";
+import { Calendar, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, Eye, Pencil, SearchX, VideoOff } from "lucide-react";
 import {
   EngineIcon,
   WatchIcon,
@@ -370,6 +370,22 @@ function NoOtherMeetingsDisclaimer() {
   );
 }
 
+function NoFilterResultsDisclaimer() {
+  return (
+    <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
+      <SearchX size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-base,#212121)]" />
+      <div className="flex flex-1 flex-col items-start">
+        <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+          Este filtro não encontrou resultados
+        </p>
+        <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+          Não há sessões listadas nesta categoria.
+        </p>
+      </div>
+    </div>
+  );
+}
+
 function NextMeetingCard({
   meeting,
   onJoinCall,
@@ -683,11 +699,7 @@ export default function Dashboard({
                 <ScheduleMeetingEmpty onSchedule={onSchedule ?? (() => router.push("/sessions/new"))} />
               )}
               {dayMeetings.length === 0 && isNextMeetingShown && <NoOtherMeetingsDisclaimer />}
-              {dayMeetings.length > 0 && filteredDayMeetings.length === 0 && (
-                <p className="w-full py-8 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
-                  Nenhuma sessão encontrada para esse filtro.
-                </p>
-              )}
+              {dayMeetings.length > 0 && filteredDayMeetings.length === 0 && <NoFilterResultsDisclaimer />}
             </div>
           </div>
 
