@@ -96,7 +96,7 @@ function NotificationDisclaimer({
       <CreditCard size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <DisclaimerTitle>Ative as notificações</DisclaimerTitle>
-        <DisclaimerDescription>Receba alertas de confirmações e de próximas reuniões.</DisclaimerDescription>
+        <DisclaimerDescription>Receba alertas de confirmações e de próximas sessões.</DisclaimerDescription>
       </div>
       <button
         type="button"

@@ -6,13 +6,13 @@ function buildWhatsAppTo(whatsapp: string) {
 // Usada quando o link em si é útil pro destinatário (ex.: compartilhar um
 // link externo do Google Meet) — inclui a URL na mensagem.
 export function buildWhatsAppShareUrl(whatsapp: string, clientName: string, meetingUrl: string, time: string) {
-  const text = `Olá, ${clientName}! Aqui está o link da nossa reunião de hoje às ${time}: ${meetingUrl}`;
+  const text = `Olá, ${clientName}! Aqui está o link da nossa sessão de hoje às ${time}: ${meetingUrl}`;
   return `https://wa.me/${buildWhatsAppTo(whatsapp)}?text=${encodeURIComponent(text)}`;
 }
 
-// Usada quando a "reunião" já É a conversa no WhatsApp — sem link, porque
+// Usada quando a "sessão" já É a conversa no WhatsApp — sem link, porque
 // mandar de volta o próprio wa.me do destinatário não faz sentido.
 export function buildWhatsAppReminderUrl(whatsapp: string, clientName: string, time: string) {
-  const text = `Olá, ${clientName}! Passando para lembrar da nossa reunião hoje às ${time}. Até já!`;
+  const text = `Olá, ${clientName}! Passando para lembrar da nossa sessão hoje às ${time}. Até já!`;
   return `https://wa.me/${buildWhatsAppTo(whatsapp)}?text=${encodeURIComponent(text)}`;
 }

@@ -44,7 +44,7 @@ const STATUS_CHIP_MAP: Record<
 
 // Chip "inverse" (Figma node 59:520) — mesmo mapeamento de tom do
 // STATUS_CHIP_MAP acima, mas com fundo/texto invertidos, pra ficar legível
-// sobre o fundo escuro do card "Próxima reunião".
+// sobre o fundo escuro do card "Próxima sessão".
 const STATUS_LABELS: Record<SessionStatus, string> = {
   confirmada: "Confirmada",
   pendente: "Pendente",
@@ -226,7 +226,7 @@ function HeadProfile({
       <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
         Você tem{" "}
         <span className="text-[color:var(--content-base,#212121)]">
-          {sessionsToday} reuniões
+          {sessionsToday} sessões
         </span>{" "}
         agendadas para hoje
       </p>
@@ -347,7 +347,7 @@ function ScheduleMeetingEmpty({ onSchedule }: { onSchedule?: () => void }) {
         className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)]"
       >
         <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
-          Agendar reunião
+          Agendar sessão
         </span>
       </button>
     </div>
@@ -360,7 +360,7 @@ function NoOtherMeetingsDisclaimer() {
       <VideoOff size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-          Não há mais reuniões hoje
+          Não há mais sessões hoje
         </p>
         <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
           Você pode agendar outras, se precisar
@@ -436,7 +436,7 @@ function NextMeetingCard({
       >
         {isGoogle ? <VideoIcon size={24} /> : <WhatsAppIcon size={24} />}
         <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
-          {isGoogle ? "Entrar na reunião" : "Abrir no WhatsApp"}
+          {isGoogle ? "Entrar na sessão" : "Abrir no WhatsApp"}
         </span>
       </a>
     </div>
@@ -524,17 +524,17 @@ export default function Dashboard({
   const weekDays = buildWeekDays(selectedDate, eventDates);
   const year = new Date(`${selectedDate}T00:00:00`).getFullYear();
 
-  // A reunião em destaque no card "Próxima reunião" não deve se repetir na
-  // lista "Reuniões do dia" logo abaixo.
+  // A sessão em destaque no card "Próxima sessão" não deve se repetir na
+  // lista "Sessões do dia" logo abaixo.
   const isNextMeetingShown = Boolean(nextMeeting) && selectedDate === todayIso;
   const dayMeetings = isNextMeetingShown
     ? meetings.filter((meeting) => meeting.id !== nextMeeting!.id)
     : meetings;
 
-  // "Concluída" não é um status salvo — é uma reunião cujo horário final
+  // "Concluída" não é um status salvo — é uma sessão cujo horário final
   // (início + duração) já passou. Uma vez concluída, ela some dos filtros de
   // "Confirmadas"/"Pendentes" (só aparece em "Concluídas"/"Todas");
-  // "Canceladas" fica de fora dessa reclassificação, já que uma reunião
+  // "Canceladas" fica de fora dessa reclassificação, já que uma sessão
   // cancelada nunca chega a ser "concluída".
   function isMeetingCompleted(meeting: Meeting) {
     if (meeting.status === "cancelada") return false;
@@ -562,7 +562,7 @@ export default function Dashboard({
       setSessionsToday(data.sessionsToday);
       setMeetings(data.meetings);
       setMonth(MONTH_LABELS[new Date(`${dateStr}T00:00:00`).getMonth()]);
-      // "Próxima reunião" fica fixa (não depende do dia selecionado no calendário)
+      // "Próxima sessão" fica fixa (não depende do dia selecionado no calendário)
     } finally {
       setLoading(false);
     }
@@ -619,7 +619,7 @@ export default function Dashboard({
             <QuickActionButton icon={<PeopleIcon size={24} />} label="Clientes" onClick={onClients ?? (() => router.push("/clients"))} />
             <QuickActionButton
               icon={<EngineIcon size={24} />}
-              label="Perfil"
+              label="Ajustes"
               hasBadge
               onClick={() => router.push("/profile")}
             />
@@ -640,7 +640,7 @@ export default function Dashboard({
 
           {nextMeeting && selectedDate === todayIso && (
             <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-              <SectionTitle text="Próxima reunião" />
+              <SectionTitle text="Próxima sessão" />
               <NextMeetingCard
                 meeting={nextMeeting}
                 onJoinCall={() => onJoinCall?.(nextMeeting.id)}
@@ -659,7 +659,7 @@ export default function Dashboard({
 
           <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
             <div className="flex w-full items-center justify-between">
-              <SectionTitle text="Reuniões do dia" />
+              <SectionTitle text="Sessões do dia" />
               <button
                 type="button"
                 onClick={() => setFilterSheetOpen(true)}
@@ -685,7 +685,7 @@ export default function Dashboard({
               {dayMeetings.length === 0 && isNextMeetingShown && <NoOtherMeetingsDisclaimer />}
               {dayMeetings.length > 0 && filteredDayMeetings.length === 0 && (
                 <p className="w-full py-8 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
-                  Nenhuma reunião encontrada para esse filtro.
+                  Nenhuma sessão encontrada para esse filtro.
                 </p>
               )}
             </div>
@@ -760,7 +760,7 @@ export default function Dashboard({
             >
               <Pencil size={24} strokeWidth={1.75} />
               <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
-                Editar reunião
+                Editar sessão
               </span>
             </button>
             <button

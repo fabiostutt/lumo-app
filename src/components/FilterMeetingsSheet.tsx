@@ -28,7 +28,7 @@ export default function FilterMeetingsSheet({ open, selected, onClose, onSelect 
     <BottomSheet open={open} onClose={onClose}>
       <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
         <p className="flex-1 font-[family-name:var(--typography-heading-h4-font-family)] font-[var(--typography-heading-h4-font-weight,600)] text-[length:var(--typography-heading-h4-font-size,16px)] leading-[var(--typography-heading-h4-line-height,24px)] tracking-[var(--typography-heading-h4-letter-spacing,-0.1px)] text-[color:var(--content-base,#212121)]">
-          Filtrar reuniões
+          Filtrar sessões
         </p>
         <button
           type="button"

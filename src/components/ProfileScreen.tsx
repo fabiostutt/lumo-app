@@ -259,7 +259,7 @@ export default function ProfileScreen({
       <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
         <SectionTitle text="Configurações" />
         <ProfileRow
-          label="Duração padrão da reunião"
+          label="Duração padrão da sessão"
           value={`${defaultDurationMinutes} min`}
           onClick={() => setOpenSheet("duration")}
         />
@@ -309,7 +309,7 @@ export default function ProfileScreen({
       <ChoiceSheet
         open={openSheet === "duration"}
         onClose={() => setOpenSheet(null)}
-        title="Duração padrão da reunião"
+        title="Duração padrão da sessão"
         field="default_duration_minutes"
         options={DURATION_OPTIONS}
         currentValue={defaultDurationMinutes}

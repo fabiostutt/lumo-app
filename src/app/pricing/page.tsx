@@ -18,7 +18,7 @@ const FEATURES = [
   "Clientes ilimitados",
   "Integração com Google Meet",
   "Alertas e notificações por WhatsApp",
-  "Agenda sem limite de reuniões",
+  "Agenda sem limite de sessões",
   "Suporte prioritário",
 ];
 
