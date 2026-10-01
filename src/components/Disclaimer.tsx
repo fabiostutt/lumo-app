@@ -92,7 +92,7 @@ function NotificationDisclaimer({
   onEnable: () => void;
 }) {
   return (
-    <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
+    <div className="flex w-full items-center gap-[var(--components-stack-gap-horizontal,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
       <Bell size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <DisclaimerTitle>Ative as notificações</DisclaimerTitle>
@@ -166,7 +166,7 @@ export default function Disclaimer({
     <button
       type="button"
       onClick={() => router.push("/pricing")}
-      className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)] text-left"
+      className="flex w-full items-center gap-[var(--components-stack-gap-horizontal,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)] text-left"
     >
       <Icon size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">

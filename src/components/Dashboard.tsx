@@ -356,7 +356,7 @@ function ScheduleMeetingEmpty({ onSchedule }: { onSchedule?: () => void }) {
 
 function NoOtherMeetingsDisclaimer() {
   return (
-    <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
+    <div className="flex w-full items-center gap-[var(--components-stack-gap-horizontal,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
       <VideoOff size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
@@ -372,7 +372,7 @@ function NoOtherMeetingsDisclaimer() {
 
 function NoFilterResultsDisclaimer() {
   return (
-    <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
+    <div className="flex w-full items-center gap-[var(--components-stack-gap-horizontal,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
       <SearchX size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
