@@ -100,7 +100,7 @@ function EditTextSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <form action={formAction} className="flex w-full flex-col gap-[var(--sheet-gap,16px)]">
+      <form action={formAction} className="flex w-full flex-col gap-[var(--sheet-gap-base,16px)]">
         <input type="hidden" name="field" value={field} />
         <TextField
           label={title}

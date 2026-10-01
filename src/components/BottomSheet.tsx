@@ -21,11 +21,11 @@ export default function BottomSheet({
         aria-hidden="true"
       />
       <div
-        className={`relative mx-4 mb-4 w-full max-w-[398px] rounded-[var(--sheet-border-radius,32px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
+        className={`relative mx-4 mb-4 w-full max-w-[398px] rounded-[var(--sheet-border-radius-base,32px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
           open ? "translate-y-0" : "translate-y-[120%]"
         }`}
       >
-        <div className="flex flex-col gap-[var(--sheet-gap,16px)] p-[var(--sheet-padding,24px)] pb-[max(var(--sheet-padding,24px),env(safe-area-inset-bottom))]">
+        <div className="flex flex-col gap-[var(--sheet-gap-base,16px)] p-[var(--sheet-padding-base,24px)] pb-[max(var(--sheet-padding-base,24px),env(safe-area-inset-bottom))]">
           {children}
         </div>
       </div>

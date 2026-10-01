@@ -330,7 +330,7 @@ const MAILBOX_ICON_URL = "https://www.figma.com/api/mcp/asset/58416fac-4489-4ffd
 
 function ScheduleMeetingEmpty({ onSchedule }: { onSchedule?: () => void }) {
   return (
-    <div className="flex w-full flex-col items-center gap-[var(--sheet-gap,16px)] rounded-[var(--sheet-border-radius,32px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtle,#bdbdbd)] p-[var(--sheet-padding,24px)]">
+    <div className="flex w-full flex-col items-center gap-[var(--sheet-gap-base,16px)] rounded-[var(--sheet-border-radius-base,32px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtle,#bdbdbd)] p-[var(--sheet-padding-base,24px)]">
       <div className="flex w-full flex-col items-center gap-[var(--numbers-padding-xs,8px)]">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={MAILBOX_ICON_URL} alt="" className="size-[48px]" />
