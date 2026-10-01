@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Bell, CreditCardX, ChevronRight, BadgeCheck } from "lucide-react";
+import { Bell, CreditCardX, ChevronRight, BadgeCheck, TrendingUp } from "lucide-react";
 import { AlertIcon } from "@/components/icons";
 import { getPushSubscriptionState, subscribeToPush } from "@/lib/push/client";
 import type { DisclaimerTone, ServerDisclaimerTone } from "@/lib/disclaimer";
@@ -63,8 +63,8 @@ const ICONS: Record<ServerDisclaimerTone, React.ComponentType<{ size?: number; c
   "lumo-pro": BadgeCheck,
   "two-days": BadgeCheck,
   "last-day": AlertIcon,
-  growth: AlertIcon,
-  "client-limit": AlertIcon,
+  growth: TrendingUp,
+  "client-limit": TrendingUp,
   "payment-failed": CreditCardX,
 };
 
