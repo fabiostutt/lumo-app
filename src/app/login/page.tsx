@@ -77,7 +77,7 @@ export default function LoginPage() {
             Crie sua conta ou faça login
           </p>
 
-          <div className="flex flex-col gap-[var(--components-stack-gap-vertical,8px)]">
+          <div className="flex flex-col gap-[var(--components-button-stack-gap-vertical,8px)]">
             <button
               type="button"
               onClick={handleGoogleLogin}
