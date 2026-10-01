@@ -59,7 +59,7 @@ export default function LoginPage() {
 
   return (
     <div className="relative flex w-full flex-1 flex-col justify-end overflow-hidden bg-[var(--surface-strong,#757575)]">
-      <div className="absolute inset-0 bg-[var(--overlay,#212121cc)] backdrop-blur-[4px]" />
+      <div className="absolute inset-0 bg-[var(--overlay-base,#212121cc)] backdrop-blur-[4px]" />
 
       <div className="relative z-[2] flex flex-col gap-[var(--screen-gap,24px)] px-[var(--screen-padding-large,24px)] pt-[var(--spacing-xxl,40px)] pb-[var(--spacing-xxl,40px)] text-[color:var(--content-subtle,white)]">
         <div className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
@@ -77,7 +77,7 @@ export default function LoginPage() {
             Crie sua conta ou faça login
           </p>
 
-          <div className="flex flex-col gap-[var(--spacing-sm,12px)]">
+          <div className="flex flex-col gap-[var(--components-stack-gap-vertical,8px)]">
             <button
               type="button"
               onClick={handleGoogleLogin}
