@@ -61,7 +61,7 @@ export default function LoginPage() {
     <div className="relative flex w-full flex-1 flex-col justify-end overflow-hidden bg-[var(--surface-strong,#757575)]">
       <div className="absolute inset-0 bg-[var(--overlay,#212121cc)] backdrop-blur-[4px]" />
 
-      <div className="relative z-[2] flex flex-col gap-[var(--screen-gap,24px)] px-[var(--screen-padding,16px)] pt-[var(--spacing-xxl,40px)] pb-[var(--spacing-xxl,40px)] text-[color:var(--content-subtle,white)]">
+      <div className="relative z-[2] flex flex-col gap-[var(--screen-gap,24px)] px-[var(--screen-padding-large,24px)] pt-[var(--spacing-xxl,40px)] pb-[var(--spacing-xxl,40px)] text-[color:var(--content-subtle,white)]">
         <div className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
           <p>Cuide dos clientes.</p>
           <p>O Lumo cuida da agenda.</p>
@@ -71,8 +71,8 @@ export default function LoginPage() {
         </p>
       </div>
 
-      <div className="relative z-[2] mx-4 mb-[18px] flex flex-col overflow-hidden rounded-[var(--sheet-border-radius,32px)] bg-[var(--surface-base,white)]">
-        <div className="flex flex-col gap-[var(--sheet-gap,16px)] p-[var(--sheet-padding,24px)]">
+      <div className="relative z-[2] mx-4 mb-[18px] flex flex-col overflow-hidden rounded-[var(--sheet-border-radius-base,32px)] bg-[var(--surface-base,white)]">
+        <div className="flex flex-col gap-[var(--sheet-gap-base,16px)] p-[var(--sheet-padding-base,24px)]">
           <p className="text-center font-[family-name:var(--typography-heading-h4-font-family)] font-[var(--typography-heading-h4-font-weight,600)] text-[length:var(--typography-heading-h4-font-size,16px)] leading-[var(--typography-heading-h4-line-height,24px)] tracking-[var(--typography-heading-h4-letter-spacing,-0.1px)] text-[color:var(--content-base,#212121)]">
             Crie sua conta ou faça login
           </p>

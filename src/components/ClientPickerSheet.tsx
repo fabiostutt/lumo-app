@@ -36,7 +36,7 @@ export default function ClientPickerSheet({
 
   return (
     <BottomSheet open={open} onClose={onClose}>
-      <div className="flex max-h-[60vh] w-full flex-col gap-[var(--sheet-gap,16px)] overflow-y-auto">
+      <div className="flex max-h-[60vh] w-full flex-col gap-[var(--sheet-gap-base,16px)] overflow-y-auto">
         <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
           <p className="flex-1 font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
             Selecionar participante

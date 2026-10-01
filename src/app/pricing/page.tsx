@@ -112,8 +112,8 @@ export default function PricingPage() {
         </div>
       </div>
 
-      <div className="relative flex w-full flex-col rounded-[var(--sheet-border-radius,32px)] bg-[var(--surface-base,white)]">
-        <div className="flex w-full flex-col gap-[var(--sheet-gap-large,24px)] p-[var(--sheet-padding,24px)]">
+      <div className="relative flex w-full flex-col rounded-[var(--sheet-border-radius-base,32px)] bg-[var(--surface-base,white)]">
+        <div className="flex w-full flex-col gap-[var(--sheet-gap-large,24px)] p-[var(--sheet-padding-base,24px)]">
           <div className="flex w-full flex-col items-start gap-[var(--spacing-xxs,4px)]">
             <h1 className="font-[family-name:var(--typography-heading-h2-font-family)] font-[var(--typography-heading-h2-font-weight,600)] text-[length:var(--typography-heading-h2-font-size,24px)] leading-[var(--typography-heading-h2-line-height,32px)] tracking-[var(--typography-heading-h2-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
               Lumo Pro
