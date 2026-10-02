@@ -315,7 +315,7 @@ function CheckoutInner() {
   }, [plan]);
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding,16px)]">
+    <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding-base,16px)]">
       <TitleAction title="Checkout" href="/pricing" />
 
       {loading || !amount ? (

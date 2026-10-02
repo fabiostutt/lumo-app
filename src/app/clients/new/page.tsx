@@ -33,7 +33,7 @@ export default async function NewClientPage({
   }
 
   return (
-    <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding,16px)]">
+    <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding-base,16px)]">
       <TitleAction title="Cadastrar cliente" href={returnTo || "/dashboard"} />
 
       {blocked ? <ClientLimitModal returnTo={returnTo} /> : <ClientForm returnTo={returnTo} />}

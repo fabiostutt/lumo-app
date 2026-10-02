@@ -212,7 +212,7 @@ export default function ProfileScreen({
   }
 
   return (
-    <div className="flex w-full flex-col gap-[var(--screen-gap,24px)] bg-white p-[var(--screen-padding,16px)]">
+    <div className="flex w-full flex-col gap-[var(--screen-gap,24px)] bg-white p-[var(--screen-padding-base,16px)]">
       <TitleAction title="Perfil" href="/dashboard" />
 
       <div className="flex w-full items-center gap-[var(--spacing-sm,12px)]">

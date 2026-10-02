@@ -11,7 +11,7 @@ export default async function ClientsPage({
   const clients = await getClientsForOwner();
 
   return (
-    <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding,16px)]">
+    <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding-base,16px)]">
       <TitleAction title="Clientes" href={returnTo || "/dashboard"} />
       <ClientsListScreen clients={clients} returnTo={returnTo} />
     </div>
