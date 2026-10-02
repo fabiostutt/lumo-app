@@ -1,5 +1,7 @@
 "use client";
 
+import { motion } from "framer-motion";
+
 export default function BottomSheet({
   open,
   onClose,
@@ -20,15 +22,19 @@ export default function BottomSheet({
         onClick={onClose}
         aria-hidden="true"
       />
-      <div
-        className={`relative mx-4 mb-4 w-full max-w-[398px] rounded-[var(--sheet-border-radius-base,32px)] bg-[var(--surface-base,white)] transition-transform duration-300 ${
-          open ? "translate-y-0" : "translate-y-[120%]"
-        }`}
+      <motion.div
+        animate={{ y: open ? 0 : "120%" }}
+        transition={
+          open
+            ? { type: "spring", stiffness: 400, damping: 32 }
+            : { type: "tween", duration: 0.2, ease: "easeIn" }
+        }
+        className="relative mx-4 mb-4 w-full max-w-[398px] rounded-[var(--sheet-border-radius-base,32px)] bg-[var(--surface-base,white)]"
       >
         <div className="flex flex-col gap-[var(--sheet-gap-base,16px)] p-[var(--sheet-padding-base,24px)] pb-[max(var(--sheet-padding-base,24px),env(safe-area-inset-bottom))]">
           {children}
         </div>
-      </div>
+      </motion.div>
     </div>
   );
 }
