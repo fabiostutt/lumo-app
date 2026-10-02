@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Calendar, ChevronDown, ChevronLeft, ChevronRight, CircleAlert, Eye, Pencil, SearchX, VideoOff } from "lucide-react";
 import {
   EngineIcon,
@@ -381,7 +382,11 @@ function NoOtherMeetingsDisclaimer() {
           Não há mais sessões hoje
         </p>
         <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-          Você pode agendar outras, se precisar
+          Você pode agendar uma nova sessão{" "}
+          <Link href="/sessions/new" className="underline">
+            aqui
+          </Link>
+          .
         </p>
       </div>
     </div>
