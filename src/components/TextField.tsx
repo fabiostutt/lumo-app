@@ -87,7 +87,7 @@ export default function TextField({
           onFocus={() => setFocused(true)}
           onBlur={() => setFocused(false)}
           placeholder={placeholder}
-          className={`flex-1 bg-transparent font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] outline-none disabled:cursor-not-allowed ${valueColor} ${placeholderColor}`}
+          className={`flex-1 bg-transparent font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] outline-none disabled:cursor-not-allowed [&::-webkit-calendar-picker-indicator]:opacity-0 ${valueColor} ${placeholderColor}`}
         />
       </div>
       {isError && (
