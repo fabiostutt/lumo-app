@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 type TextFieldProps = {
   label: string;
@@ -26,6 +26,20 @@ export default function TextField({
   disabled = false,
 }: TextFieldProps) {
   const [focused, setFocused] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const isPickerType = type === "date" || type === "time";
+
+  function openPicker() {
+    if (disabled) return;
+    const input = inputRef.current;
+    if (input && "showPicker" in input) {
+      try {
+        input.showPicker();
+      } catch {
+        // navegador bloqueou (ex: sem gesto do usuário) — ignora
+      }
+    }
+  }
 
   const hasValue = value.trim().length > 0;
   const isError = !!error;
@@ -74,10 +88,12 @@ export default function TextField({
         {label}
       </label>
       <div
-        className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid px-[var(--input-padding,16px)] ${surfaceColor} ${borderColor}`}
+        onClick={isPickerType ? openPicker : undefined}
+        className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid px-[var(--input-padding,16px)] ${surfaceColor} ${borderColor} ${isPickerType && !disabled ? "cursor-pointer" : ""}`}
       >
         <span className={`shrink-0 ${iconColor}`}>{icon}</span>
         <input
+          ref={inputRef}
           id={name}
           name={name}
           type={type}
