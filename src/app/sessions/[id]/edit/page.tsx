@@ -21,7 +21,7 @@ export default async function EditSessionPage({
   if (!session) notFound();
 
   return (
-    <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding,16px)]">
+    <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding-base,16px)]">
       <TitleAction title="Editar sessão" href="/dashboard" />
       <ScheduleSessionForm
         clients={clients}

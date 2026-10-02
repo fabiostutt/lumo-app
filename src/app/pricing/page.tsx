@@ -62,7 +62,7 @@ export default function PricingPage() {
       : null;
 
   return (
-    <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-subtle,#fafafa)] p-[var(--screen-padding,16px)]">
+    <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-subtle,#fafafa)] p-[var(--screen-padding-base,16px)]">
       <TitleAction title="Benefícios" href="/dashboard" />
 
       <div className="flex w-full flex-col items-center gap-[var(--spacing-xs,8px)]">

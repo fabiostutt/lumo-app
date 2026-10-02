@@ -4,7 +4,7 @@ import { useActionState, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
-import { AddUserIcon, PeopleIcon, ScheduleIcon, VideoIcon, WatchIcon } from "@/components/icons";
+import { AddUserIcon, PeopleIcon, ScheduleIcon, WatchIcon } from "@/components/icons";
 import { createSessionAction } from "@/lib/actions/create-session";
 import { updateSessionAction } from "@/lib/actions/update-session";
 import ClientPickerSheet from "@/components/ClientPickerSheet";
@@ -13,8 +13,6 @@ import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
 import { RECURRENCE_PRESET_LABELS, type RecurrencePreset } from "@/lib/scheduling";
-import Toast from "@/components/Toast";
-import { useToast } from "@/hooks/useToast";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null; email?: string | null };
 
@@ -58,7 +56,6 @@ export default function ScheduleSessionForm({
   const duration = String(initialDurationMinutes ?? 50);
   const [platform, setPlatform] = useState<"whatsapp" | "google">(initialPlatform ?? "whatsapp");
   const [notificationsOn, setNotificationsOn] = useState(initialNotificationsOn ?? true);
-  const { show: toastShow, message: toastMessage, showToast } = useToast();
   const [recurrencePreset, setRecurrencePreset] = useState<RecurrencePreset>("none");
   const [recurrenceSheetOpen, setRecurrenceSheetOpen] = useState(false);
 
@@ -75,16 +72,6 @@ export default function ScheduleSessionForm({
   const meetingLink = isEditing && initialMeetingLink ? initialMeetingLink : computedLink;
 
   const isValid = !!clientId && !!date && !!time;
-
-  async function handleCopy() {
-    if (!meetingLink) return;
-    try {
-      await navigator.clipboard.writeText(meetingLink);
-      showToast("Link copiado");
-    } catch {
-      // clipboard indisponível — ignora
-    }
-  }
 
   return (
     <form action={formAction} className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
@@ -137,7 +124,7 @@ export default function ScheduleSessionForm({
         </Link>
       </div>
 
-      <div className="flex w-full gap-[var(--stacks-gap-horizontal,16px)]">
+      <div className="flex w-full gap-[var(--components-button-stack-gap-horizontal,16px)]">
         <div className="min-w-0 flex-1">
           <TextField
             label="Data"
@@ -202,33 +189,11 @@ export default function ScheduleSessionForm({
         ]}
       />
 
-      {platform === "google" &&
-        (meetingLink ? (
-          <div className="flex w-full items-end gap-[var(--spacing-xs,8px)]">
-            <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
-              <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-                Link da sessão
-              </p>
-              <div className="flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid border-[var(--input-filled-border-default,#757575)] bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)]">
-                <VideoIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-                <p className="flex-1 truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] text-[color:var(--input-filled-content-value,#212121)]">
-                  {meetingLink}
-                </p>
-              </div>
-            </div>
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="flex h-[48px] shrink-0 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--numbers-padding-md,16px)] text-[18px] font-semibold leading-[24px] text-[color:var(--button-primary-content-enabled,#fafafa)]"
-            >
-              Copiar
-            </button>
-          </div>
-        ) : (
-          <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-            O link do Google Meet é gerado automaticamente ao salvar.
-          </p>
-        ))}
+      {platform === "google" && (
+        <p className="w-full text-center font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--content-strongest,#757575)]">
+          Ao salvar a sessão, o link será gerado e enviado automaticamente para o e-mail do participante.
+        </p>
+      )}
 
       <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-lg,16px)]">
         <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
@@ -296,8 +261,6 @@ export default function ScheduleSessionForm({
           setRecurrenceSheetOpen(false);
         }}
       />
-
-      <Toast show={toastShow} message={toastMessage} />
     </form>
   );
 }
