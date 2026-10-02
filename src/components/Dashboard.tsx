@@ -93,6 +93,24 @@ function formatShortDate(iso: string) {
   return `${dd}/${mm}`;
 }
 
+// Altura/gap reais dos botões da stack do menu de ações (h-[40px] + gap de
+// --components-button-stack-gap-vertical, 8px) — usados aqui só pra estimar
+// a altura total do menu e decidir se ele cabe abaixo do botão ⋮.
+const ACTIONS_MENU_ITEM_HEIGHT = 40;
+const ACTIONS_MENU_GAP = 8;
+const ACTIONS_MENU_SCREEN_MARGIN = 16;
+
+function getActionsMenuStyle(anchor: DOMRect, clientWhatsapp?: string | null) {
+  const itemCount = 3 + (clientWhatsapp ? 1 : 0);
+  const menuHeight = itemCount * ACTIONS_MENU_ITEM_HEIGHT + (itemCount - 1) * ACTIONS_MENU_GAP;
+  const right = window.innerWidth - anchor.left + 16;
+  const fitsBelow = anchor.top + menuHeight + ACTIONS_MENU_SCREEN_MARGIN <= window.innerHeight;
+
+  return fitsBelow
+    ? { top: anchor.top, right }
+    : { bottom: window.innerHeight - anchor.bottom, right };
+}
+
 const WEEKDAY_LABELS = ["SEG", "TER", "QUA", "QUI", "SEX", "SÁB", "DOM"];
 const MONTH_LABELS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -542,7 +560,7 @@ export default function Dashboard({
   const [sheetMeeting, setSheetMeeting] = useState<Meeting | null>(null);
   const [meetingFilter, setMeetingFilter] = useState<MeetingFilter>("all");
   const [filterSheetOpen, setFilterSheetOpen] = useState(false);
-  const [actionsMenu, setActionsMenu] = useState<{ meeting: Meeting; top: number; right: number } | null>(null);
+  const [actionsMenu, setActionsMenu] = useState<{ meeting: Meeting; anchor: DOMRect } | null>(null);
 
   const weekDays = buildWeekDays(selectedDate, eventDates);
   const year = new Date(`${selectedDate}T00:00:00`).getFullYear();
@@ -670,9 +688,7 @@ export default function Dashboard({
                 onViewDetails={() => setSheetMeeting(nextMeeting)}
                 onOptions={(anchor) =>
                   setActionsMenu((prev) =>
-                    prev?.meeting.id === nextMeeting.id
-                      ? null
-                      : { meeting: nextMeeting, top: anchor.top, right: window.innerWidth - anchor.left + 16 }
+                    prev?.meeting.id === nextMeeting.id ? null : { meeting: nextMeeting, anchor }
                   )
                 }
                 isMenuOpen={actionsMenu?.meeting.id === nextMeeting.id}
@@ -700,11 +716,7 @@ export default function Dashboard({
                   key={meeting.id}
                   meeting={meeting}
                   onOptions={(anchor) =>
-                    setActionsMenu((prev) =>
-                      prev?.meeting.id === meeting.id
-                        ? null
-                        : { meeting, top: anchor.top, right: window.innerWidth - anchor.left + 16 }
-                    )
+                    setActionsMenu((prev) => (prev?.meeting.id === meeting.id ? null : { meeting, anchor }))
                   }
                   isMenuOpen={actionsMenu?.meeting.id === meeting.id}
                 />
@@ -746,7 +758,7 @@ export default function Dashboard({
           />
           <div
             className="fixed z-50 flex flex-col items-end gap-[var(--components-button-stack-gap-vertical,8px)]"
-            style={{ top: actionsMenu.top, right: actionsMenu.right }}
+            style={getActionsMenuStyle(actionsMenu.anchor, actionsMenu.meeting.clientWhatsapp)}
           >
             <button
               type="button"
