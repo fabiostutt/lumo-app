@@ -48,9 +48,10 @@ export default function TextField({
   // navegador/SO, não o lang do documento — por isso não dá pra forçar
   // "dd/mm/aaaa" via lang="pt-BR" ou via placeholder (ambos ignorados pelo
   // Chrome/Safari pra esse tipo de input). Sobrepomos nosso próprio texto
-  // quando o campo está vazio e sem foco (foco escondido pra não cobrir o
-  // que o usuário já começou a digitar).
-  const showDatePlaceholder = type === "date" && !hasValue && !focused;
+  // sempre que o campo está vazio, inclusive com foco — senão o
+  // placeholder nativo (em inglês) reaparece assim que o usuário clica no
+  // campo, antes de escolher uma data.
+  const showDatePlaceholder = type === "date" && !hasValue;
 
   const labelColor = disabled
     ? "text-[color:var(--input-disabled-label,#bdbdbd)]"
