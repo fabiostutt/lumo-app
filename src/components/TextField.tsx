@@ -44,6 +44,13 @@ export default function TextField({
   const hasValue = value.trim().length > 0;
   const isError = !!error;
   const isFilled = hasValue && !focused && !isError;
+  // O formato/placeholder nativo do input type="date" segue o idioma do
+  // navegador/SO, não o lang do documento — por isso não dá pra forçar
+  // "dd/mm/aaaa" via lang="pt-BR" ou via placeholder (ambos ignorados pelo
+  // Chrome/Safari pra esse tipo de input). Sobrepomos nosso próprio texto
+  // quando o campo está vazio e sem foco (foco escondido pra não cobrir o
+  // que o usuário já começou a digitar).
+  const showDatePlaceholder = type === "date" && !hasValue && !focused;
 
   const labelColor = disabled
     ? "text-[color:var(--input-disabled-label,#bdbdbd)]"
@@ -92,19 +99,30 @@ export default function TextField({
         className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid px-[var(--input-padding,16px)] ${surfaceColor} ${borderColor} ${isPickerType && !disabled ? "cursor-pointer" : ""}`}
       >
         <span className={`shrink-0 ${iconColor}`}>{icon}</span>
-        <input
-          ref={inputRef}
-          id={name}
-          name={name}
-          type={type}
-          value={value}
-          disabled={disabled}
-          onChange={(e) => onChange(e.target.value)}
-          onFocus={() => setFocused(true)}
-          onBlur={() => setFocused(false)}
-          placeholder={placeholder}
-          className={`flex-1 bg-transparent font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] outline-none disabled:cursor-not-allowed [&::-webkit-calendar-picker-indicator]:opacity-0 ${valueColor} ${placeholderColor}`}
-        />
+        <div className="relative min-w-0 flex-1">
+          <input
+            ref={inputRef}
+            id={name}
+            name={name}
+            type={type}
+            value={value}
+            disabled={disabled}
+            onChange={(e) => onChange(e.target.value)}
+            onFocus={() => setFocused(true)}
+            onBlur={() => setFocused(false)}
+            placeholder={placeholder}
+            className={`w-full bg-transparent font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] outline-none disabled:cursor-not-allowed [&::-webkit-calendar-picker-indicator]:opacity-0 ${
+              showDatePlaceholder ? "text-transparent" : valueColor
+            } ${placeholderColor}`}
+          />
+          {showDatePlaceholder && (
+            <span
+              className={`pointer-events-none absolute inset-0 flex items-center font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] text-[color:var(--input-default-content-placeholder,#757575)]`}
+            >
+              dd/mm/aaaa
+            </span>
+          )}
+        </div>
       </div>
       {isError && (
         <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--input-error-supporting-text,#d71d1d)]">
