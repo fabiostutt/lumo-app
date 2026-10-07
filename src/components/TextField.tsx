@@ -111,6 +111,19 @@ export default function TextField({
             onChange={(e) => onChange(e.target.value)}
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
+            onMouseDown={
+              type === "date"
+                ? (e) => {
+                    // Clicar direto num segmento (dia/mês/ano) do input nativo
+                    // foca e seleciona aquele segmento, e o destaque de seleção
+                    // nativo (com o texto no idioma do navegador, ex: "yyyy")
+                    // pinta por cima da nossa sobreposição "dd/mm/aaaa".
+                    // Prevenindo o foco por mouse/touch aqui, o clique ainda
+                    // borbulha pro wrapper (que abre o seletor via showPicker).
+                    e.preventDefault();
+                  }
+                : undefined
+            }
             placeholder={placeholder}
             className={`w-full bg-transparent font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] outline-none disabled:cursor-not-allowed [&::-webkit-calendar-picker-indicator]:opacity-0 ${
               showDatePlaceholder ? "text-transparent" : valueColor
