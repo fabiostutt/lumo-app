@@ -141,53 +141,51 @@ export default function MeetingDetailsSheet({
             </button>
           </div>
 
-          <div className="flex w-full flex-col gap-[var(--spacing-xs,8px)]">
-            <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
-              <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--input-default-label,#212121)]">
-                {isGoogle ? "Link da sessão" : canShareByWhatsApp ? `Conversa com ${meeting.clientName}` : "Link da sessão"}
-              </p>
-              <div
-                className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
-                  isFilled
-                    ? "border-[var(--input-filled-border-default,#757575)]"
-                    : "border-[var(--input-default-border-default,#bdbdbd)]"
-                }`}
-              >
-                {isGoogle ? (
-                  <VideoIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-                ) : (
-                  <WhatsAppIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
-                )}
-                <p
-                  className={`flex-[1_0_0] truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+          {isGoogle && (
+            <div className="flex w-full flex-col gap-[var(--spacing-xs,8px)]">
+              <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
+                <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--input-default-label,#212121)]">
+                  Link da sessão
+                </p>
+                <div
+                  className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
                     isFilled
-                      ? "text-[color:var(--input-filled-content-value,#212121)]"
-                      : "text-[color:var(--input-default-content-placeholder,#757575)]"
+                      ? "border-[var(--input-filled-border-default,#757575)]"
+                      : "border-[var(--input-default-border-default,#bdbdbd)]"
                   }`}
                 >
-                  {meeting.meetingUrl || "O link aparecerá aqui"}
-                </p>
+                  <VideoIcon size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
+                  <p
+                    className={`flex-[1_0_0] truncate font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] ${
+                      isFilled
+                        ? "text-[color:var(--input-filled-content-value,#212121)]"
+                        : "text-[color:var(--input-default-content-placeholder,#757575)]"
+                    }`}
+                  >
+                    {meeting.meetingUrl || "O link aparecerá aqui"}
+                  </p>
+                </div>
               </div>
+              {canShareByWhatsApp && (
+                <a
+                  href={buildWhatsAppShareUrl(
+                    meeting.clientWhatsapp!,
+                    meeting.clientName,
+                    meeting.meetingUrl!,
+                    meeting.time
+                  )}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--button-outline-border,#757575)] bg-[var(--button-outline-surface-enabled,#fafafa)] px-[var(--button-padding,16px)]"
+                >
+                  <WhatsAppIcon size={24} className="text-[color:var(--button-outline-content-enabled,#212121)]" />
+                  <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-outline-content-enabled,#212121)]">
+                    Compartilhar
+                  </span>
+                </a>
+              )}
             </div>
-            {isGoogle && canShareByWhatsApp && (
-              <a
-                href={buildWhatsAppShareUrl(
-                  meeting.clientWhatsapp!,
-                  meeting.clientName,
-                  meeting.meetingUrl!,
-                  meeting.time
-                )}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--button-outline-border,#757575)] bg-[var(--button-outline-surface-enabled,#fafafa)] px-[var(--button-padding,16px)]"
-              >
-                <WhatsAppIcon size={24} className="text-[color:var(--button-outline-content-enabled,#212121)]" />
-                <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-outline-content-enabled,#212121)]">
-                  Compartilhar
-                </span>
-              </a>
-            )}
-          </div>
+          )}
 
           <div className="flex w-full flex-col items-start rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
             <div className="flex w-full items-center gap-[var(--spacing-md,16px)]">
