@@ -112,12 +112,13 @@ export default function TextField({
             onFocus={() => setFocused(true)}
             onBlur={() => setFocused(false)}
             onMouseDown={
-              type === "date"
+              isPickerType
                 ? (e) => {
-                    // Clicar direto num segmento (dia/mês/ano) do input nativo
-                    // foca e seleciona aquele segmento, e o destaque de seleção
-                    // nativo (com o texto no idioma do navegador, ex: "yyyy")
-                    // pinta por cima da nossa sobreposição "dd/mm/aaaa".
+                    // Clicar direto num segmento (dia/mês/ano, ou hora/minuto)
+                    // do input nativo foca e seleciona aquele segmento, com o
+                    // destaque de seleção nativo do navegador por cima (no
+                    // input de data isso ainda mostrava o texto em inglês;
+                    // no de hora, os "--" ficam marcados/destacados à toa).
                     // Prevenindo o foco por mouse/touch aqui, o clique ainda
                     // borbulha pro wrapper (que abre o seletor via showPicker).
                     e.preventDefault();
