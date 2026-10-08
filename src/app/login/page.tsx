@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { createClient } from "@/lib/supabase/client";
 
 function GoogleIcon() {
@@ -97,8 +98,14 @@ export default function LoginPage() {
 
           <p className="text-center font-[family-name:var(--typography-body-x-small-font-family)] font-[var(--typography-body-x-small-font-weight,400)] text-[length:var(--typography-body-x-small-font-size,12px)] leading-[var(--typography-body-x-small-line-height,20px)] tracking-[var(--typography-body-x-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
             Ao continuar, você concorda com os{" "}
-            <span className="text-[color:var(--content-base,#212121)]">Termos de Uso</span> e a{" "}
-            <span className="text-[color:var(--content-base,#212121)]">Política de Privacidade</span> do Lumo.
+            <Link href="/termos" className="text-[color:var(--content-base,#212121)] underline">
+              Termos de Uso
+            </Link>{" "}
+            e a{" "}
+            <Link href="/privacidade" className="text-[color:var(--content-base,#212121)] underline">
+              Política de Privacidade
+            </Link>{" "}
+            do Lumo.
           </p>
         </div>
       </div>
