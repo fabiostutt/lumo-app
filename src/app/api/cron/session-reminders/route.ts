@@ -65,12 +65,10 @@ export async function GET(request: NextRequest) {
       });
 
       if (session.notifications_enabled && session.platform === "WhatsApp" && session.clients?.whatsapp) {
-        const [, month, day] = session.date.split("-");
         try {
           await sendSessionReminderMessage({
             toRaw: session.clients.whatsapp,
             clientName,
-            date: `${day}/${month}`,
             time: session.time.slice(0, 5),
             sessionId: session.id,
           });

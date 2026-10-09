@@ -148,8 +148,16 @@ export async function createSessionAction(
       });
     } catch (err) {
       // Não deixamos uma falha no envio do WhatsApp derrubar o agendamento —
-      // a sessão já foi criada com sucesso.
+      // a sessão já foi criada com sucesso. Guardamos o erro na própria linha
+      // pra dar pra mostrar um aviso pro profissional depois.
       console.error("[create-session] Falha ao enviar confirmação por WhatsApp:", err);
+      await supabase
+        .from("sessions")
+        .update({
+          whatsapp_send_error: err instanceof Error ? err.message : String(err),
+          whatsapp_send_error_at: new Date().toISOString(),
+        })
+        .eq("id", firstOccurrence.id);
     }
   } else if (notificationsEnabled && platform === "whatsapp" && !client?.whatsapp) {
     console.warn(
