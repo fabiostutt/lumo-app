@@ -62,13 +62,71 @@ export async function GET(request: NextRequest) {
       )
     : { ok: false, status: 0, body: { error: "WHATSAPP_PHONE_NUMBER_ID não está configurado" } };
 
-  // 3) Os templates que o código espera (WHATSAPP_TEMPLATE_NAME etc.) existem
-  // e estão APPROVED nessa WABA, pelo nome exato configurado?
+  // 3) Os templates que o código espera (WHATSAPP_TEMPLATE_NAME etc.) existem,
+  // estão APPROVED nessa WABA, e — principalmente — "components" mostra a
+  // estrutura exata (quantas variáveis no corpo, quais botões, nessa ordem)
+  // pra comparar com o que src/lib/whatsapp.ts está montando.
   const templates = wabaId
     ? await safeGet(
-        `https://graph.facebook.com/${GRAPH_VERSION}/${wabaId}/message_templates?fields=name,status,language&limit=100&access_token=${encodeURIComponent(token)}`
+        `https://graph.facebook.com/${GRAPH_VERSION}/${wabaId}/message_templates?fields=name,status,language,components&limit=100&access_token=${encodeURIComponent(token)}`
       )
     : { ok: false, status: 0, body: { error: "WABA_ID não está configurado" } };
+
+  // 4) Teste real e opcional: ?testSendTo=5511999999999 manda de fato o
+  // template de confirmação pra esse número, com dados fictícios, e devolve
+  // a resposta crua da Graph API — reproduz exatamente a chamada que
+  // create-session.ts faz, sem precisar criar uma sessão de verdade.
+  const testSendTo = request.nextUrl.searchParams.get("testSendTo");
+  let testSend: unknown = null;
+  if (testSendTo && phoneNumberId) {
+    const to = testSendTo.replace(/\D/g, "");
+    const res = await fetch(`https://graph.facebook.com/${GRAPH_VERSION}/${phoneNumberId}/messages`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${token}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        messaging_product: "whatsapp",
+        to,
+        type: "template",
+        template: {
+          name: process.env.WHATSAPP_TEMPLATE_NAME || "meeting_confirmation",
+          language: { code: process.env.WHATSAPP_TEMPLATE_LANG || "pt_BR" },
+          components: [
+            {
+              type: "body",
+              parameters: [
+                { type: "text", text: "Teste" },
+                { type: "text", text: "01/01" },
+                { type: "text", text: "10:00" },
+              ],
+            },
+            {
+              type: "button",
+              sub_type: "quick_reply",
+              index: "0",
+              parameters: [{ type: "payload", payload: "confirm_debug" }],
+            },
+            {
+              type: "button",
+              sub_type: "quick_reply",
+              index: "1",
+              parameters: [{ type: "payload", payload: "cancel_debug" }],
+            },
+          ],
+        },
+      }),
+    });
+    const resBody = await res.text();
+    let parsed: unknown;
+    try {
+      parsed = JSON.parse(resBody);
+    } catch {
+      parsed = resBody;
+    }
+    testSend = { ok: res.ok, status: res.status, body: parsed };
+  }
 
   return NextResponse.json({
     expectedConfig: {
@@ -83,5 +141,6 @@ export async function GET(request: NextRequest) {
     tokenDebug,
     phoneNumber,
     templates,
+    testSend,
   });
 }
