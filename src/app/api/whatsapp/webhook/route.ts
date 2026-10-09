@@ -24,12 +24,32 @@ export async function POST(request: Request) {
 
     const value = body?.entry?.[0]?.changes?.[0]?.value;
     const statuses = value?.statuses as
-      | Array<{ id?: string; status?: string; timestamp?: string; recipient_id?: string; errors?: unknown }>
+      | Array<{
+          id?: string;
+          status?: string;
+          timestamp?: string;
+          recipient_id?: string;
+          errors?: Array<{ code?: number | string; title?: string; message?: string }>;
+        }>
       | undefined;
 
     if (statuses?.length) {
+      const supabaseAdmin = createAdminClient();
       for (const status of statuses) {
         console.log("[whatsapp webhook] Status de entrega:", status);
+
+        if (!status.id || !status.status) continue;
+
+        const error = status.errors?.[0];
+        await supabaseAdmin
+          .from("whatsapp_messages")
+          .update({
+            status: status.status,
+            error_code: error ? String(error.code ?? "") || null : null,
+            error_message: error ? error.message || error.title || null : null,
+            updated_at: new Date().toISOString(),
+          })
+          .eq("wamid", status.id);
       }
     }
 
