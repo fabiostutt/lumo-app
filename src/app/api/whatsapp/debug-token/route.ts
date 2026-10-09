@@ -28,7 +28,13 @@ async function safeGet(url: string) {
 export async function GET(request: NextRequest) {
   const cronSecret = process.env.CRON_SECRET;
   const authHeader = request.headers.get("authorization");
-  if (!cronSecret || authHeader !== `Bearer ${cronSecret}`) {
+  // Aceita o secret tanto no header Authorization (uso normal de API) quanto
+  // em ?secret= na própria URL — pra dar pra abrir isso direto no navegador,
+  // sem precisar de terminal nem de um cliente HTTP.
+  const secretParam = request.nextUrl.searchParams.get("secret");
+  const isAuthorized =
+    !!cronSecret && (authHeader === `Bearer ${cronSecret}` || secretParam === cronSecret);
+  if (!isAuthorized) {
     return NextResponse.json({ error: "unauthorized" }, { status: 401 });
   }
 
