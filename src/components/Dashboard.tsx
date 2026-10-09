@@ -429,7 +429,7 @@ function NextMeetingCard({
       className="flex w-full cursor-pointer flex-col gap-[var(--next-meeting-gap,16px)] rounded-[var(--next-meeting-border-radius,32px)] border-[length:var(--border-width-primary,0.5px)] border-[var(--next-meeting-border-base,#757575)] border-solid bg-[var(--next-meeting-surface-base,#212121)] p-[var(--next-meeting-padding-large,24px)]"
     >
       <div className="flex w-full items-start gap-[var(--next-meeting-gap,16px)]">
-        <div className="flex flex-1 flex-col items-start gap-[var(--spacing-xs,8px)]">
+        <div className="flex flex-1 flex-col items-start gap-[var(--semantic-spacing-xxs,8px)]">
           <div className="flex flex-col items-start text-[color:var(--next-meeting-content-base,#fafafa)]">
             <p className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] text-[length:var(--typography-heading-h1-font-size,28px)] leading-[var(--typography-heading-h1-line-height,36px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
               {meeting.time}
