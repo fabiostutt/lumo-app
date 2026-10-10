@@ -4,8 +4,10 @@ import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { getOrCreateProfile } from "@/lib/plan";
 import { revalidatePath } from "next/cache";
+import { AREAS } from "@/lib/vocabulary";
 
 const WEEKDAYS = ["mon", "tue", "wed", "thu", "fri", "sat", "sun"] as const;
+const AREA_IDS = AREAS.map((a) => a.id) as readonly string[];
 
 export type CompleteOnboardingState = { error?: string } | null;
 
@@ -24,6 +26,8 @@ export async function completeOnboardingAction(
   await getOrCreateProfile();
 
   const specialty = String(formData.get("specialty") || "").trim();
+  const areaRaw = String(formData.get("area") || "").trim();
+  const area = AREA_IDS.includes(areaRaw) ? areaRaw : null;
   const workDaysRaw = formData.getAll("workDays").map(String);
   const workDays = workDaysRaw.filter((d) => (WEEKDAYS as readonly string[]).includes(d));
   const workHoursFrom = String(formData.get("workHoursFrom") || "").trim();
@@ -40,6 +44,7 @@ export async function completeOnboardingAction(
     .from("profiles")
     .update({
       specialty: specialty || null,
+      area,
       work_days: workDays.length > 0 ? workDays : null,
       work_hours_from: workHoursFrom || null,
       work_hours_to: workHoursTo || null,

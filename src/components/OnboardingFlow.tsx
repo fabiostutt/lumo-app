@@ -5,21 +5,14 @@ import { Plus } from "lucide-react";
 import TextField from "@/components/TextField";
 import { AddUserIcon, WatchIcon } from "@/components/icons";
 import { completeOnboardingAction, type CompleteOnboardingState } from "@/lib/actions/complete-onboarding";
+import { AREAS } from "@/lib/vocabulary";
 
 const TOTAL_STEPS = 4;
 
-const SPECIALTY_OPTIONS = [
-  "Psicologia",
-  "Terapia",
-  "Medicina",
-  "Nutrição",
-  "Educação",
-  "Fisioterapia",
-  "Recursos Humanos",
-  "Consultoria",
-  "Personal Trainer",
-  "Outros",
-];
+// Mesma lista que alimenta o vocabulário adaptável (src/lib/vocabulary.ts) —
+// os labels dos chips precisam bater exatamente com AREAS pra gente saber
+// qual AreaId gravar em profiles.area a partir do que foi clicado aqui.
+const SPECIALTY_OPTIONS = AREAS.map((a) => a.label);
 
 const WEEKDAY_OPTIONS: { code: string; label: string }[] = [
   { code: "mon", label: "SEG" },
@@ -172,6 +165,7 @@ export default function OnboardingFlow() {
   }
 
   const finalSpecialty = specialty === "Outros" ? customSpecialty.trim() : specialty ?? "";
+  const areaId = specialty ? AREAS.find((a) => a.label === specialty)?.id ?? "outros" : "";
   const finalDuration = duration === -1 ? Number(customDuration) : duration;
 
   const step1Valid = !!specialty && (specialty !== "Outros" || customSpecialty.trim().length > 0);
@@ -206,6 +200,7 @@ export default function OnboardingFlow() {
 
         <form action={formAction} className="flex w-full flex-col gap-[var(--stacks-gap-vertical,8px)]">
           <input type="hidden" name="specialty" value={finalSpecialty} />
+          <input type="hidden" name="area" value={areaId} />
           {workDays.map((d) => (
             <input key={d} type="hidden" name="workDays" value={d} />
           ))}
@@ -218,6 +213,7 @@ export default function OnboardingFlow() {
 
         <form action={formAction} className="flex w-full">
           <input type="hidden" name="specialty" value={finalSpecialty} />
+          <input type="hidden" name="area" value={areaId} />
           {workDays.map((d) => (
             <input key={d} type="hidden" name="workDays" value={d} />
           ))}
