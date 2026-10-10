@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { Plus, GraduationCap, Calendar, Clock } from "lucide-react";
+import { Plus, GraduationCap, Calendar, Clock, Hourglass } from "lucide-react";
 import TextField from "@/components/TextField";
 import { AddUserIcon, WatchIcon } from "@/components/icons";
 import { completeOnboardingAction, type CompleteOnboardingState } from "@/lib/actions/complete-onboarding";
@@ -335,7 +335,7 @@ export default function OnboardingFlow() {
 
   return (
     <div className="flex min-h-screen w-full flex-col justify-between gap-[var(--slot-gap-large,40px)] bg-[var(--surface-base,white)] px-[var(--screen-padding-base,16px)] py-[var(--screen-padding-large,24px)]">
-      {step === 1 || step === 2 || step === 3 ? (
+      {step === 1 || step === 2 || step === 3 || step === 4 ? (
         <StepperAndSkip step={step} onSkip={next} />
       ) : (
         <StepTrace step={step} />
@@ -442,9 +442,12 @@ export default function OnboardingFlow() {
 
         {step === 4 && (
           <>
+            <IconBadge>
+              <Hourglass size={24} className="text-[color:var(--content-base,#212121)]" />
+            </IconBadge>
             <Title
-              title="Qual é a duração das tuas sessões?"
-              subtitle="Vou usar esta informação como base para as sessões e te avisar se houver conflito de agenda."
+              title="Quanto tempo dura uma sessão?"
+              subtitle="Usamos como padrão ao agendar e para avisar quando duas sessões se sobrepõem. Você poderá ajustar em cada sessão, se precisar."
             />
             <div className="flex w-full flex-wrap items-start gap-[var(--spacing-xs,8px)]">
               {DURATION_OPTIONS.map((min) => (
@@ -462,7 +465,6 @@ export default function OnboardingFlow() {
                 label="Qual é a duração da sessão?"
                 name="customDuration"
                 placeholder="Ex.: 120 min"
-                icon={<WatchIcon size={24} />}
                 value={customDuration}
                 onChange={setCustomDuration}
               />
@@ -482,9 +484,6 @@ export default function OnboardingFlow() {
           }
           onClick={next}
         />
-        {step !== 1 && step !== 2 && step !== 3 && (
-          <SecondaryButton label="Pular por agora" onClick={next} />
-        )}
       </div>
     </div>
   );
