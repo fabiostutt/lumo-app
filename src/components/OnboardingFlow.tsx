@@ -342,7 +342,7 @@ export default function OnboardingFlow() {
           <input type="hidden" name="defaultDurationMinutes" value={finalDuration ? String(finalDuration) : ""} />
           <input type="hidden" name="nextPath" value="/clients/new?returnTo=%2Fdashboard" />
           <PrimaryButton
-            label={pending ? "Cadastrando..." : "Cadastrar agora"}
+            label={pending ? "Carregando..." : "Cadastrar agora"}
             disabled={pending}
             type="submit"
             onClick={clearSavedProgress}
