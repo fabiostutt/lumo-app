@@ -2,6 +2,7 @@ import { createClient } from "@/lib/supabase/server";
 import type { SessionStatus } from "@/components/MeetingDetailsSheet";
 import { getOrCreateProfile, FREE_CLIENT_LIMIT } from "@/lib/plan";
 import { getServerDisclaimerTone } from "@/lib/disclaimer";
+import { getVocabulary, type Vocabulary } from "@/lib/vocabulary";
 
 const MONTH_LABELS = [
   "Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho",
@@ -48,13 +49,13 @@ type SessionRow = {
   clients: { name: string; whatsapp: string | null } | null;
 };
 
-function mapRow(s: SessionRow) {
+function mapRow(s: SessionRow, vocab: Vocabulary) {
   return {
     id: s.id,
     time: s.time.slice(0, 5),
     date: s.date,
     durationMinutes: s.duration_minutes ?? 50,
-    clientName: s.clients?.name ?? "Cliente",
+    clientName: s.clients?.name ?? vocab.Person(1),
     clientWhatsapp: s.clients?.whatsapp ?? null,
     status: (s.status as SessionStatus) ?? "pendente",
     notificationsOn: s.notifications_enabled ?? false,
@@ -122,14 +123,16 @@ export async function getDashboardData() {
     clientLimit: FREE_CLIENT_LIMIT,
   });
 
+  const vocab = getVocabulary(profile.area);
+
   const eventDates = Array.from(new Set((weekResult.data ?? []).map((s) => s.date as string)));
   const eventDatesSet = new Set(eventDates);
 
-  const meetings = (todayResult.data ?? []).map((s) => mapRow(s as unknown as SessionRow));
+  const meetings = (todayResult.data ?? []).map((s) => mapRow(s as unknown as SessionRow, vocab));
 
   const nextMeeting =
     nextResult.data && nextResult.data.length > 0
-      ? mapRow(nextResult.data[0] as unknown as SessionRow)
+      ? mapRow(nextResult.data[0] as unknown as SessionRow, vocab)
       : null;
 
   const weekDays = Array.from({ length: 7 }).map((_, i) => {

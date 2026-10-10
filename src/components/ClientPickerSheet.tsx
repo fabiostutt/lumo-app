@@ -5,6 +5,8 @@ import { Search } from "lucide-react";
 import { AppXIcon, PeopleIcon } from "@/components/icons";
 import BottomSheet from "@/components/BottomSheet";
 import { maskPhone } from "@/lib/masks";
+import { useVocabulary } from "@/components/VocabularyProvider";
+import { getPersonCountLabel } from "@/lib/vocabulary";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
@@ -23,6 +25,7 @@ export default function ClientPickerSheet({
   onClose,
   onConfirm,
 }: ClientPickerSheetProps) {
+  const vocab = useVocabulary();
   const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(initialSelectedId ?? "");
 
@@ -40,7 +43,7 @@ export default function ClientPickerSheet({
       <div className="flex max-h-[60vh] w-full flex-col gap-[var(--sheet-gap-base,16px)] overflow-y-auto">
         <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
           <p className="flex-1 font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-            Selecionar participante
+            Selecionar {vocab.attendee()}
           </p>
           <button
             type="button"
@@ -57,14 +60,14 @@ export default function ClientPickerSheet({
           <input
             value={query}
             onChange={(e) => setQuery(e.target.value)}
-            placeholder="Buscar cliente"
+            placeholder={`Buscar ${vocab.person(1)}`}
             className="flex-1 bg-transparent text-[16px] leading-[28px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] outline-none placeholder:text-[color:var(--input-default-content-placeholder,#757575)]"
           />
         </div>
 
         <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
           <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-strongest,#757575)]">
-            {filtered.length} {filtered.length === 1 ? "cliente cadastrado" : "clientes cadastrados"}
+            {getPersonCountLabel(filtered.length, vocab)}
           </p>
 
           {filtered.map((client) => {
@@ -95,7 +98,7 @@ export default function ClientPickerSheet({
 
           {filtered.length === 0 && (
             <p className="w-full py-8 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
-              Nenhum cliente encontrado.
+              Nenhum resultado encontrado.
             </p>
           )}
         </div>
@@ -111,7 +114,7 @@ export default function ClientPickerSheet({
             : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
         }`}
       >
-        Confirmar participante
+        Confirmar {vocab.attendee()}
       </button>
     </BottomSheet>
   );

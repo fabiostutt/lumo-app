@@ -1,5 +1,10 @@
 import { createAdminClient } from "@/lib/supabase/admin";
 
+// TODO: vocabulário adaptável por área (src/lib/vocabulary.ts) não é aplicado
+// aqui de propósito — os templates de mensagem aprovados na Meta têm o texto
+// "sessão" fixo (ver CLAUDE.md), então mudar a palavra aqui sem reaprovar os
+// templates quebraria o envio. Revisar se/quando existirem templates por área.
+
 function formatPhoneForWhatsApp(raw: string) {
   const digits = raw.replace(/\D/g, "");
   if (digits.startsWith("55")) return digits;

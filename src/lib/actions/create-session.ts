@@ -13,6 +13,8 @@ import {
   RECURRENCE_PRESET_LABELS,
   type RecurrencePreset,
 } from "@/lib/scheduling";
+import { getOrCreateProfile } from "@/lib/plan";
+import { getVocabulary } from "@/lib/vocabulary";
 
 const APP_TIME_ZONE = "America/Sao_Paulo";
 
@@ -30,6 +32,9 @@ export async function createSessionAction(
 
   if (!user) throw new Error("Usuário não autenticado");
 
+  const profile = await getOrCreateProfile();
+  const vocab = getVocabulary(profile.area);
+
   const clientId = String(formData.get("clientId") || "");
   const date = String(formData.get("date") || "");
   const time = String(formData.get("time") || "");
@@ -42,7 +47,7 @@ export async function createSessionAction(
     submittedPreset in RECURRENCE_PRESET_LABELS ? (submittedPreset as RecurrencePreset) : "none";
 
   if (!clientId || !date || !time) {
-    return { error: "Preencha participante, data e hora" };
+    return { error: `Preencha ${vocab.attendee()}, data e hora` };
   }
 
   const client = await getClientById(clientId);
@@ -92,8 +97,8 @@ export async function createSessionAction(
 
         const event = await createCalendarEvent({
           accessToken,
-          summary: `Sessão com ${client.name}`,
-          description: "Sessão agendada via Lumo.",
+          summary: `${vocab.Event(1)} com ${client.name}`,
+          description: `${vocab.Event(1)} agendada via Lumo.`,
           startDateTime: start.toISOString(),
           endDateTime: end.toISOString(),
           timeZone: APP_TIME_ZONE,

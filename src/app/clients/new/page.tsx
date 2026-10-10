@@ -3,6 +3,7 @@ import ClientLimitModal from "@/components/ClientLimitModal";
 import TitleAction from "@/components/TitleAction";
 import { createClient } from "@/lib/supabase/server";
 import { getOrCreateProfile, hasActiveSubscription, FREE_CLIENT_LIMIT } from "@/lib/plan";
+import { getVocabularyForCurrentUser } from "@/lib/vocabulary-server";
 
 export default async function NewClientPage({
   searchParams,
@@ -32,9 +33,11 @@ export default async function NewClientPage({
     }
   }
 
+  const vocab = await getVocabularyForCurrentUser();
+
   return (
     <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding-base,16px)]">
-      <TitleAction title="Cadastrar cliente" href={returnTo || "/dashboard"} />
+      <TitleAction title={`Cadastrar ${vocab.person(1)}`} href={returnTo || "/dashboard"} />
 
       {blocked ? <ClientLimitModal returnTo={returnTo} /> : <ClientForm returnTo={returnTo} />}
     </div>

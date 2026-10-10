@@ -1,3 +1,4 @@
+import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
 
 const TRIAL_DAYS = 7;
@@ -18,13 +19,17 @@ export type Profile = {
   work_hours_from: string | null;
   work_hours_to: string | null;
   onboarding_completed_at: string | null;
+  area: string | null;
 };
 
 export function needsOnboarding(profile: Profile): boolean {
   return !profile.onboarding_completed_at;
 }
 
-export async function getOrCreateProfile(): Promise<Profile> {
+// cache() do React dedupe chamadas repetidas dentro do mesmo request (ex:
+// root layout + página chamando isso na mesma renderização) — sem isso cada
+// chamador dispararia sua própria query em profiles.
+export const getOrCreateProfile = cache(async (): Promise<Profile> => {
   const supabase = await createClient();
 
   const {
@@ -52,7 +57,7 @@ export async function getOrCreateProfile(): Promise<Profile> {
 
   if (error) throw error;
   return created as Profile;
-}
+});
 
 // Assinatura Stripe de verdade (paga ou em trialing do próprio Stripe) —
 // diferente do trial local de 7 dias (trial_ends_at), que não deve contar

@@ -6,6 +6,8 @@ import { Bell, CreditCardX, ChevronRight, BadgeCheck, TrendingUp } from "lucide-
 import { AlertIcon } from "@/components/icons";
 import { getPushSubscriptionState, subscribeToPush } from "@/lib/push/client";
 import type { DisclaimerTone, ServerDisclaimerTone } from "@/lib/disclaimer";
+import { useVocabulary } from "@/components/VocabularyProvider";
+import type { Vocabulary } from "@/lib/vocabulary";
 
 const EVER_OPENED_KEY = "lumo:ever-opened-dashboard";
 const RETURNING_SESSION_KEY = "lumo:returning-session";
@@ -29,15 +31,19 @@ function getIsReturningSession() {
   }
 }
 
-const CONTENT: Record<ServerDisclaimerTone, { title: string; description: (clientCount: number) => string }> = {
+const CONTENT: Record<
+  ServerDisclaimerTone,
+  { title: string; description: (clientCount: number, vocab: Vocabulary) => string }
+> = {
   "lumo-pro": {
     title: "Conheça o Lumo Pro",
-    description: () => "Clientes ilimitados, agenda sem limite de sessões, suporte dedicado e muito mais.",
+    description: (_clientCount, vocab) =>
+      `Sem limite de ${vocab.person(2)}, agenda sem limite de ${vocab.event(2)}, suporte dedicado e muito mais.`,
   },
   "two-days": {
     title: "Continue com tudo liberado",
-    description: () =>
-      "Faltam 2 dias do seu teste gratuito. Assine e mantenha clientes ilimitados e notificações automáticas.",
+    description: (_clientCount, vocab) =>
+      `Faltam 2 dias do seu teste gratuito. Assine e mantenha ${vocab.person(2)} sem limite e notificações automáticas.`,
   },
   "last-day": {
     title: "Último dia do seu teste",
@@ -45,12 +51,13 @@ const CONTENT: Record<ServerDisclaimerTone, { title: string; description: (clien
   },
   growth: {
     title: "Seu negócio está crescendo",
-    description: (clientCount) =>
-      `Você já tem ${clientCount} ${clientCount === 1 ? "cliente cadastrado" : "clientes cadastrados"}. Assine o Pro e continue crescendo sem limites.`,
+    description: (clientCount, vocab) =>
+      `Você já tem ${clientCount} ${vocab.person(clientCount)}. Assine o Pro e continue crescendo sem limites.`,
   },
   "client-limit": {
     title: "Seu negócio está crescendo",
-    description: () => "Você não pode mais cadastrar clientes. Assine o Pro e continue crescendo sem limites.",
+    description: (_clientCount, vocab) =>
+      `Você não pode mais cadastrar ${vocab.person(2)}. Assine o Pro e continue crescendo sem limites.`,
   },
   "payment-failed": {
     title: "Atualize sua forma de pagamento",
@@ -91,12 +98,13 @@ function NotificationDisclaimer({
   subscribing: boolean;
   onEnable: () => void;
 }) {
+  const vocab = useVocabulary();
   return (
     <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
       <Bell size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <DisclaimerTitle>Ative as notificações</DisclaimerTitle>
-        <DisclaimerDescription>Receba alertas de confirmações e de próximas sessões.</DisclaimerDescription>
+        <DisclaimerDescription>Receba alertas de confirmações e de próximas {vocab.event(2)}.</DisclaimerDescription>
       </div>
       <button
         type="button"
@@ -120,6 +128,7 @@ export default function Disclaimer({
   clientCount: number;
 }) {
   const router = useRouter();
+  const vocab = useVocabulary();
   const [pushState, setPushState] = useState<"loading" | "unsupported" | "denied" | "unsubscribed" | "subscribed">(
     "loading"
   );
@@ -171,7 +180,7 @@ export default function Disclaimer({
       <Icon size={24} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <DisclaimerTitle>{content.title}</DisclaimerTitle>
-        <DisclaimerDescription>{content.description(clientCount)}</DisclaimerDescription>
+        <DisclaimerDescription>{content.description(clientCount, vocab)}</DisclaimerDescription>
       </div>
       <ChevronRight size={24} className="shrink-0 text-[color:var(--content-strongest,#757575)]" />
     </button>

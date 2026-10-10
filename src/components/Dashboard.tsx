@@ -18,6 +18,8 @@ import {
 } from "@/components/icons";
 import MeetingDetailsSheet, { type SessionStatus } from "@/components/MeetingDetailsSheet";
 import Disclaimer from "@/components/Disclaimer";
+import { useVocabulary } from "@/components/VocabularyProvider";
+import { getDashboardSummary } from "@/lib/vocabulary";
 import type { ServerDisclaimerTone } from "@/lib/disclaimer";
 import FilterMeetingsSheet, { MEETING_FILTER_LABELS, type MeetingFilter } from "@/components/FilterMeetingsSheet";
 import { buildWhatsAppReminderUrl } from "@/lib/whatsapp-links";
@@ -237,17 +239,29 @@ function HeadProfile({
   userName: string;
   sessionsToday: number;
 }) {
+  const vocab = useVocabulary();
+  const summary = getDashboardSummary(sessionsToday, vocab);
+  // Destaca só a parte "N {evento}" do resumo, independente de onde ela cai
+  // na frase (varia com a contagem: "0 sessões" vs "1 sessão" vs "N sessões").
+  const countLabel =
+    sessionsToday === 1 ? `1 ${vocab.event(1)}` : `${sessionsToday} ${vocab.event(sessionsToday)}`;
+  const [before, after] = summary.split(countLabel);
+
   return (
     <div className="flex w-full flex-col items-start">
       <h1 className="font-[family-name:var(--typography-heading-h1-font-family)] font-[var(--typography-heading-h1-font-weight,600)] leading-[var(--typography-heading-h1-line-height,36px)] text-[color:var(--content-base,#212121)] text-[length:var(--typography-heading-h1-font-size,28px)] tracking-[var(--typography-heading-h1-letter-spacing,-0.4px)]">
         Olá, {userName}.
       </h1>
       <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-        Você tem{" "}
-        <span className="text-[color:var(--content-base,#212121)]">
-          {sessionsToday} sessões
-        </span>{" "}
-        agendadas para hoje
+        {before !== undefined ? (
+          <>
+            {before}
+            <span className="text-[color:var(--content-base,#212121)]">{countLabel}</span>
+            {after}
+          </>
+        ) : (
+          summary
+        )}
       </p>
     </div>
   );
@@ -348,6 +362,7 @@ function WeekCalendar({
 const MAILBOX_ICON_URL = "https://www.figma.com/api/mcp/asset/58416fac-4489-4ffd-a671-10a4c826218b.svg";
 
 function ScheduleMeetingEmpty({ onSchedule }: { onSchedule?: () => void }) {
+  const vocab = useVocabulary();
   return (
     <div className="flex w-full flex-col items-center gap-[var(--sheet-gap-base,16px)] rounded-[var(--sheet-border-radius-base,32px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtle,#bdbdbd)] p-[var(--sheet-padding-base,24px)]">
       <div className="flex w-full flex-col items-center gap-[var(--numbers-padding-xs,8px)]">
@@ -366,7 +381,7 @@ function ScheduleMeetingEmpty({ onSchedule }: { onSchedule?: () => void }) {
         className="flex h-[40px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-primary-surface-enabled,#212121)] px-[var(--button-padding-small,12px)]"
       >
         <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] text-[color:var(--button-primary-content-enabled,#fafafa)]">
-          Agendar sessão
+          Agendar {vocab.event(1)}
         </span>
       </button>
     </div>
@@ -374,15 +389,16 @@ function ScheduleMeetingEmpty({ onSchedule }: { onSchedule?: () => void }) {
 }
 
 function NoOtherMeetingsDisclaimer() {
+  const vocab = useVocabulary();
   return (
     <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
       <VideoOff size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-base,#212121)]" />
       <div className="flex flex-1 flex-col items-start">
         <p className="w-full font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-          Não há mais sessões hoje
+          Não há mais {vocab.event(2)} hoje
         </p>
         <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-          Você pode agendar uma nova sessão{" "}
+          Você pode agendar uma nova {vocab.event(1)}{" "}
           <Link href="/sessions/new" className="underline">
             aqui
           </Link>
@@ -394,6 +410,7 @@ function NoOtherMeetingsDisclaimer() {
 }
 
 function NoFilterResultsDisclaimer() {
+  const vocab = useVocabulary();
   return (
     <div className="flex w-full items-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
       <SearchX size={24} strokeWidth={1.75} className="shrink-0 text-[color:var(--content-base,#212121)]" />
@@ -402,7 +419,7 @@ function NoFilterResultsDisclaimer() {
           Nenhum resultado para este filtro
         </p>
         <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-          Selecione outro filtro para ver as sessões disponíveis.
+          Selecione outro filtro para ver {vocab.event(2)} disponíveis.
         </p>
       </div>
     </div>
@@ -423,6 +440,7 @@ function NextMeetingCard({
   isMenuOpen?: boolean;
 }) {
   const isGoogle = meeting.platform === "google";
+  const vocab = useVocabulary();
   return (
     <div
       onClick={onViewDetails}
@@ -475,7 +493,7 @@ function NextMeetingCard({
       >
         {isGoogle ? <VideoIcon size={24} /> : <WhatsAppIcon size={24} />}
         <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)]">
-          {isGoogle ? "Entrar na sessão" : "Abrir no WhatsApp"}
+          {isGoogle ? `Entrar na ${vocab.event(1)}` : "Abrir no WhatsApp"}
         </span>
       </a>
     </div>
@@ -553,6 +571,7 @@ export default function Dashboard({
   onToggleNotifications,
 }: DashboardProps) {
   const router = useRouter();
+  const vocab = useVocabulary();
   const todayIso = toISO(new Date());
 
   const [selectedDate, setSelectedDate] = useState(todayIso);
@@ -661,8 +680,8 @@ export default function Dashboard({
 
           <div className="flex w-full items-start justify-between">
             <QuickActionButton icon={<WatchIcon size={24} />} label="Agendar" primary onClick={onSchedule ?? (() => router.push("/sessions/new"))} />
-            <QuickActionButton icon={<AddUserIcon size={24} />} label="Novo cliente" onClick={onNewClient ?? (() => router.push("/clients/new"))} />
-            <QuickActionButton icon={<PeopleIcon size={24} />} label="Clientes" onClick={onClients ?? (() => router.push("/clients"))} />
+            <QuickActionButton icon={<AddUserIcon size={24} />} label={`Novo ${vocab.person(1)}`} onClick={onNewClient ?? (() => router.push("/clients/new"))} />
+            <QuickActionButton icon={<PeopleIcon size={24} />} label={vocab.Person(2)} onClick={onClients ?? (() => router.push("/clients"))} />
             <QuickActionButton
               icon={<EngineIcon size={24} />}
               label="Ajustes"
@@ -686,7 +705,7 @@ export default function Dashboard({
 
           {nextMeeting && selectedDate === todayIso && (
             <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
-              <SectionTitle text="Próxima sessão" />
+              <SectionTitle text={`Próxima ${vocab.event(1)}`} />
               <NextMeetingCard
                 meeting={nextMeeting}
                 onJoinCall={() => onJoinCall?.(nextMeeting.id)}
@@ -703,7 +722,7 @@ export default function Dashboard({
 
           <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
             <div className="flex w-full items-center justify-between">
-              <SectionTitle text="Sessões do dia" />
+              <SectionTitle text={`${vocab.Event(2)} do dia`} />
               <button
                 type="button"
                 onClick={() => setFilterSheetOpen(true)}

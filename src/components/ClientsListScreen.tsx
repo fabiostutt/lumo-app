@@ -5,6 +5,8 @@ import Link from "next/link";
 import { Search, Pencil } from "lucide-react";
 import { PeopleIcon } from "@/components/icons";
 import { maskPhone } from "@/lib/masks";
+import { useVocabulary } from "@/components/VocabularyProvider";
+import { getPersonCountLabel } from "@/lib/vocabulary";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null };
 
@@ -32,6 +34,7 @@ export default function ClientsListScreen({
   clients: ClientOption[];
   returnTo?: string;
 }) {
+  const vocab = useVocabulary();
   const [query, setQuery] = useState("");
 
   const filtered = clients.filter((c) =>
@@ -45,14 +48,14 @@ export default function ClientsListScreen({
         <input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
-          placeholder="Buscar cliente"
+          placeholder={`Buscar ${vocab.person(1)}`}
           className="flex-1 bg-transparent text-[16px] leading-[28px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] outline-none placeholder:text-[color:var(--input-default-content-placeholder,#757575)]"
         />
       </div>
 
       <div className="flex w-full flex-col gap-[var(--section-gap,4px)]">
         <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-strongest,#757575)]">
-          {filtered.length} {filtered.length === 1 ? "cliente cadastrado" : "clientes cadastrados"}
+          {getPersonCountLabel(filtered.length, vocab)}
         </p>
 
         {groupByFirstLetter(filtered).map((group) => (
@@ -76,7 +79,7 @@ export default function ClientsListScreen({
                     <Link
                       href={`/clients/${client.id}/edit`}
                       className="flex size-[40px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] bg-[var(--surface-base,white)]"
-                      aria-label="Editar cliente"
+                      aria-label={`Editar ${vocab.person(1)}`}
                     >
                       <Pencil size={20} strokeWidth={1.75} />
                     </Link>
@@ -97,7 +100,7 @@ export default function ClientsListScreen({
 
         {filtered.length === 0 && (
           <p className="w-full py-8 text-center text-[14px] text-[color:var(--content-strongest,#757575)]">
-            Nenhum cliente encontrado.
+            Nenhum resultado encontrado.
           </p>
         )}
       </div>

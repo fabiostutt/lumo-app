@@ -11,6 +11,8 @@ import {
   updateCalendarEvent,
 } from "@/lib/google/calendar";
 import { findConflicts, formatConflictsMessage } from "@/lib/scheduling";
+import { getOrCreateProfile } from "@/lib/plan";
+import { getVocabulary } from "@/lib/vocabulary";
 
 const APP_TIME_ZONE = "America/Sao_Paulo";
 
@@ -28,6 +30,9 @@ export async function updateSessionAction(
 
   if (!user) throw new Error("Usuário não autenticado");
 
+  const profile = await getOrCreateProfile();
+  const vocab = getVocabulary(profile.area);
+
   const sessionId = String(formData.get("sessionId") || "");
   const clientId = String(formData.get("clientId") || "");
   const date = String(formData.get("date") || "");
@@ -38,7 +43,7 @@ export async function updateSessionAction(
   const durationMinutes = Number(formData.get("duration")) || 50;
 
   if (!sessionId || !clientId || !date || !time) {
-    return { error: "Preencha participante, data e hora" };
+    return { error: `Preencha ${vocab.attendee()}, data e hora` };
   }
 
   const { data: existingSessions } = await supabase
@@ -85,8 +90,8 @@ export async function updateSessionAction(
 
         if (existingEventId) {
           const event = await updateCalendarEvent(accessToken, existingEventId, {
-            summary: `Sessão com ${client!.name}`,
-            description: "Sessão agendada via Lumo.",
+            summary: `${vocab.Event(1)} com ${client!.name}`,
+            description: `${vocab.Event(1)} agendada via Lumo.`,
             startDateTime: start.toISOString(),
             endDateTime: end.toISOString(),
             timeZone: APP_TIME_ZONE,
@@ -96,8 +101,8 @@ export async function updateSessionAction(
         } else {
           const event = await createCalendarEvent({
             accessToken,
-            summary: `Sessão com ${client!.name}`,
-            description: "Sessão agendada via Lumo.",
+            summary: `${vocab.Event(1)} com ${client!.name}`,
+            description: `${vocab.Event(1)} agendada via Lumo.`,
             startDateTime: start.toISOString(),
             endDateTime: end.toISOString(),
             timeZone: APP_TIME_ZONE,

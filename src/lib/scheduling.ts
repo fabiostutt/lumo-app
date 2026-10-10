@@ -149,7 +149,7 @@ export function findConflicts(
         conflicts.push({
           date: existing.date,
           time: existing.time.slice(0, 5),
-          clientName: existing.clients?.name ?? "outro cliente",
+          clientName: existing.clients?.name ?? "outro horário",
         });
       }
     }

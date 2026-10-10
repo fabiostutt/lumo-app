@@ -13,6 +13,7 @@ import SegmentedToggle from "@/components/SegmentedToggle";
 import TextField from "@/components/TextField";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
 import { RECURRENCE_PRESET_LABELS, type RecurrencePreset } from "@/lib/scheduling";
+import { useVocabulary } from "@/components/VocabularyProvider";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null; email?: string | null };
 
@@ -41,6 +42,7 @@ export default function ScheduleSessionForm({
 }: ScheduleSessionFormProps) {
   const isEditing = !!sessionId;
   const pathname = usePathname();
+  const vocab = useVocabulary();
 
   const [state, formAction, pending] = useActionState(
     isEditing ? updateSessionAction : createSessionAction,
@@ -91,7 +93,7 @@ export default function ScheduleSessionForm({
       <div className="flex w-full items-end gap-[var(--spacing-xs,8px)]">
         <div className="flex flex-1 flex-col gap-[var(--input-gap,4px)]">
           <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-            Adicionar participante
+            Adicionar {vocab.attendee()}
           </p>
           <button
             type="button"
@@ -118,7 +120,7 @@ export default function ScheduleSessionForm({
         <Link
           href={`/clients/new?returnTo=${encodeURIComponent(pathname)}`}
           className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]"
-          aria-label="Cadastrar novo cliente"
+          aria-label={`Cadastrar novo ${vocab.person(1)}`}
         >
           <AddUserIcon size={24} className="text-[color:var(--content-base,#212121)]" />
         </Link>
@@ -191,7 +193,7 @@ export default function ScheduleSessionForm({
 
       {platform === "google" && (
         <p className="w-full text-center font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--content-strongest,#757575)]">
-          Ao salvar a sessão, o link será gerado e enviado automaticamente para o e-mail do participante.
+          Ao salvar a {vocab.event(1)}, o link será gerado e enviado automaticamente para o e-mail do {vocab.attendee()}.
         </p>
       )}
 
@@ -235,7 +237,7 @@ export default function ScheduleSessionForm({
               : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
           }`}
         >
-          {pending ? "Salvando..." : isEditing ? "Salvar alterações" : "Salvar sessão"}
+          {pending ? "Salvando..." : isEditing ? "Salvar alterações" : `Salvar ${vocab.event(1)}`}
         </button>
 
         {isEditing && <DeleteSessionButton sessionId={sessionId!} />}

@@ -4,8 +4,10 @@ import { useState, useTransition } from "react";
 import { AppXIcon } from "@/components/icons";
 import { deleteClientAction } from "@/lib/actions/delete-client";
 import BottomSheet from "@/components/BottomSheet";
+import { useVocabulary } from "@/components/VocabularyProvider";
 
 export default function DeleteClientButton({ clientId }: { clientId: string }) {
+  const vocab = useVocabulary();
   const [open, setOpen] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
@@ -23,7 +25,7 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
         if (err && typeof err === "object" && "digest" in err && String(err.digest).startsWith("NEXT_REDIRECT")) {
           throw err;
         }
-        setError(err instanceof Error ? err.message : "Não foi possível excluir o cliente");
+        setError(err instanceof Error ? err.message : `Não foi possível excluir ${vocab.person(1)}`);
       }
     });
   }
@@ -36,7 +38,7 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
         className="flex h-[var(--button-height-large,56px)] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-large,16px)] bg-[var(--button-danger-primary-surface-enabled,#fafafa)] px-[var(--button-padding,16px)]"
       >
         <span className="font-[family-name:var(--typography-label-large-font-family)] font-[var(--typography-label-large-font-weight,500)] text-[length:var(--typography-label-large-font-size,20px)] leading-[var(--typography-label-large-line-height,24px)] tracking-[var(--typography-label-large-letter-spacing,-0.4px)] text-[color:var(--button-danger-primary-content-enabled,#d71d1d)]">
-          Excluir cliente
+          Excluir {vocab.person(1)}
         </span>
       </button>
 
@@ -44,7 +46,7 @@ export default function DeleteClientButton({ clientId }: { clientId: string }) {
         <div className="flex w-full items-start gap-[var(--spacing-md,16px)]">
           <div className="flex flex-1 flex-col items-start">
             <p className="font-[family-name:var(--typography-heading-h4-font-family)] font-[var(--typography-heading-h4-font-weight,600)] text-[length:var(--typography-heading-h4-font-size,16px)] leading-[var(--typography-heading-h4-line-height,24px)] tracking-[var(--typography-heading-h4-letter-spacing,-0.1px)] text-[color:var(--content-base,#212121)]">
-              Excluir cliente?
+              Excluir {vocab.person(1)}?
             </p>
             <p className="font-[family-name:var(--typography-heading-h4-font-family)] font-[var(--typography-heading-h4-font-weight,600)] text-[length:var(--typography-heading-h4-font-size,16px)] leading-[var(--typography-heading-h4-line-height,24px)] tracking-[var(--typography-heading-h4-letter-spacing,-0.1px)] text-[color:var(--content-strongest,#757575)]">
               Esta ação não poderá ser desfeita.

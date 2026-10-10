@@ -4,11 +4,13 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import BottomSheet from "@/components/BottomSheet";
+import { useVocabulary } from "@/components/VocabularyProvider";
 
 // Placeholder simples — o design final desse aviso ainda vai ser desenhado
 // no Figma e este componente será atualizado para bater com ele.
 export default function ClientLimitModal({ returnTo }: { returnTo?: string }) {
   const router = useRouter();
+  const vocab = useVocabulary();
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -24,10 +26,10 @@ export default function ClientLimitModal({ returnTo }: { returnTo?: string }) {
     <BottomSheet open={open} onClose={handleClose}>
       <div className="flex w-full flex-col items-start gap-[var(--spacing-md,16px)]">
         <p className="text-[20px] font-semibold leading-[28px] text-[color:var(--content-base,#212121)]">
-          Limite de clientes atingido
+          Limite de {vocab.person(2)} atingido
         </p>
         <p className="text-[14px] leading-[20px] text-[color:var(--content-strongest,#757575)]">
-          Você atingiu o limite de 5 clientes do plano gratuito. Assine o Lumo Pro para cadastrar clientes ilimitados.
+          Você atingiu o limite de 5 {vocab.person(2)} do plano gratuito. Assine o Lumo Pro para cadastrar {vocab.person(2)} sem limite.
         </p>
         <Link
           href="/pricing"

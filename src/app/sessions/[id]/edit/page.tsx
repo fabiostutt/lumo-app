@@ -3,6 +3,7 @@ import TitleAction from "@/components/TitleAction";
 import { getClientsForOwner } from "@/lib/clients";
 import { getSessionById } from "@/lib/sessions";
 import { notFound } from "next/navigation";
+import { getVocabularyForCurrentUser } from "@/lib/vocabulary-server";
 
 export default async function EditSessionPage({
   params,
@@ -20,9 +21,11 @@ export default async function EditSessionPage({
 
   if (!session) notFound();
 
+  const vocab = await getVocabularyForCurrentUser();
+
   return (
     <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding-base,16px)]">
-      <TitleAction title="Editar sessão" href="/dashboard" />
+      <TitleAction title={`Editar ${vocab.event(1)}`} href="/dashboard" />
       <ScheduleSessionForm
         clients={clients}
         sessionId={session.id}

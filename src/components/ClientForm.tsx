@@ -8,6 +8,7 @@ import { updateClientAction } from "@/lib/actions/update-client";
 import TextField from "@/components/TextField";
 import DeleteClientButton from "@/components/DeleteClientButton";
 import { maskCPF, maskPhone } from "@/lib/masks";
+import { useVocabulary } from "@/components/VocabularyProvider";
 
 type ClientFormProps = {
   clientId?: string;
@@ -27,6 +28,7 @@ export default function ClientForm({
   returnTo,
 }: ClientFormProps) {
   const isEditing = !!clientId;
+  const vocab = useVocabulary();
   const [state, formAction, pending] = useActionState(
     isEditing ? updateClientAction : createClientAction,
     null
@@ -44,7 +46,7 @@ export default function ClientForm({
       {!isEditing && returnTo && <input type="hidden" name="returnTo" value={returnTo} />}
 
       <TextField
-        label="Nome do cliente"
+        label="Nome completo"
         name="name"
         placeholder="Digite o nome"
         icon={<PeopleIcon size={24} />}
@@ -75,13 +77,13 @@ export default function ClientForm({
         icon={<IdIcon size={24} />}
         value={cpf}
         onChange={(v) => setCpf(maskCPF(v))}
-        error={state?.error === "cpf_duplicate" ? "Já existe um cliente com esse CPF" : undefined}
+        error={state?.error === "cpf_duplicate" ? "Esse CPF já está cadastrado." : undefined}
       />
 
       {state?.error === "limit_reached" && (
         <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
           <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-base,#212121)]">
-            Você atingiu o limite de 5 clientes do plano Free.
+            Você atingiu o limite de 5 {vocab.person(2)} do plano Free.
           </p>
           <Link
             href="/pricing"
@@ -105,7 +107,7 @@ export default function ClientForm({
               : "bg-[var(--button-primary-surface-disabled,#eee)] text-[color:var(--button-primary-content-disabled,#9e9e9e)]"
           }`}
         >
-          {pending ? "Salvando..." : isEditing ? "Salvar alterações" : "Salvar cliente"}
+          {pending ? "Salvando..." : isEditing ? "Salvar alterações" : `Salvar ${vocab.person(1)}`}
         </button>
 
         {isEditing && <DeleteClientButton clientId={clientId} />}

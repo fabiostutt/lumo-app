@@ -59,7 +59,7 @@ export async function updateClientAction(
     return { error: error.message };
   }
   if (!data || data.length === 0) {
-    return { error: "Cliente não encontrado" };
+    return { error: "Registro não encontrado." };
   }
 
   revalidatePath("/clients");

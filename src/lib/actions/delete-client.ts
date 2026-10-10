@@ -14,7 +14,7 @@ export async function deleteClientAction(formData: FormData) {
   if (!user) throw new Error("Usuário não autenticado");
 
   const clientId = String(formData.get("clientId") || "");
-  if (!clientId) throw new Error("Cliente inválido");
+  if (!clientId) throw new Error("Registro inválido.");
 
   const { data, error } = await supabase
     .from("clients")
@@ -24,7 +24,7 @@ export async function deleteClientAction(formData: FormData) {
     .select("id");
 
   if (error) throw error;
-  if (!data || data.length === 0) throw new Error("Cliente não encontrado");
+  if (!data || data.length === 0) throw new Error("Registro não encontrado.");
 
   revalidatePath("/clients");
   redirect("/clients");
