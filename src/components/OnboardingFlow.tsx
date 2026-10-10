@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useEffect, useState } from "react";
-import { Plus, GraduationCap, Calendar } from "lucide-react";
+import { Plus, GraduationCap, Calendar, Clock } from "lucide-react";
 import TextField from "@/components/TextField";
 import { AddUserIcon, WatchIcon } from "@/components/icons";
 import { completeOnboardingAction, type CompleteOnboardingState } from "@/lib/actions/complete-onboarding";
@@ -335,7 +335,7 @@ export default function OnboardingFlow() {
 
   return (
     <div className="flex min-h-screen w-full flex-col justify-between gap-[var(--slot-gap-large,40px)] bg-[var(--surface-base,white)] px-[var(--screen-padding-base,16px)] py-[var(--screen-padding-large,24px)]">
-      {step === 1 || step === 2 ? (
+      {step === 1 || step === 2 || step === 3 ? (
         <StepperAndSkip step={step} onSkip={next} />
       ) : (
         <StepTrace step={step} />
@@ -406,25 +406,28 @@ export default function OnboardingFlow() {
 
         {step === 3 && (
           <>
+            <IconBadge>
+              <Clock size={24} className="text-[color:var(--content-base,#212121)]" />
+            </IconBadge>
             <Title
-              title="Qual são os horários que você atende normalmente?"
-              subtitle="Ao agendar uma sessão, vou te indicar quais horários você tem disponíveis."
+              title="Quais horários você atende?"
+              subtitle="Vamos usar como padrão aos exibir teus horários disponíveis."
             />
             <div className="flex w-full gap-[var(--button-stack-gap-horizontal,16px)]">
               <div className="min-w-0 flex-1">
                 <TextField
-                  label="De"
+                  label="De:"
                   name="hoursFrom"
                   type="time"
                   placeholder="HH:MM"
-                  icon={<WatchIcon size={24} />}
+                  icon={<Clock size={24} />}
                   value={hoursFrom}
                   onChange={setHoursFrom}
                 />
               </div>
               <div className="min-w-0 flex-1">
                 <TextField
-                  label="Até"
+                  label="Até:"
                   name="hoursTo"
                   type="time"
                   placeholder="HH:MM"
@@ -479,7 +482,9 @@ export default function OnboardingFlow() {
           }
           onClick={next}
         />
-        {step !== 1 && step !== 2 && <SecondaryButton label="Pular por agora" onClick={next} />}
+        {step !== 1 && step !== 2 && step !== 3 && (
+          <SecondaryButton label="Pular por agora" onClick={next} />
+        )}
       </div>
     </div>
   );
