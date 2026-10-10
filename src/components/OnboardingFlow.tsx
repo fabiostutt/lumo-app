@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useEffect, useState } from "react";
+import { useActionState, useEffect, useState, useTransition } from "react";
 import { Plus, GraduationCap, Calendar, Clock, Hourglass } from "lucide-react";
 import TextField from "@/components/TextField";
 import { AddUserIcon, WatchIcon } from "@/components/icons";
@@ -62,14 +62,23 @@ function StepTrace({ step }: { step: number }) {
 // Linha combinada trace + "Pular" (substitui a trace sozinha + botão
 // secundário no rodapé) — nova etapa de área usa isso; as demais etapas
 // ainda vão migrar pra esse padrão depois.
-function StepperAndSkip({ step, onSkip }: { step: number; onSkip: () => void }) {
+function StepperAndSkip({
+  step,
+  onSkip,
+  disabled,
+}: {
+  step: number;
+  onSkip: () => void;
+  disabled?: boolean;
+}) {
   return (
     <div className="flex w-full items-center gap-[var(--spacing-sm,12px)]">
       <StepTrace step={step} />
       <button
         type="button"
         onClick={onSkip}
-        className="flex h-[40px] shrink-0 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-ghost-surface-enabled,transparent)] px-[var(--button-padding-small,12px)]"
+        disabled={disabled}
+        className="flex h-[40px] shrink-0 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-ghost-surface-enabled,transparent)] px-[var(--button-padding-small,12px)] disabled:opacity-60"
       >
         <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] whitespace-nowrap text-[color:var(--button-ghost-content-enabled,#212121)]">
           Pular
@@ -264,6 +273,36 @@ export default function OnboardingFlow() {
   const areaId = specialty ? AREAS.find((a) => a.label === specialty)?.id ?? "outros" : "";
   const finalDuration = duration === -1 ? Number(customDuration) : duration;
 
+  const [finalSkipPending, startFinalSkip] = useTransition();
+
+  // O "Pular" do header na tela final precisa fazer a mesma coisa que o
+  // botão "Explorar o Lumo primeiro" (concluir com os dados já
+  // preenchidos, sem cadastrar cliente) — mas ele não pode ficar dentro de
+  // nenhum dos dois <form> (não dá pra aninhar form), então dispara a
+  // server action diretamente, igual o DeleteClientButton já faz.
+  function handleFinalSkip() {
+    clearSavedProgress();
+    startFinalSkip(async () => {
+      try {
+        const formData = new FormData();
+        formData.set("specialty", finalSpecialty);
+        formData.set("area", areaId);
+        workDays.forEach((d) => formData.append("workDays", d));
+        formData.set("workHoursFrom", hoursFrom);
+        formData.set("workHoursTo", hoursTo);
+        formData.set("defaultDurationMinutes", finalDuration ? String(finalDuration) : "");
+        formData.set("nextPath", "/dashboard");
+        await completeOnboardingAction(null, formData);
+      } catch (err) {
+        // redirect() na server action lança um erro especial que precisa
+        // continuar subindo pro Next.js navegar — não é uma falha de verdade.
+        if (err && typeof err === "object" && "digest" in err && String(err.digest).startsWith("NEXT_REDIRECT")) {
+          throw err;
+        }
+      }
+    });
+  }
+
   const step1Valid = !!specialty && (specialty !== "Outros" || customSpecialty.trim().length > 0);
   const step2Valid = workDays.length > 0;
   const step3Valid = !!hoursFrom && !!hoursTo;
@@ -274,17 +313,15 @@ export default function OnboardingFlow() {
   if (step === 5) {
     return (
       <div className="flex min-h-screen w-full flex-col justify-between gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] px-[var(--screen-padding-base,16px)] py-[var(--screen-padding-large,24px)]">
-        <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
-          <StepTrace step={TOTAL_STEPS} />
-        </div>
+        <StepperAndSkip step={TOTAL_STEPS} onSkip={handleFinalSkip} disabled={pending || finalSkipPending} />
 
         <div className="flex w-full flex-1 flex-col items-start gap-[var(--section-padding,16px)]">
-          <div className="flex h-[48px] w-[80px] items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]">
+          <IconBadge>
             <AddUserIcon size={24} className="text-[color:var(--content-base,#212121)]" />
-          </div>
+          </IconBadge>
           <Title
-            title="Agora vamos cadastrar teu primeiro cliente"
-            subtitle="Com um cliente cadastrado, você já poderá agendar tua primeira sessão."
+            title="Agora, cadastre seu primeiro cliente."
+            subtitle="Com um cliente cadastrado, você já pode agendar sua primeira sessão."
           />
         </div>
 
@@ -305,7 +342,7 @@ export default function OnboardingFlow() {
           <input type="hidden" name="defaultDurationMinutes" value={finalDuration ? String(finalDuration) : ""} />
           <input type="hidden" name="nextPath" value="/clients/new?returnTo=%2Fdashboard" />
           <PrimaryButton
-            label={pending ? "Cadastrando..." : "Cadastrar"}
+            label={pending ? "Cadastrando..." : "Cadastrar agora"}
             disabled={pending}
             type="submit"
             onClick={clearSavedProgress}
