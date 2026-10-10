@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Plus, GraduationCap } from "lucide-react";
+import { Plus, GraduationCap, Calendar } from "lucide-react";
 import TextField from "@/components/TextField";
 import { AddUserIcon, WatchIcon } from "@/components/icons";
 import { completeOnboardingAction, type CompleteOnboardingState } from "@/lib/actions/complete-onboarding";
@@ -257,7 +257,11 @@ export default function OnboardingFlow() {
 
   return (
     <div className="flex min-h-screen w-full flex-col justify-between gap-[var(--slot-gap-large,40px)] bg-[var(--surface-base,white)] px-[var(--screen-padding-base,16px)] py-[var(--screen-padding-large,24px)]">
-      {step === 1 ? <StepperAndSkip step={step} onSkip={next} /> : <StepTrace step={step} />}
+      {step === 1 || step === 2 ? (
+        <StepperAndSkip step={step} onSkip={next} />
+      ) : (
+        <StepTrace step={step} />
+      )}
 
       <div className="flex w-full flex-1 flex-col gap-[40px]">
         {step === 1 && (
@@ -288,12 +292,15 @@ export default function OnboardingFlow() {
 
         {step === 2 && (
           <>
+            <IconBadge>
+              <Calendar size={24} className="text-[color:var(--content-base,#212121)]" />
+            </IconBadge>
             <Title
-              title="Quais são os dias das tuas sessões?"
-              subtitle="Vou personalizar o teu painel considerando os dias em que tu atua."
+              title="Quando você atende?"
+              subtitle="Vamos usar como padrão na hora de agendar. Você muda quando quiser em Ajustes."
             />
             <div className="flex w-full flex-col items-start gap-[var(--spacing-md,16px)]">
-              <div className="flex w-full flex-wrap items-start gap-[var(--spacing-xs,8px)]">
+              <div className="flex w-full flex-wrap items-start justify-center gap-[var(--spacing-xs,8px)]">
                 {visibleWeekdays.map((d) => (
                   <Pill
                     key={d.code}
@@ -394,7 +401,7 @@ export default function OnboardingFlow() {
           }
           onClick={next}
         />
-        {step !== 1 && <SecondaryButton label="Pular por agora" onClick={next} />}
+        {step !== 1 && step !== 2 && <SecondaryButton label="Pular por agora" onClick={next} />}
       </div>
     </div>
   );
