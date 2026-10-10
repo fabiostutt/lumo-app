@@ -1,11 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
-import { getOrCreateProfile } from "@/lib/plan";
+import { getOrCreateProfile, needsOnboarding } from "@/lib/plan";
 import { NextResponse } from "next/server";
 
 export async function GET(request: Request) {
   const { searchParams, origin } = new URL(request.url);
   const code = searchParams.get("code");
-  const next = searchParams.get("next") ?? "/dashboard";
+  const explicitNext = searchParams.get("next");
 
   if (code) {
     const supabase = await createClient();
@@ -20,10 +20,12 @@ export async function GET(request: Request) {
       const providerAccessToken = data.session?.provider_token;
       const user = data.user;
 
+      // Garante que a linha de profile já existe (trial_ends_at é
+      // obrigatório) antes de gravar os tokens do Google nela, e também pra
+      // poder checar se o onboarding ainda não foi concluído.
+      const profile = user ? await getOrCreateProfile() : null;
+
       if (user && providerRefreshToken) {
-        // Garante que a linha de profile já existe (trial_ends_at é
-        // obrigatório) antes de gravar os tokens do Google nela.
-        await getOrCreateProfile();
         await supabase
           .from("profiles")
           .update({
@@ -33,6 +35,10 @@ export async function GET(request: Request) {
           })
           .eq("id", user.id);
       }
+
+      // Sem ?next explícito, manda pro onboarding se ele ainda não foi
+      // concluído — senão segue pro dashboard como antes.
+      const next = explicitNext ?? (profile && needsOnboarding(profile) ? "/onboarding" : "/dashboard");
 
       return NextResponse.redirect(`${origin}${next}`);
     }

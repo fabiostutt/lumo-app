@@ -14,7 +14,15 @@ export type Profile = {
   specialty: string | null;
   default_duration_minutes: number;
   default_session_type: string;
+  work_days: string[] | null;
+  work_hours_from: string | null;
+  work_hours_to: string | null;
+  onboarding_completed_at: string | null;
 };
+
+export function needsOnboarding(profile: Profile): boolean {
+  return !profile.onboarding_completed_at;
+}
 
 export async function getOrCreateProfile(): Promise<Profile> {
   const supabase = await createClient();
