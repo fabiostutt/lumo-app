@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
+import { useActionState, useEffect, useState } from "react";
 import { Plus, GraduationCap, Calendar } from "lucide-react";
 import TextField from "@/components/TextField";
 import { AddUserIcon, WatchIcon } from "@/components/icons";
@@ -25,6 +25,24 @@ const WEEKDAY_OPTIONS: { code: string; label: string }[] = [
 ];
 
 const DURATION_OPTIONS = [15, 30, 50, 60, 90];
+
+// Progresso salvo no navegador — sem isso, um reload no meio do wizard
+// (antes do submit final, que é a única hora que a gente grava no banco)
+// jogava o usuário de volta pro passo 1, perdendo tudo que já tinha
+// preenchido.
+const STORAGE_KEY = "lumo:onboarding-progress";
+
+type SavedProgress = {
+  step: number;
+  specialty: string | null;
+  customSpecialty: string;
+  weekendExpanded: boolean;
+  workDays: string[];
+  hoursFrom: string;
+  hoursTo: string;
+  duration: number | null;
+  customDuration: string;
+};
 
 function StepTrace({ step }: { step: number }) {
   return (
@@ -184,6 +202,56 @@ export default function OnboardingFlow() {
     null
   );
 
+  // Restaura progresso salvo uma vez, no mount. Roda só no cliente — por
+  // isso via efeito, não no useState inicial (que também executa no
+  // servidor durante o SSR, onde localStorage não existe).
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return;
+      const saved = JSON.parse(raw) as Partial<SavedProgress>;
+      if (typeof saved.step === "number" && saved.step >= 1 && saved.step <= 5) setStep(saved.step);
+      if (typeof saved.specialty === "string") setSpecialty(saved.specialty);
+      if (typeof saved.customSpecialty === "string") setCustomSpecialty(saved.customSpecialty);
+      if (typeof saved.weekendExpanded === "boolean") setWeekendExpanded(saved.weekendExpanded);
+      if (Array.isArray(saved.workDays)) setWorkDays(saved.workDays);
+      if (typeof saved.hoursFrom === "string") setHoursFrom(saved.hoursFrom);
+      if (typeof saved.hoursTo === "string") setHoursTo(saved.hoursTo);
+      if (typeof saved.duration === "number") setDuration(saved.duration);
+      if (typeof saved.customDuration === "string") setCustomDuration(saved.customDuration);
+    } catch {
+      // localStorage indisponível (ex: modo privado) — segue do zero, sem travar
+    }
+  }, []);
+
+  // Salva a cada mudança — cobre reload, fechar/reabrir aba, app em background.
+  useEffect(() => {
+    try {
+      const data: SavedProgress = {
+        step,
+        specialty,
+        customSpecialty,
+        weekendExpanded,
+        workDays,
+        hoursFrom,
+        hoursTo,
+        duration,
+        customDuration,
+      };
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch {
+      // localStorage indisponível — segue sem persistir, sem travar o fluxo
+    }
+  }, [step, specialty, customSpecialty, weekendExpanded, workDays, hoursFrom, hoursTo, duration, customDuration]);
+
+  function clearSavedProgress() {
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+    } catch {
+      // ignora
+    }
+  }
+
   function toggleWorkDay(code: string) {
     setWorkDays((prev) => (prev.includes(code) ? prev.filter((d) => d !== code) : [...prev, code]));
   }
@@ -236,7 +304,12 @@ export default function OnboardingFlow() {
           <input type="hidden" name="workHoursTo" value={hoursTo} />
           <input type="hidden" name="defaultDurationMinutes" value={finalDuration ? String(finalDuration) : ""} />
           <input type="hidden" name="nextPath" value="/clients/new?returnTo=%2Fdashboard" />
-          <PrimaryButton label={pending ? "Cadastrando..." : "Cadastrar"} disabled={pending} type="submit" />
+          <PrimaryButton
+            label={pending ? "Cadastrando..." : "Cadastrar"}
+            disabled={pending}
+            type="submit"
+            onClick={clearSavedProgress}
+          />
         </form>
 
         <form action={formAction} className="flex w-full">
@@ -249,7 +322,12 @@ export default function OnboardingFlow() {
           <input type="hidden" name="workHoursTo" value={hoursTo} />
           <input type="hidden" name="defaultDurationMinutes" value={finalDuration ? String(finalDuration) : ""} />
           <input type="hidden" name="nextPath" value="/dashboard" />
-          <SecondaryButton label="Explorar o Lumo primeiro" type="submit" disabled={pending} />
+          <SecondaryButton
+            label="Explorar o Lumo primeiro"
+            type="submit"
+            disabled={pending}
+            onClick={clearSavedProgress}
+          />
         </form>
       </div>
     );
