@@ -44,14 +44,17 @@ export default function TextField({
   const hasValue = value.trim().length > 0;
   const isError = !!error;
   const isFilled = hasValue && !focused && !isError;
-  // O formato/placeholder nativo do input type="date" segue o idioma do
-  // navegador/SO, não o lang do documento — por isso não dá pra forçar
-  // "dd/mm/aaaa" via lang="pt-BR" ou via placeholder (ambos ignorados pelo
-  // Chrome/Safari pra esse tipo de input). Sobrepomos nosso próprio texto
-  // sempre que o campo está vazio, inclusive com foco — senão o
-  // placeholder nativo (em inglês) reaparece assim que o usuário clica no
-  // campo, antes de escolher uma data.
-  const showDatePlaceholder = type === "date" && !hasValue;
+  // O formato/placeholder nativo dos inputs type="date" e type="time" segue
+  // o idioma do navegador/SO, não o lang do documento nem a prop
+  // `placeholder` (ambos ignorados pelo Chrome/Safari pra esses tipos) — o
+  // type="date" mostra "mm/dd/yyyy" em inglês e o type="time" mostra
+  // "--:--" em vez do nosso "HH:MM". Sobrepomos nosso próprio texto sempre
+  // que o campo está vazio, inclusive com foco — senão o placeholder nativo
+  // reaparece assim que o usuário clica no campo, antes de escolher um
+  // valor.
+  const nativePlaceholderOverride =
+    type === "date" ? "dd/mm/aaaa" : type === "time" ? "HH:MM" : null;
+  const showNativePlaceholderOverride = nativePlaceholderOverride !== null && !hasValue;
 
   const labelColor = disabled
     ? "text-[color:var(--input-disabled-label,#bdbdbd)]"
@@ -127,14 +130,14 @@ export default function TextField({
             }
             placeholder={placeholder}
             className={`w-full bg-transparent font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] outline-none disabled:cursor-not-allowed [&::-webkit-calendar-picker-indicator]:opacity-0 ${
-              showDatePlaceholder ? "text-transparent" : valueColor
+              showNativePlaceholderOverride ? "text-transparent" : valueColor
             } ${placeholderColor}`}
           />
-          {showDatePlaceholder && (
+          {showNativePlaceholderOverride && (
             <span
               className={`pointer-events-none absolute inset-0 flex items-center font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)] text-[color:var(--input-default-content-placeholder,#757575)]`}
             >
-              dd/mm/aaaa
+              {nativePlaceholderOverride}
             </span>
           )}
         </div>
