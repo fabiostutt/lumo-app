@@ -6,7 +6,7 @@ type TextFieldProps = {
   label: string;
   name: string;
   placeholder: string;
-  icon: React.ReactNode;
+  icon?: React.ReactNode;
   type?: string;
   value: string;
   onChange: (value: string) => void;
@@ -99,7 +99,7 @@ export default function TextField({
         onClick={isPickerType ? openPicker : undefined}
         className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid px-[var(--input-padding,16px)] ${surfaceColor} ${borderColor} ${isPickerType && !disabled ? "cursor-pointer" : ""}`}
       >
-        <span className={`shrink-0 ${iconColor}`}>{icon}</span>
+        {icon && <span className={`shrink-0 ${iconColor}`}>{icon}</span>}
         <div className="relative min-w-0 flex-1">
           <input
             ref={inputRef}

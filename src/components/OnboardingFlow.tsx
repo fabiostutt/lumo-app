@@ -82,10 +82,10 @@ function Pill({
     <button
       type="button"
       onClick={onClick}
-      className={`flex h-[50.75px] shrink-0 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-extra-large,120px)] px-[var(--button-padding,16px)] ${
+      className={`flex h-[50.75px] shrink-0 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-extra-large,120px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid px-[var(--button-padding,16px)] ${
         selected
-          ? "bg-[var(--button-primary-surface-enabled,#212121)]"
-          : "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--button-outline-border,#757575)] bg-[var(--button-outline-surface-enabled,#fafafa)]"
+          ? "border-transparent bg-[var(--button-primary-surface-enabled,#212121)]"
+          : "border-[var(--button-outline-border,#757575)] bg-[var(--button-outline-surface-enabled,#fafafa)]"
       }`}
     >
       <span
@@ -279,7 +279,6 @@ export default function OnboardingFlow() {
                 label="Escreva aqui"
                 name="customSpecialty"
                 placeholder="Ex.: Fonoaudiologia"
-                icon={<AddUserIcon size={24} />}
                 value={customSpecialty}
                 onChange={setCustomSpecialty}
               />
