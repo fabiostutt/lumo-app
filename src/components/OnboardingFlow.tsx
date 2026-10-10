@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState, useState } from "react";
-import { Plus } from "lucide-react";
+import { Plus, GraduationCap } from "lucide-react";
 import TextField from "@/components/TextField";
 import { AddUserIcon, WatchIcon } from "@/components/icons";
 import { completeOnboardingAction, type CompleteOnboardingState } from "@/lib/actions/complete-onboarding";
@@ -37,6 +37,34 @@ function StepTrace({ step }: { step: number }) {
           }`}
         />
       ))}
+    </div>
+  );
+}
+
+// Linha combinada trace + "Pular" (substitui a trace sozinha + botão
+// secundário no rodapé) — nova etapa de área usa isso; as demais etapas
+// ainda vão migrar pra esse padrão depois.
+function StepperAndSkip({ step, onSkip }: { step: number; onSkip: () => void }) {
+  return (
+    <div className="flex w-full items-center gap-[var(--spacing-sm,12px)]">
+      <StepTrace step={step} />
+      <button
+        type="button"
+        onClick={onSkip}
+        className="flex h-[40px] shrink-0 items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-small,8px)] bg-[var(--button-ghost-surface-enabled,transparent)] px-[var(--button-padding-small,12px)]"
+      >
+        <span className="font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] whitespace-nowrap text-[color:var(--button-ghost-content-enabled,#212121)]">
+          Pular
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function IconBadge({ children }: { children: React.ReactNode }) {
+  return (
+    <div className="flex size-[48px] shrink-0 items-center justify-center rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)]">
+      {children}
     </div>
   );
 }
@@ -229,14 +257,17 @@ export default function OnboardingFlow() {
 
   return (
     <div className="flex min-h-screen w-full flex-col justify-between gap-[var(--slot-gap-large,40px)] bg-[var(--surface-base,white)] px-[var(--screen-padding-base,16px)] py-[var(--screen-padding-large,24px)]">
-      <StepTrace step={step} />
+      {step === 1 ? <StepperAndSkip step={step} onSkip={next} /> : <StepTrace step={step} />}
 
       <div className="flex w-full flex-1 flex-col gap-[40px]">
         {step === 1 && (
           <>
+            <IconBadge>
+              <GraduationCap size={24} className="text-[color:var(--content-base,#212121)]" />
+            </IconBadge>
             <Title
-              title="Qual é a tua área de atuação?"
-              subtitle="Esta informação é essencial para eu personalizar a tua experiência."
+              title="Qual é a sua profissão?"
+              subtitle="Assim deixamos o Lumo com a cara do seu atendimento."
             />
             <div className="flex w-full flex-wrap items-start gap-[var(--spacing-xs,8px)]">
               {SPECIALTY_OPTIONS.map((opt) => (
@@ -245,7 +276,7 @@ export default function OnboardingFlow() {
             </div>
             {specialty === "Outros" && (
               <TextField
-                label="Qual é a tua profissão?"
+                label="Escreva aqui"
                 name="customSpecialty"
                 placeholder="Ex.: Fonoaudiologia"
                 icon={<AddUserIcon size={24} />}
@@ -364,7 +395,7 @@ export default function OnboardingFlow() {
           }
           onClick={next}
         />
-        <SecondaryButton label="Pular por agora" onClick={next} />
+        {step !== 1 && <SecondaryButton label="Pular por agora" onClick={next} />}
       </div>
     </div>
   );
