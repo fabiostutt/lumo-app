@@ -7,15 +7,9 @@ import { SingleCheckIcon } from "@/components/icons";
 import { useVocabulary } from "@/components/VocabularyProvider";
 import { getPaywallCopy, getChecks, type ProFeature, type ProPaywallMeta } from "@/lib/pro-gate";
 import { track } from "@/lib/track";
+import { formatPrice } from "@/lib/pricing";
 
 type PricingData = { monthly: number; yearly: number; currency: string };
-
-function formatPrice(cents: number, currency: string) {
-  return (cents / 100).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  });
-}
 
 export default function ProPaywallSheet({
   feature,

@@ -16,6 +16,7 @@ import TitleAction from "@/components/TitleAction";
 import TextField from "@/components/TextField";
 import { maskCPF } from "@/lib/masks";
 import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client";
+import { formatPrice } from "@/lib/pricing";
 
 type Plan = "monthly" | "yearly";
 
@@ -25,13 +26,6 @@ const PLAN_LABEL: Record<Plan, { title: string; billing: string }> = {
 };
 
 const stripePromise = loadStripe(process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY!);
-
-function formatPrice(cents: number, currency: string) {
-  return (cents / 100).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  });
-}
 
 // Estilo dos Card Elements (número/validade/CVC) ajustado aos tokens reais do
 // Lumo — cada elemento é só o campo em si, sem chrome da Stripe; o cartão

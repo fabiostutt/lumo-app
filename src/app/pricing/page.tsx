@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Percent } from "lucide-react";
 import { SingleCheckIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
+import { formatPrice, getSavings, formatSavingsLabel } from "@/lib/pricing";
 
 type Plan = "monthly" | "yearly";
 
@@ -21,13 +22,6 @@ const FEATURES = [
   "Agenda sem limite de sessões",
   "Suporte prioritário",
 ];
-
-function formatPrice(cents: number, currency: string) {
-  return (cents / 100).toLocaleString("pt-BR", {
-    style: "currency",
-    currency: currency.toUpperCase(),
-  });
-}
 
 function isInternalPath(path: string | null): path is string {
   return !!path && path.startsWith("/") && !path.startsWith("//");
@@ -63,11 +57,9 @@ function PricingInner() {
 
   const displayedAmount = prices ? (plan === "monthly" ? prices.monthly : prices.yearly) : null;
   const displayedSuffix = plan === "monthly" ? "/mês" : "/ano";
+  const annualMonthlyEquivalent = prices ? prices.yearly / 12 : null;
 
-  const savingsPercent =
-    prices && prices.monthly > 0
-      ? Math.round((1 - prices.yearly / 12 / prices.monthly) * 100)
-      : null;
+  const savingsLabel = prices ? formatSavingsLabel(getSavings(prices.monthly, prices.yearly)) : null;
 
   return (
     <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-subtle,#fafafa)] p-[var(--screen-padding-base,16px)]">
@@ -99,11 +91,11 @@ function PricingInner() {
           </button>
         </div>
 
-        {savingsPercent !== null && savingsPercent > 0 && (
+        {savingsLabel && (
           <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)]">
             <Percent size={16} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
             <span className="font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--feedback-success-strongest,#1b6303)]">
-              Economize {savingsPercent}% no plano anual
+              {savingsLabel}
             </span>
           </div>
         )}
@@ -118,6 +110,12 @@ function PricingInner() {
             {displayedSuffix}
           </p>
         </div>
+
+        {plan === "yearly" && !loadingPrices && annualMonthlyEquivalent != null && prices && (
+          <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+            equivale a {formatPrice(annualMonthlyEquivalent, prices.currency)}/mês
+          </p>
+        )}
       </div>
 
       <div className="relative flex w-full flex-col rounded-[var(--sheet-border-radius-base,32px)] bg-[var(--surface-base,white)]">
