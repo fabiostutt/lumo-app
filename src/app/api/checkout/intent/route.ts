@@ -3,6 +3,7 @@ import { PRICE_IDS } from "@/lib/stripe/prices";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { getOrCreateProfile } from "@/lib/plan";
+import { isTrialActive } from "@/lib/billing";
 import { NextResponse } from "next/server";
 import type Stripe from "stripe";
 
@@ -49,6 +50,15 @@ export async function POST(request: Request) {
 
     await stripe.paymentMethods.attach(paymentMethodId, { customer: customerId });
 
+    // Quem assina com o trial local (profiles.trial_ends_at) ainda vigente só
+    // é cobrado no fim dele — passamos trial_end explicitamente pra
+    // sobrescrever qualquer trial default do Price. Quem assina com o trial
+    // já vencido cai no fluxo normal (cobrança imediata, sem trial_end).
+    const trialActive = isTrialActive(profile.trial_ends_at);
+    const trialEnd = trialActive
+      ? Math.floor(new Date(profile.trial_ends_at).getTime() / 1000)
+      : undefined;
+
     const subscription = await stripe.subscriptions.create({
       customer: customerId,
       items: [{ price: PRICE_IDS[plan as "monthly" | "yearly"] }],
@@ -56,14 +66,15 @@ export async function POST(request: Request) {
       payment_behavior: "default_incomplete",
       expand: ["latest_invoice.confirmation_secret", "pending_setup_intent"],
       metadata: { supabase_user_id: user.id },
+      ...(trialEnd ? { trial_end: trialEnd } : {}),
     });
 
     // Nesta versão da API da Stripe, o Invoice não tem mais campo
     // `payment_intent` — o client_secret vem em `confirmation_secret`
-    // (https://docs.stripe.com/changelog/basil/2025-03-31/...). Quando o
-    // Price tem período de teste, a primeira fatura é de R$ 0,00 e não há
-    // nada a confirmar por essa via — a Stripe cria um SetupIntent em vez
-    // disso, só para guardar o cartão e cobrar depois do trial.
+    // (https://docs.stripe.com/changelog/basil/2025-03-31/...). Com
+    // trial_end (acima), a primeira fatura é de R$ 0,00 e não há nada a
+    // confirmar por essa via — a Stripe cria um SetupIntent em vez disso, só
+    // pra guardar o cartão e cobrar depois do trial.
     const invoice = subscription.latest_invoice as Stripe.Invoice | null;
     const pendingSetupIntent =
       typeof subscription.pending_setup_intent === "object"

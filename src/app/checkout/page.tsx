@@ -17,6 +17,7 @@ import TextField from "@/components/TextField";
 import { maskCPF } from "@/lib/masks";
 import { createClient as createBrowserSupabaseClient } from "@/lib/supabase/client";
 import { formatPrice } from "@/lib/pricing";
+import { formatChargeDate } from "@/lib/billing";
 
 type Plan = "monthly" | "yearly";
 
@@ -42,7 +43,15 @@ const CARD_ELEMENT_STYLE = {
   invalid: { color: "#d71d1d" },
 };
 
-function OrderSummary({ plan, priceLabel }: { plan: Plan; priceLabel: string }) {
+function OrderSummary({
+  plan,
+  priceLabel,
+  firstChargeLabel,
+}: {
+  plan: Plan;
+  priceLabel: string;
+  firstChargeLabel: string;
+}) {
   return (
     <div className="flex w-full items-center overflow-clip rounded-[var(--border-radius-lg,16px)] border border-solid border-[var(--action-primary-subtle,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-md,16px)] text-[color:var(--content-base,#212121)]">
       <div className="flex flex-1 flex-col items-start overflow-clip">
@@ -51,6 +60,9 @@ function OrderSummary({ plan, priceLabel }: { plan: Plan; priceLabel: string }) 
         </p>
         <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)]">
           {PLAN_LABEL[plan].billing}
+        </p>
+        <p className="w-full font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
+          {firstChargeLabel}
         </p>
       </div>
       <p className="whitespace-nowrap font-[family-name:var(--typography-body-large-font-family)] font-[var(--typography-body-large-font-weight,500)] text-[length:var(--typography-body-large-font-size,18px)] leading-[var(--typography-body-large-line-height,24px)] tracking-[var(--typography-body-large-letter-spacing,-0.2px)]">
@@ -140,6 +152,7 @@ function CheckoutFormBody({
   plan,
   email,
   amount,
+  trialStatus,
   errorMsg,
   onError,
   onSuccess,
@@ -147,6 +160,7 @@ function CheckoutFormBody({
   plan: Plan;
   email: string | null;
   amount: { value: number; currency: string };
+  trialStatus: { trialActive: boolean; trialEndsAt: string | null } | null;
   errorMsg: string | null;
   onError: (msg: string | null) => void;
   onSuccess: () => void;
@@ -158,6 +172,10 @@ function CheckoutFormBody({
   const [submitting, setSubmitting] = useState(false);
 
   const priceLabel = formatPrice(amount.value, amount.currency);
+  const firstChargeLabel =
+    trialStatus?.trialActive && trialStatus.trialEndsAt
+      ? `Primeira cobrança em ${formatChargeDate(trialStatus.trialEndsAt)}`
+      : "Primeira cobrança hoje";
 
   async function handleSubmit() {
     const cardNumberElement = elements?.getElement(CardNumberElement);
@@ -216,7 +234,7 @@ function CheckoutFormBody({
 
   return (
     <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
-      <OrderSummary plan={plan} priceLabel={priceLabel} />
+      <OrderSummary plan={plan} priceLabel={priceLabel} firstChargeLabel={firstChargeLabel} />
 
       <div className="flex w-full items-center gap-[var(--spacing-sm,12px)] font-[family-name:var(--typography-body-medium-font-family)] font-[var(--typography-body-medium-font-weight,400)] text-[length:var(--typography-body-medium-font-size,16px)] leading-[var(--typography-body-medium-line-height,28px)] tracking-[var(--typography-body-medium-letter-spacing,-0.2px)]">
         <p className="whitespace-nowrap text-[color:var(--content-strongest,#757575)]">E-mail</p>
@@ -293,10 +311,23 @@ function CheckoutInner() {
   const [amount, setAmount] = useState<{ value: number; currency: string } | null>(null);
   const [loading, setLoading] = useState(true);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [trialStatus, setTrialStatus] = useState<{ trialActive: boolean; trialEndsAt: string | null } | null>(
+    null
+  );
 
   useEffect(() => {
     const supabase = createBrowserSupabaseClient();
     supabase.auth.getUser().then(({ data }) => setEmail(data.user?.email ?? null));
+  }, []);
+
+  useEffect(() => {
+    fetch("/api/billing/trial-status")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.error);
+        setTrialStatus(data);
+      })
+      .catch(() => setTrialStatus(null));
   }, []);
 
   useEffect(() => {
@@ -327,6 +358,7 @@ function CheckoutInner() {
             plan={plan}
             email={email}
             amount={amount}
+            trialStatus={trialStatus}
             errorMsg={errorMsg}
             onError={setErrorMsg}
             onSuccess={() =>

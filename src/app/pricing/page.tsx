@@ -6,6 +6,7 @@ import { Percent } from "lucide-react";
 import { SingleCheckIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
 import { formatPrice, getSavings, formatSavingsLabel } from "@/lib/pricing";
+import { formatChargeDate } from "@/lib/billing";
 
 type Plan = "monthly" | "yearly";
 
@@ -36,6 +37,9 @@ function PricingInner() {
   const [loadingPrices, setLoadingPrices] = useState(true);
   const [submitting, setSubmitting] = useState(false);
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
+  const [trialStatus, setTrialStatus] = useState<{ trialActive: boolean; trialEndsAt: string | null } | null>(
+    null
+  );
 
   useEffect(() => {
     fetch("/api/pricing")
@@ -47,6 +51,21 @@ function PricingInner() {
       .catch(() => setErrorMsg("Não foi possível carregar os preços"))
       .finally(() => setLoadingPrices(false));
   }, []);
+
+  useEffect(() => {
+    fetch("/api/billing/trial-status")
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.error) throw new Error(data.error);
+        setTrialStatus(data);
+      })
+      .catch(() => setTrialStatus(null));
+  }, []);
+
+  const trialCopy =
+    trialStatus?.trialActive && trialStatus.trialEndsAt
+      ? `Primeira cobrança em ${formatChargeDate(trialStatus.trialEndsAt)}. Cancele quando quiser.`
+      : "Cancele quando quiser.";
 
   function handleSubscribe() {
     setSubmitting(true);
@@ -159,7 +178,7 @@ function PricingInner() {
             </button>
 
             <p className="w-full text-center font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--content-strongest,#757575)]">
-              7 dias grátis. Cancele quando quiser.
+              {trialCopy}
             </p>
           </div>
         </div>
