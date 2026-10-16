@@ -13,10 +13,15 @@ import {
 import { findConflicts, formatConflictsMessage } from "@/lib/scheduling";
 import { getOrCreateProfile } from "@/lib/plan";
 import { getVocabulary } from "@/lib/vocabulary";
+import type { CreateSessionState } from "@/lib/actions/create-session";
 
 const APP_TIME_ZONE = "America/Sao_Paulo";
 
-export type UpdateSessionState = { error?: string } | null;
+// Mesmo tipo de estado do create-session — a ação nunca retorna a variante
+// pro_required (recorrência não está disponível ao editar), mas precisa ser
+// o mesmo tipo pra useActionState aceitar as duas ações no mesmo hook em
+// ScheduleSessionForm.tsx.
+export type UpdateSessionState = CreateSessionState;
 
 export async function updateSessionAction(
   _prevState: UpdateSessionState,

@@ -5,7 +5,7 @@ import { useRouter, usePathname } from "next/navigation";
 import BottomSheet from "@/components/BottomSheet";
 import { SingleCheckIcon } from "@/components/icons";
 import { useVocabulary } from "@/components/VocabularyProvider";
-import { getPaywallCopy, getPaywallChecks, type ProFeature, type ProPaywallMeta } from "@/lib/pro-gate";
+import { getPaywallCopy, getChecks, type ProFeature, type ProPaywallMeta } from "@/lib/pro-gate";
 import { track } from "@/lib/track";
 
 type PricingData = { monthly: number; yearly: number; currency: string };
@@ -46,7 +46,7 @@ export default function ProPaywallSheet({
   }, [open, feature]);
 
   const copy = getPaywallCopy(feature, vocab, meta);
-  const checks = getPaywallChecks(feature, vocab);
+  const checks = getChecks(feature, vocab);
 
   function handleCta() {
     track("paywall_cta_clicked", { feature });

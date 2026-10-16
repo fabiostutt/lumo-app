@@ -19,7 +19,10 @@ import { FEATURE_LIVE } from "@/lib/pro-gate";
 
 const APP_TIME_ZONE = "America/Sao_Paulo";
 
-export type CreateSessionState = { error?: string } | null;
+export type CreateSessionState =
+  | { error: string }
+  | { ok: false; code: "pro_required"; feature: "recurrence" }
+  | null;
 
 export async function createSessionAction(
   _prevState: CreateSessionState,
@@ -49,6 +52,17 @@ export async function createSessionAction(
 
   if (!clientId || !date || !time) {
     return { error: `Preencha ${vocab.attendee()}, data e hora` };
+  }
+
+  // Só bloqueia a CRIAÇÃO de uma série nova — não altera a implementação
+  // existente da recorrência, então séries já criadas antes de um downgrade
+  // continuam funcionando normalmente (editáveis/excluíveis).
+  if (
+    FEATURE_LIVE.recurrence &&
+    recurrencePreset !== "none" &&
+    getGateState(profile) === "free"
+  ) {
+    return { ok: false, code: "pro_required", feature: "recurrence" };
   }
 
   const client = await getClientById(clientId);

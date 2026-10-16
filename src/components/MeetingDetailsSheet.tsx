@@ -108,6 +108,18 @@ export default function MeetingDetailsSheet({
     }
     onToggleNotifications?.(meeting.id, !meeting.notificationsOn);
   }
+
+  // "Compartilhar" (enviar os detalhes/link da sessão por WhatsApp) é a
+  // ação nova atrás da flag whatsapp_share — "Abrir no WhatsApp"
+  // (buildWhatsAppReminderUrl, mais abaixo) continua sempre grátis e não
+  // passa por aqui.
+  function handleShareByWhatsApp(e: React.MouseEvent) {
+    if (FEATURE_LIVE.whatsapp_share && gateState === "free") {
+      e.preventDefault();
+      onClose();
+      openPaywall("whatsapp_share");
+    }
+  }
   const hasWhatsAppTarget = !!meeting?.clientWhatsapp;
   const canShareByWhatsApp = !!(meeting?.meetingUrl && hasWhatsAppTarget);
 
@@ -196,6 +208,7 @@ export default function MeetingDetailsSheet({
                   )}
                   target="_blank"
                   rel="noopener noreferrer"
+                  onClick={handleShareByWhatsApp}
                   className="flex h-[48px] w-full items-center justify-center gap-[var(--button-gap,8px)] rounded-[var(--button-border-radius-medium,12px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--button-outline-border,#757575)] bg-[var(--button-outline-surface-enabled,#fafafa)] px-[var(--button-padding,16px)]"
                 >
                   <WhatsAppIcon size={24} className="text-[color:var(--button-outline-content-enabled,#212121)]" />

@@ -1,6 +1,6 @@
 "use client";
 
-import { useActionState, useMemo, useState } from "react";
+import { useActionState, useEffect, useMemo, useState } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { ChevronDown, ChevronRight } from "lucide-react";
@@ -75,6 +75,25 @@ export default function ScheduleSessionForm({
   const [recurrencePreset, setRecurrencePreset] = useState<RecurrencePreset>("none");
   const [recurrenceSheetOpen, setRecurrenceSheetOpen] = useState(false);
 
+  const recurrenceLocked = FEATURE_LIVE.recurrence && gateState === "free";
+
+  // Checagem no cliente é só conveniência (evita abrir o sheet pra nada) —
+  // a de verdade é no servidor, que recusa com pro_required se o preset
+  // vier diferente de "none" pra um Free.
+  function handleOpenRecurrence() {
+    if (recurrenceLocked) {
+      openPaywall("recurrence");
+      return;
+    }
+    setRecurrenceSheetOpen(true);
+  }
+
+  useEffect(() => {
+    if (state && "code" in state && state.code === "pro_required") {
+      openPaywall(state.feature);
+    }
+  }, [state, openPaywall]);
+
   const selectedClient = clients.find((c) => c.id === clientId) ?? null;
 
   const computedLink = useMemo(() => {
@@ -98,7 +117,7 @@ export default function ScheduleSessionForm({
       <input type="hidden" name="platform" value={platform} />
       {!isEditing && <input type="hidden" name="recurrencePreset" value={recurrencePreset} />}
 
-      {state?.error && (
+      {state && "error" in state && state.error && (
         <p className="w-full rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-danger-subtlest,#fbe8e8)] p-[var(--spacing-padding-lg,16px)] text-[14px] text-[color:var(--feedback-danger-strongest,#610d0d)]">
           {state.error}
         </p>
@@ -169,12 +188,19 @@ export default function ScheduleSessionForm({
 
       {!isEditing && (
         <div className="flex w-full flex-col gap-[var(--input-gap,4px)]">
-          <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
-            Recorrência
-          </p>
+          <div className="flex items-center gap-[var(--spacing-xxs,4px)]">
+            <p className="font-[family-name:var(--typography-label-small-font-family)] font-[var(--typography-label-small-font-weight,600)] text-[length:var(--typography-label-small-font-size,16px)] leading-[var(--typography-label-small-line-height,24px)] tracking-[var(--typography-label-small-letter-spacing,0px)] text-[color:var(--content-base,#212121)]">
+              Recorrência
+            </p>
+            {recurrenceLocked && (
+              <span className="rounded-[var(--border-radius-sm,6px)] bg-[var(--surface-strongest,#212121)] px-[var(--spacing-xxs,4px)] py-[1px] text-[10px] font-semibold uppercase tracking-[0.4px] text-[color:var(--content-subtle,white)]">
+                Pro
+              </span>
+            )}
+          </div>
           <button
             type="button"
-            onClick={() => setRecurrenceSheetOpen(true)}
+            onClick={handleOpenRecurrence}
             className={`flex h-[48px] w-full items-center gap-[var(--input-gap-inner,8px)] rounded-[var(--input-border-radius,16px)] border-[length:var(--input-border-width,0.5px)] border-solid bg-[var(--input-default-surface,#fafafa)] px-[var(--input-padding,16px)] ${
               recurrencePreset !== "none"
                 ? "border-[var(--input-filled-border-default,#757575)]"
