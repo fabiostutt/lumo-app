@@ -241,11 +241,13 @@ function HeadProfile({
 }) {
   const vocab = useVocabulary();
   const summary = getDashboardSummary(sessionsToday, vocab);
-  // Destaca só a parte "N {evento}" do resumo, independente de onde ela cai
-  // na frase (varia com a contagem: "0 sessões" vs "1 sessão" vs "N sessões").
-  const countLabel =
-    sessionsToday === 1 ? `1 ${vocab.event(1)}` : `${sessionsToday} ${vocab.event(sessionsToday)}`;
-  const [before, after] = summary.split(countLabel);
+  // Destaca só a parte "N {evento}" do resumo — mas só existe uma contagem
+  // pra destacar quando há sessão; a frase de "zero" ("Você não tem sessões
+  // agendadas para hoje.") não cita número nenhum, então não tenta achar
+  // "0 sessões" nela (o split não encontrava e acabava concatenando os dois
+  // no final da frase).
+  const countLabel = sessionsToday > 0 ? `${sessionsToday} ${vocab.event(sessionsToday)}` : null;
+  const [before, after] = countLabel ? summary.split(countLabel) : [undefined, undefined];
 
   return (
     <div className="flex w-full flex-col items-start">
