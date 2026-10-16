@@ -116,3 +116,11 @@ export function getChecks(feature: ProFeature, vocab: Vocabulary): string[] {
 
   return [...triggerItems, ...restItems].slice(0, MAX_CHECKS).map((item) => item.label);
 }
+
+// Lista completa de benefícios pra página de planos (/pricing) — é material
+// de venda, não a UI de gate: mostra a proposta de valor inteira do Lumo
+// Pro na ordem da lista mestra, sem filtrar por FEATURE_LIVE nem cortar em
+// 4 (diferente de getChecks, usado no sheet de paywall contextual).
+export function getMarketingChecks(vocab: Vocabulary): string[] {
+  return getMasterChecks(vocab).map((item) => item.label);
+}

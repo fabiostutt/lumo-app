@@ -2,11 +2,13 @@
 
 import { Suspense, useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Percent } from "lucide-react";
+import { Gift } from "lucide-react";
 import { SingleCheckIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
 import { formatPrice, getSavings, formatSavingsLabel } from "@/lib/pricing";
 import { formatChargeDate } from "@/lib/billing";
+import { getMarketingChecks } from "@/lib/pro-gate";
+import { useVocabulary } from "@/components/VocabularyProvider";
 
 type Plan = "monthly" | "yearly";
 
@@ -16,14 +18,6 @@ type PricingData = {
   currency: string;
 };
 
-const FEATURES = [
-  "Clientes ilimitados",
-  "Integração com Google Meet",
-  "Alertas e notificações por WhatsApp",
-  "Agenda sem limite de sessões",
-  "Suporte prioritário",
-];
-
 function isInternalPath(path: string | null): path is string {
   return !!path && path.startsWith("/") && !path.startsWith("//");
 }
@@ -31,6 +25,7 @@ function isInternalPath(path: string | null): path is string {
 function PricingInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const vocab = useVocabulary();
   const retorno = searchParams.get("retorno");
   const [plan, setPlan] = useState<Plan>("monthly");
   const [prices, setPrices] = useState<PricingData | null>(null);
@@ -79,17 +74,18 @@ function PricingInner() {
   const annualMonthlyEquivalent = prices ? prices.yearly / 12 : null;
 
   const savingsLabel = prices ? formatSavingsLabel(getSavings(prices.monthly, prices.yearly)) : null;
+  const features = getMarketingChecks(vocab);
 
   return (
     <div className="flex min-h-screen w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-subtle,#fafafa)] p-[var(--screen-padding-base,16px)]">
       <TitleAction title="Benefícios" href="/dashboard" />
 
       <div className="flex w-full flex-col items-center gap-[var(--spacing-xs,8px)]">
-        <div className="flex items-center gap-[var(--spacing-horizontal-sm,8px)] rounded-[var(--border-radius-xl,20px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtle,#bdbdbd)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-xs,4px)]">
+        <div className="flex w-full items-center gap-[var(--spacing-horizontal-sm,8px)] rounded-[var(--border-radius-xxxl,32px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtle,#bdbdbd)] bg-[var(--surface-base,white)] p-[var(--spacing-padding-xs,4px)]">
           <button
             type="button"
             onClick={() => setPlan("monthly")}
-            className={`flex items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
+            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] p-[var(--spacing-md,16px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
               plan === "monthly"
                 ? "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
                 : "text-[color:var(--content-base,#212121)]"
@@ -100,7 +96,7 @@ function PricingInner() {
           <button
             type="button"
             onClick={() => setPlan("yearly")}
-            className={`flex items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] px-[var(--spacing-md,16px)] py-[var(--spacing-xs,8px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
+            className={`flex flex-1 items-center justify-center gap-[var(--spacing-md,16px)] rounded-[var(--border-radius-xxxl,32px)] p-[var(--spacing-md,16px)] font-[family-name:var(--typography-label-medium-font-family)] font-[var(--typography-label-medium-font-weight,600)] text-[length:var(--typography-label-medium-font-size,18px)] leading-[var(--typography-label-medium-line-height,24px)] tracking-[var(--typography-label-medium-letter-spacing,0px)] ${
               plan === "yearly"
                 ? "border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-strongest,#212121)] text-[color:var(--content-subtle,white)]"
                 : "text-[color:var(--content-base,#212121)]"
@@ -112,7 +108,7 @@ function PricingInner() {
 
         {savingsLabel && (
           <div className="flex items-center justify-center gap-[var(--spacing-xxs,4px)] rounded-[var(--border-radius-lg,16px)] bg-[var(--feedback-success-subtlest,#efffe5)] p-[var(--spacing-xxs,4px)]">
-            <Percent size={16} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
+            <Gift size={16} className="text-[color:var(--feedback-success-strongest,#1b6303)]" />
             <span className="font-[family-name:var(--typography-label-x-small-font-family)] font-[var(--typography-label-x-small-font-weight,600)] text-[length:var(--typography-label-x-small-font-size,12px)] leading-[var(--typography-label-x-small-line-height,16px)] tracking-[var(--typography-label-x-small-letter-spacing,0.4px)] text-[color:var(--feedback-success-strongest,#1b6303)]">
               {savingsLabel}
             </span>
@@ -149,7 +145,7 @@ function PricingInner() {
           </div>
 
           <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)]">
-            {FEATURES.map((feature) => (
+            {features.map((feature) => (
               <div key={feature} className="flex w-full items-center gap-[var(--spacing-xs,8px)]">
                 <SingleCheckIcon size={24} className="shrink-0 text-[color:var(--feedback-success-strong,#2b9c04)]" />
                 <p className="flex-1 font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-base,#212121)]">
