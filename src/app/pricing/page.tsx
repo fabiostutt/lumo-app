@@ -5,7 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { Gift } from "lucide-react";
 import { SingleCheckIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
-import { formatPrice, getSavings, formatSavingsLabel } from "@/lib/pricing";
+import { formatPrice, getSavings, formatSavingsLabel, getSavingsAmountCents } from "@/lib/pricing";
 import { formatChargeDate } from "@/lib/billing";
 import { getMarketingChecks } from "@/lib/pro-gate";
 import { useVocabulary } from "@/components/VocabularyProvider";
@@ -71,7 +71,7 @@ function PricingInner() {
 
   const displayedAmount = prices ? (plan === "monthly" ? prices.monthly : prices.yearly) : null;
   const displayedSuffix = plan === "monthly" ? "/mês" : "/ano";
-  const annualMonthlyEquivalent = prices ? prices.yearly / 12 : null;
+  const savingsAmountCents = prices ? getSavingsAmountCents(prices.monthly, prices.yearly) : null;
 
   const savingsLabel = prices ? formatSavingsLabel(getSavings(prices.monthly, prices.yearly)) : null;
   const features = getMarketingChecks(vocab);
@@ -126,9 +126,9 @@ function PricingInner() {
           </p>
         </div>
 
-        {plan === "yearly" && !loadingPrices && annualMonthlyEquivalent != null && prices && (
+        {plan === "yearly" && !loadingPrices && savingsAmountCents != null && prices && (
           <p className="font-[family-name:var(--typography-body-small-font-family)] font-[var(--typography-body-small-font-weight,400)] text-[length:var(--typography-body-small-font-size,14px)] leading-[var(--typography-body-small-line-height,20px)] tracking-[var(--typography-body-small-letter-spacing,-0.2px)] text-[color:var(--content-strongest,#757575)]">
-            equivale a {formatPrice(annualMonthlyEquivalent, prices.currency)}/mês
+            Você está economizando {formatPrice(savingsAmountCents, prices.currency)}
           </p>
         )}
       </div>

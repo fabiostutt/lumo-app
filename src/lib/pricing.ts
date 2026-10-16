@@ -39,3 +39,10 @@ export function formatSavingsLabel(savings: Savings): string | null {
   }
   return `Economize ${savings.percent}% no plano anual`;
 }
+
+// Quanto o plano anual economiza em relação a pagar o mensal 12x (em
+// centavos) — null se o anual não for mais barato.
+export function getSavingsAmountCents(monthlyCents: number, annualCents: number): number | null {
+  const amount = monthlyCents * 12 - annualCents;
+  return amount > 0 ? amount : null;
+}
