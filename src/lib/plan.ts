@@ -75,3 +75,17 @@ export function getEffectivePlan(profile: Profile): "pro" | "free" {
   }
   return "free";
 }
+
+export type GateState = "pro" | "free" | "payment_issue";
+
+// Estado do gate pro paywall — "payment_issue" é um caso à parte de "free":
+// a assinatura existiu mas está com problema de cobrança (past_due/unpaid),
+// então não deve mostrar o paywall genérico (ele sugeriria assinar de novo).
+// TODO: construir o componente dedicado de "problema de pagamento" com
+// cobrança (fora do escopo deste paywall) e passar a usar esse estado aqui.
+export function getGateState(profile: Profile): GateState {
+  if (profile.subscription_status === "past_due" || profile.subscription_status === "unpaid") {
+    return "payment_issue";
+  }
+  return getEffectivePlan(profile);
+}

@@ -3,8 +3,12 @@
 import { createClient } from "@/lib/supabase/server";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
+import type { CreateClientState } from "@/lib/actions/create-client";
 
-export type UpdateClientState = { error?: string } | null;
+// Mesmo tipo de estado do create-client — a ação nunca retorna a variante
+// pro_required, mas precisa ser o mesmo tipo pra useActionState aceitar as
+// duas ações no mesmo hook em ClientForm.tsx.
+export type UpdateClientState = CreateClientState;
 
 export async function updateClientAction(
   _prevState: UpdateClientState,

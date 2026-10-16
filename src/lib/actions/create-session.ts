@@ -13,8 +13,9 @@ import {
   RECURRENCE_PRESET_LABELS,
   type RecurrencePreset,
 } from "@/lib/scheduling";
-import { getOrCreateProfile } from "@/lib/plan";
+import { getOrCreateProfile, getGateState } from "@/lib/plan";
 import { getVocabulary } from "@/lib/vocabulary";
+import { FEATURE_LIVE } from "@/lib/pro-gate";
 
 const APP_TIME_ZONE = "America/Sao_Paulo";
 
@@ -76,6 +77,10 @@ export async function createSessionAction(
 
   const timeHHMM = time.slice(0, 5);
 
+  // TODO(pro-gate): quando FEATURE_LIVE.google_calendar virar true, checar
+  // getGateState(profile) aqui antes de gerar o evento automático — plano
+  // Free continua podendo escolher "Google" como plataforma e colar o link
+  // manualmente, só a geração automática fica atrás do gate.
   // Um evento no Google Calendar por ocorrência, criados em paralelo — em
   // série, uma recorrência de 12 sessões facilmente estouraria o timeout da
   // função serverless.
@@ -139,9 +144,24 @@ export async function createSessionAction(
 
   const firstOccurrence = inserted?.find((row) => row.date === date);
 
+  // Gatilho pronto pra quando a automação de WhatsApp sair da flag: a
+  // checagem de plano tem que acontecer NO ENVIO (não na criação da sessão)
+  // pra que sessões criadas durante um trial parem de mandar mensagem se o
+  // profissional cair pra Free depois, sem precisar alterar a linha já
+  // gravada. Hoje FEATURE_LIVE.whatsapp_automation é false, então
+  // `canSendWhatsappAutomation` é sempre true e nada muda.
+  const canSendWhatsappAutomation =
+    !FEATURE_LIVE.whatsapp_automation || getGateState(profile) !== "free";
+
   // Confirmação por WhatsApp só na primeira ocorrência — mandar N mensagens
   // de uma vez pro mesmo cliente na criação de uma série seria spam.
-  if (notificationsEnabled && platform === "whatsapp" && client?.whatsapp && firstOccurrence) {
+  if (
+    canSendWhatsappAutomation &&
+    notificationsEnabled &&
+    platform === "whatsapp" &&
+    client?.whatsapp &&
+    firstOccurrence
+  ) {
     const [, month, day] = date.split("-");
     try {
       await sendSessionConfirmationMessage({

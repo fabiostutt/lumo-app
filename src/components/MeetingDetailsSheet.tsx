@@ -6,6 +6,8 @@ import { AppXIcon, WhatsAppIcon, VideoIcon, CircleCheckIcon, CancelIcon } from "
 import BottomSheet from "@/components/BottomSheet";
 import { buildWhatsAppShareUrl, buildWhatsAppReminderUrl } from "@/lib/whatsapp-links";
 import { useVocabulary } from "@/components/VocabularyProvider";
+import { useProGate } from "@/components/ProGateProvider";
+import { FEATURE_LIVE } from "@/lib/pro-gate";
 
 export type SessionStatus = "pendente" | "confirmada" | "cancelada";
 
@@ -86,10 +88,26 @@ export default function MeetingDetailsSheet({
   onStatusChange,
 }: MeetingDetailsSheetProps) {
   const vocab = useVocabulary();
+  const { gateState, openPaywall } = useProGate();
   const isFilled = !!meeting?.meetingUrl;
   const meetingId = meeting?.id;
   const meetingStatus = meeting?.status;
   const isGoogle = meeting?.platform === "google";
+
+  // Gatilho pronto pra quando a automação de WhatsApp sair da flag — hoje
+  // FEATURE_LIVE.whatsapp_automation é false, então este bloco nunca executa
+  // e o toggle continua se comportando exatamente como antes.
+  function handleToggleNotifications() {
+    if (!meeting) return;
+    if (FEATURE_LIVE.whatsapp_automation && gateState === "free") {
+      // Fecha este sheet antes de abrir o paywall (nunca dois sheets
+      // abertos ao mesmo tempo).
+      onClose();
+      openPaywall("whatsapp_automation");
+      return;
+    }
+    onToggleNotifications?.(meeting.id, !meeting.notificationsOn);
+  }
   const hasWhatsAppTarget = !!meeting?.clientWhatsapp;
   const canShareByWhatsApp = !!(meeting?.meetingUrl && hasWhatsAppTarget);
 
@@ -203,7 +221,7 @@ export default function MeetingDetailsSheet({
                 type="button"
                 role="switch"
                 aria-checked={meeting.notificationsOn}
-                onClick={() => onToggleNotifications?.(meeting.id, !meeting.notificationsOn)}
+                onClick={handleToggleNotifications}
                 className={`flex shrink-0 flex-col items-center rounded-[var(--border-radius-10,10px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-base,#757575)] px-[var(--spacing-xxxs,2px)] transition-all ${
                   meeting.notificationsOn
                     ? "bg-[var(--surface-strongest,#212121)] pt-[var(--spacing-xxxs,2px)] pb-[var(--spacing-md,16px)]"

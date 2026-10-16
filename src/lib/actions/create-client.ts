@@ -5,7 +5,10 @@ import { redirect } from "next/navigation";
 import { getOrCreateProfile, hasActiveSubscription, FREE_CLIENT_LIMIT } from "@/lib/plan";
 import { revalidatePath } from "next/cache";
 
-export type CreateClientState = { error?: string } | null;
+export type CreateClientState =
+  | { error: string }
+  | { ok: false; code: "pro_required"; feature: "client_limit"; meta: { count: number } }
+  | null;
 
 export async function createClientAction(
   _prevState: CreateClientState,
@@ -53,7 +56,7 @@ export async function createClientAction(
       .eq("owner_id", user.id);
 
     if ((count ?? 0) >= FREE_CLIENT_LIMIT) {
-      return { error: "limit_reached" };
+      return { ok: false, code: "pro_required", feature: "client_limit", meta: { count: count ?? 0 } };
     }
   }
 

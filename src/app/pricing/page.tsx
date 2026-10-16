@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { Suspense, useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Percent } from "lucide-react";
 import { SingleCheckIcon } from "@/components/icons";
 import TitleAction from "@/components/TitleAction";
@@ -29,8 +29,14 @@ function formatPrice(cents: number, currency: string) {
   });
 }
 
-export default function PricingPage() {
+function isInternalPath(path: string | null): path is string {
+  return !!path && path.startsWith("/") && !path.startsWith("//");
+}
+
+function PricingInner() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const retorno = searchParams.get("retorno");
   const [plan, setPlan] = useState<Plan>("monthly");
   const [prices, setPrices] = useState<PricingData | null>(null);
   const [loadingPrices, setLoadingPrices] = useState(true);
@@ -50,7 +56,9 @@ export default function PricingPage() {
 
   function handleSubscribe() {
     setSubmitting(true);
-    router.push(`/checkout?plan=${plan}`);
+    const params = new URLSearchParams({ plan });
+    if (isInternalPath(retorno)) params.set("retorno", retorno);
+    router.push(`/checkout?${params.toString()}`);
   }
 
   const displayedAmount = prices ? (plan === "monthly" ? prices.monthly : prices.yearly) : null;
@@ -159,5 +167,13 @@ export default function PricingPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function PricingPage() {
+  return (
+    <Suspense fallback={null}>
+      <PricingInner />
+    </Suspense>
   );
 }

@@ -1,8 +1,7 @@
-import ClientForm from "@/components/ClientForm";
-import ClientLimitModal from "@/components/ClientLimitModal";
+import ClientFormWithGate from "@/components/ClientFormWithGate";
 import TitleAction from "@/components/TitleAction";
 import { createClient } from "@/lib/supabase/server";
-import { getOrCreateProfile, hasActiveSubscription, FREE_CLIENT_LIMIT } from "@/lib/plan";
+import { getOrCreateProfile, getGateState, FREE_CLIENT_LIMIT } from "@/lib/plan";
 import { getVocabularyForCurrentUser } from "@/lib/vocabulary-server";
 
 export default async function NewClientPage({
@@ -18,18 +17,19 @@ export default async function NewClientPage({
   } = await supabase.auth.getUser();
 
   let blocked = false;
+  let count = 0;
 
   if (user) {
     const profile = await getOrCreateProfile();
 
-    // O trial local não isenta do limite — só assinatura Stripe ativa/trialing.
-    if (!hasActiveSubscription(profile)) {
-      const { count } = await supabase
+    if (getGateState(profile) === "free") {
+      const { count: clientCount } = await supabase
         .from("clients")
         .select("id", { count: "exact", head: true })
         .eq("owner_id", user.id);
 
-      blocked = (count ?? 0) >= FREE_CLIENT_LIMIT;
+      count = clientCount ?? 0;
+      blocked = count >= FREE_CLIENT_LIMIT;
     }
   }
 
@@ -39,7 +39,7 @@ export default async function NewClientPage({
     <div className="flex w-full flex-col gap-[var(--slot-gap-base,24px)] bg-[var(--surface-base,white)] p-[var(--screen-padding-base,16px)]">
       <TitleAction title={`Cadastrar ${vocab.person(1)}`} href={returnTo || "/dashboard"} />
 
-      {blocked ? <ClientLimitModal returnTo={returnTo} /> : <ClientForm returnTo={returnTo} />}
+      <ClientFormWithGate returnTo={returnTo} openOnMount={blocked} clientCount={count} />
     </div>
   );
 }

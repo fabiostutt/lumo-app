@@ -285,10 +285,15 @@ function CheckoutFormBody({
   );
 }
 
+function isInternalPath(path: string | null): path is string {
+  return !!path && path.startsWith("/") && !path.startsWith("//");
+}
+
 function CheckoutInner() {
   const searchParams = useSearchParams();
   const router = useRouter();
   const plan: Plan = searchParams.get("plan") === "yearly" ? "yearly" : "monthly";
+  const retorno = searchParams.get("retorno");
 
   const [email, setEmail] = useState<string | null>(null);
   const [amount, setAmount] = useState<{ value: number; currency: string } | null>(null);
@@ -330,7 +335,11 @@ function CheckoutInner() {
             amount={amount}
             errorMsg={errorMsg}
             onError={setErrorMsg}
-            onSuccess={() => router.push("/success")}
+            onSuccess={() =>
+              router.push(
+                isInternalPath(retorno) ? `/success?retorno=${encodeURIComponent(retorno)}` : "/success"
+              )
+            }
           />
         </Elements>
       )}

@@ -1,7 +1,6 @@
 "use client";
 
-import { useActionState, useState } from "react";
-import Link from "next/link";
+import { useActionState, useEffect, useState } from "react";
 import { PeopleIcon, WhatsAppIcon, MailIcon, IdIcon } from "@/components/icons";
 import { createClientAction } from "@/lib/actions/create-client";
 import { updateClientAction } from "@/lib/actions/update-client";
@@ -9,6 +8,7 @@ import TextField from "@/components/TextField";
 import DeleteClientButton from "@/components/DeleteClientButton";
 import { maskCPF, maskPhone } from "@/lib/masks";
 import { useVocabulary } from "@/components/VocabularyProvider";
+import { useProGate } from "@/components/ProGateProvider";
 
 type ClientFormProps = {
   clientId?: string;
@@ -29,6 +29,7 @@ export default function ClientForm({
 }: ClientFormProps) {
   const isEditing = !!clientId;
   const vocab = useVocabulary();
+  const { openPaywall } = useProGate();
   const [state, formAction, pending] = useActionState(
     isEditing ? updateClientAction : createClientAction,
     null
@@ -39,6 +40,12 @@ export default function ClientForm({
   const [cpf, setCpf] = useState(maskCPF(initialCpf ?? ""));
 
   const isValid = name.trim().length > 0;
+
+  useEffect(() => {
+    if (state && "code" in state && state.code === "pro_required") {
+      openPaywall(state.feature, state.meta);
+    }
+  }, [state, openPaywall]);
 
   return (
     <form action={formAction} className="flex w-full flex-col gap-[var(--slot-gap-base,24px)]">
@@ -77,23 +84,10 @@ export default function ClientForm({
         icon={<IdIcon size={24} />}
         value={cpf}
         onChange={(v) => setCpf(maskCPF(v))}
-        error={state?.error === "cpf_duplicate" ? "Esse CPF já está cadastrado." : undefined}
+        error={state && "error" in state && state.error === "cpf_duplicate" ? "Esse CPF já está cadastrado." : undefined}
       />
 
-      {state?.error === "limit_reached" && (
-        <div className="flex w-full flex-col items-start gap-[var(--spacing-xs,8px)] rounded-[var(--border-radius-lg,16px)] border-[length:var(--border-width-xxs,1px)] border-solid border-[var(--border-subtlest,#eee)] bg-[var(--surface-subtle,#fafafa)] p-[var(--spacing-padding-lg,16px)]">
-          <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[color:var(--content-base,#212121)]">
-            Você atingiu o limite de 5 {vocab.person(2)} do plano Free.
-          </p>
-          <Link
-            href="/pricing"
-            className="text-[14px] font-semibold leading-[24px] tracking-[-0.2px] text-[color:var(--content-base,#212121)] underline"
-          >
-            Ver planos
-          </Link>
-        </div>
-      )}
-      {state?.error && state.error !== "limit_reached" && state.error !== "cpf_duplicate" && (
+      {state && "error" in state && state.error && state.error !== "cpf_duplicate" && (
         <p className="text-[14px] leading-[24px] tracking-[-0.2px] text-[#d71d1d]">{state.error}</p>
       )}
 

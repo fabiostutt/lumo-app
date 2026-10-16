@@ -14,6 +14,8 @@ import TextField from "@/components/TextField";
 import DeleteSessionButton from "@/components/DeleteSessionButton";
 import { RECURRENCE_PRESET_LABELS, type RecurrencePreset } from "@/lib/scheduling";
 import { useVocabulary } from "@/components/VocabularyProvider";
+import { useProGate } from "@/components/ProGateProvider";
+import { FEATURE_LIVE } from "@/lib/pro-gate";
 
 type ClientOption = { id: string; name: string; whatsapp: string | null; email?: string | null };
 
@@ -58,6 +60,18 @@ export default function ScheduleSessionForm({
   const duration = String(initialDurationMinutes ?? 50);
   const [platform, setPlatform] = useState<"whatsapp" | "google">(initialPlatform ?? "whatsapp");
   const [notificationsOn, setNotificationsOn] = useState(initialNotificationsOn ?? true);
+  const { gateState, openPaywall } = useProGate();
+
+  // Gatilho pronto pra quando a automação de WhatsApp sair da flag — hoje
+  // FEATURE_LIVE.whatsapp_automation é false, então este bloco nunca executa
+  // e o toggle continua se comportando exatamente como antes.
+  function handleToggleNotifications() {
+    if (FEATURE_LIVE.whatsapp_automation && gateState === "free") {
+      openPaywall("whatsapp_automation");
+      return;
+    }
+    setNotificationsOn((v) => !v);
+  }
   const [recurrencePreset, setRecurrencePreset] = useState<RecurrencePreset>("none");
   const [recurrenceSheetOpen, setRecurrenceSheetOpen] = useState(false);
 
@@ -211,7 +225,7 @@ export default function ScheduleSessionForm({
             type="button"
             role="switch"
             aria-checked={notificationsOn}
-            onClick={() => setNotificationsOn((v) => !v)}
+            onClick={handleToggleNotifications}
             className={`flex shrink-0 flex-col items-center rounded-[var(--border-radius-10,10px)] border-[length:var(--border-width-xxxs,0.5px)] border-solid border-[var(--border-base,#757575)] px-[var(--spacing-xxxs,2px)] transition-all ${
               notificationsOn
                 ? "bg-[var(--surface-strongest,#212121)] pt-[var(--spacing-xxxs,2px)] pb-[var(--spacing-md,16px)]"
